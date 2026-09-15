@@ -1,9 +1,10 @@
 // ==UserScript==
 // @name         小黑盒深色模式
 // @namespace    xiaoheihe-dark-mode
-// @version      0.3.2
+// @version      0.3.3
 // @author       油猴脚本-小黑盒页面优化
 // @description  为小黑盒网页版（xiaoheihe.cn）提供深色模式：按角色重映射站点 CSS 规则，覆盖伪元素与交互态，可一键切换并记住偏好。
+// @license      MIT
 // @icon         https://cdn.max-c.com/heybox/logo/app_251.png
 // @homepageURL  https://github.com/a285292107s/xiaoheihe-dark-mode
 // @downloadURL  https://raw.githubusercontent.com/a285292107s/xiaoheihe-dark-mode/main/dist/xiaoheihe-dark-mode.user.js
