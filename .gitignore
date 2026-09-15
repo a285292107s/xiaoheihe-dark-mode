@@ -54,3 +54,5 @@ research/js/
 #   research/css-detail/  详情页额外分片（research/fetch-detail-css.mjs）
 #   fixtures/             真实页面 DOM 快照
 
+# 会话技能目录（工具生成，非项目内容）
+.agents/
