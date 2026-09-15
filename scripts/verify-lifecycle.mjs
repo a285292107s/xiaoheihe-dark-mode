@@ -23,6 +23,10 @@
  *
  *   场景四  url() 保护：COLOR_TOKEN 里的裸颜色名会命中 url() 路径
  *           （`icon_white.png`）与 SVG 引用（`#fade`）。
+ *
+ *   场景五  后台标签页与状态出口：后台定时器会被压到 1s 甚至 1/min，防抖重建可能
+ *           长时间不跑，所以回前台必须补一次对账；`html[data-hb-engine]` 是给 CSS
+ *           与验收脚本读的「引擎是否已完成映射」的单一出口。
  */
 import { createRequire } from 'node:module';
 import http from 'node:http';
@@ -249,6 +253,80 @@ console.log('\n===== 场景四：url() 内容逐字节保留 =====');
   check('url(#fade) 未被改写', out.u2.img.includes('#fade') && !out.u2.img.includes('rgb('), out.u2.img);
   check('同一样式表里的颜色仍被改写（防空跑）', out.u3.bg === 'rgb(38, 44, 51)', out.u3.bg);
   check('border-image 里的 url 未被改写', out.u4.bi.includes('red-black.svg') && !out.u4.bi.includes('rgb('), out.u4.bi);
+  check('无 JS 报错', errors.length === 0, errors.join(' | '));
+  await context.close();
+}
+
+// ---------- 场景五：回前台补一次对账 + 引擎状态出口 ----------
+console.log('\n===== 场景五：后台变更的回前台对账与引擎状态出口 =====');
+{
+  const s = await server((_req, res) => {
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    res.end('<!doctype html><html lang="zh-CN">' + HEAD_PART);
+  });
+  servers.push(s);
+  const { context, page, errors } = await newPage({ origin: `http://127.0.0.1:${s.address().port}/` });
+
+  // 越过全部里程碑，之后没有任何待跑的构建
+  await page.waitForTimeout(4000);
+
+  const state = await page.evaluate(() => document.documentElement.dataset.hbEngine);
+  check('映射完成后 html[data-hb-engine] 为 ready（防空跑：状态出口真的写上了）', state === 'ready', `attr=${state}`);
+
+  // 先把一张表挂进 head（这条路径有即时重建），确认它能被映射 —— 作为对照基线
+  const inserted = await page.evaluate(() => {
+    const st = document.createElement('style');
+    st.id = 'hb-probe-sheet';
+    st.textContent = '#hb-probe{background-color:#ffffff}';
+    document.head.appendChild(st);
+    return true;
+  });
+  await page.waitForTimeout(400);
+  const probeMapped = await page.evaluate(() => {
+    const st = document.getElementById('hb-probe-sheet');
+    const sheet = [...document.styleSheets].find((x) => x.ownerNode === st);
+    return sheet.cssRules[0].style.getPropertyValue('background-color');
+  });
+  check('head 里新挂的样式表被映射（防空跑）', inserted && probeMapped === 'rgb(38, 44, 51)', `bg=${probeMapped}`);
+
+  // 在既有样式表里 insertRule：不产生任何节点变更，两个观察器都看不见 ——
+  // 这是已知边界（本站实测 0 次调用），正是「回前台对账」要兜的形状
+  const runtimeRule = await page.evaluate(() => {
+    const st = document.getElementById('hb-probe-sheet');
+    const sheet = [...document.styleSheets].find((x) => x.ownerNode === st);
+    sheet.insertRule('#hb-runtime{background-color:#ffffff}', sheet.cssRules.length);
+    return sheet.cssRules[sheet.cssRules.length - 1].style.getPropertyValue('background-color');
+  });
+  await page.waitForTimeout(400);
+  const stillLight = await page.evaluate(() => {
+    const st = document.getElementById('hb-probe-sheet');
+    const sheet = [...document.styleSheets].find((x) => x.ownerNode === st);
+    return sheet.cssRules[sheet.cssRules.length - 1].style.getPropertyValue('background-color');
+  });
+  check('运行时 insertRule 的规则没有任何触发路径能看见（边界，非本次修复目标）',
+    runtimeRule !== 'rgb(38, 44, 51)' && stillLight === runtimeRule, `${runtimeRule} -> ${stillLight}`);
+
+  // 回前台：补一次对账，把它映射掉
+  await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
+  await page.waitForTimeout(400);
+  const afterVisible = await page.evaluate(() => {
+    const st = document.getElementById('hb-probe-sheet');
+    const sheet = [...document.styleSheets].find((x) => x.ownerNode === st);
+    return sheet.cssRules[sheet.cssRules.length - 1].style.getPropertyValue('background-color');
+  });
+  check('回到前台后补上一次对账（运行时规则被映射）', afterVisible === 'rgb(38, 44, 51)', `bg=${afterVisible}`);
+
+  // 状态出口随开关走：关闭时撤掉，再开启后重新写上
+  const off = await page.evaluate(() => {
+    window.__hbSetDark(false);
+    return document.documentElement.dataset.hbEngine ?? null;
+  });
+  const on = await page.evaluate(() => {
+    window.__hbSetDark(true);
+    return document.documentElement.dataset.hbEngine ?? null;
+  });
+  check('关闭深色时状态出口被撤掉', off === null, `attr=${off}`);
+  check('再次开启后状态出口恢复为 ready', on === 'ready', `attr=${on}`);
   check('无 JS 报错', errors.length === 0, errors.join(' | '));
   await context.close();
 }

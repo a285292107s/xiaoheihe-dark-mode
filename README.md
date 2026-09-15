@@ -5,7 +5,7 @@
 因此**伪元素、`:hover`/`:focus` 等交互态、`@keyframes`、JS 写入的内联颜色都能覆盖到**。
 
 ```
-产物     30.2 KB（gzip 9.2 KB），无运行时依赖
+产物     30.7 KB（gzip 9.4 KB），无运行时依赖
 开销     一次遍历 4700~5500 条规则约 20~35ms（实测）；元素级只处理「确实带内联颜色」的那约 20 个元素
 例外     1106 字节（人工审计的例外层，其余全部就地改写站点声明）
 ```
@@ -38,6 +38,13 @@ https://raw.githubusercontent.com/a285292107s/xiaoheihe-dark-mode/main/dist/xiao
   | `__hbEngineStats()` | 本次构建：读取样式表数、扫描规则数、改动规则数、改动声明数、关键帧数、跟踪集大小、错误数 |
   | `__hbEngineCss()` | 例外层字节数 + 最近一次构建中被改写的前若干条声明 |
   | `__hbRebuild()` | 强制重建（换路由后样式没跟上时可用） |
+
+- 页面上的两个状态出口（CSS 与验收脚本都读它们，不必问引擎内部状态）：
+
+  | 标记 | 含义 |
+  |---|---|
+  | `html.hb-dark` | 深色是否已开启 |
+  | `html[data-hb-engine="ready"]` | 已完成至少一次规则映射；**缺这个属性**表示「已开启但站点样式还没被映射」 |
 
 ## 为什么不是简单反色
 
@@ -90,7 +97,7 @@ npm run verify:all   # 构建 + 全部验收（推荐）
 | `npm run verify:canvas` | 离线：整屏底色层「首轮构建 == 强制重建」（含阴性对照） | 4 判据 |
 | `npm run verify:flash` | 离线：换路由白闪（JS 写内联白底的加载幕、新 CSS 分片，各含阴性对照） | 8 判据 |
 | `npm run verify:ui` | 切换按钮全部行为：Shadow DOM 隔离、初始态、记忆、图标/aria 同步、双色焦点环、冷淡扁平材质、reduced-motion | 55 |
-| `npm run verify:lifecycle` | `<head>` 启动竞态、内联写循环、跟踪集约束、`url()` 保护 | 16 |
+| `npm run verify:lifecycle` | `<head>` 启动竞态、内联写循环、跟踪集约束、`url()` 保护、回前台对账与引擎状态出口 | 23 |
 | `npm run verify:preview` | 预览壳双向切换与自身样式隔离 | 9 |
 | `npm run verify:idempotent` | 反复重建 6 轮的渲染指纹、例外层字节、伪元素底色层「首轮 == 重建」 | 6 轮 |
 | `npm run verify:cascade` | hover 层叠顺序（含阴性对照，证明判据有判别力） | 4 判据 |

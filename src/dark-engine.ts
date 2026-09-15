@@ -44,6 +44,24 @@
 /** 加在 <html> 上的类名 */
 export const ROOT_CLASS = 'hb-dark';
 
+/**
+ * 引擎状态出口：`html[data-hb-engine="ready"]`。
+ *
+ * 语义只有一条：**已完成至少一次规则映射**（当前在册的样式表都已被改写）。
+ * 缺这个属性同样是有意义的读数：`html.hb-dark:not([data-hb-engine])` 就是
+ * 「深色已开启、站点样式尚未被映射」的那段时间窗 —— CSS 与验收脚本都能直接读它，
+ * 不必去问引擎内部状态（与 README 里 `html.hb-dark` 同一套路）。
+ */
+const ENGINE_STATE_ATTR = 'hbEngine';
+
+function markEngineReady(): void {
+  document.documentElement.dataset[ENGINE_STATE_ATTR] = 'ready';
+}
+
+function clearEngineReady(): void {
+  delete document.documentElement.dataset[ENGINE_STATE_ATTR];
+}
+
 const STYLE_ID = 'hb-dark-overrides';
 /**
  * 引擎统计。
@@ -930,6 +948,7 @@ function build(): void {
   }
   stats.keyframes = kf;
   stats.tracked = ruleStyles.size + kfStyles.size;
+  markEngineReady();
 }
 
 function scheduleBuild(delay = 400): void {
@@ -960,6 +979,26 @@ function scheduleImmediateBuild(): void {
   Promise.resolve().then(() => {
     immediateQueued = false;
     if (enabled) build();
+  });
+}
+
+let visibilityBound = false;
+
+/**
+ * 回前台补一次对账。
+ *
+ * 后台标签页里定时器会被压到 1s、极端情况 1/min（Chrome 的 intensive throttling），
+ * 于是「按 400ms 防抖重建」这条兜底路径在后台可能长时间不跑，切回前台的第一帧
+ * 就会用未映射的样式绘制。可见时立刻重建一次（走与其它即时路径同一个入口）。
+ *
+ * 它同时也是「引擎看不见的变更」的兜底：运行时用 `insertRule` / `replaceSync`
+ * 改 CSSOM 不产生任何节点变更，两个观察器都看不见（本站实测 0 次，属边界而非现状）。
+ */
+function startVisibilityCatchUp(): void {
+  if (visibilityBound) return;
+  visibilityBound = true;
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) scheduleImmediateBuild();
   });
 }
 
@@ -1037,6 +1076,7 @@ export function enableDarkEngine(): void {
   scheduleMilestones();
   startInlineObserver();
   startSheetObserver();
+  startVisibilityCatchUp();
 }
 
 export function disableDarkEngine(): void {
@@ -1045,6 +1085,7 @@ export function disableDarkEngine(): void {
   document.documentElement.classList.remove(ROOT_CLASS);
   document.documentElement.classList.remove('dark');
   document.documentElement.style.colorScheme = '';
+  clearEngineReady();
 
   stopInlineObserver();
   if (headObserver) {

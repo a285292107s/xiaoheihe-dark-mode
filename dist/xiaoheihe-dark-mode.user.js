@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         小黑盒深色模式
 // @namespace    xiaoheihe-dark-mode
-// @version      0.3.6
+// @version      0.3.7
 // @author       油猴脚本-小黑盒页面优化
 // @description  为小黑盒网页版（xiaoheihe.cn）提供深色模式：按角色重映射站点 CSS 规则，覆盖伪元素与交互态，可一键切换并记住偏好。
 // @license      MIT
@@ -17,6 +17,13 @@
 (function() {
 	"use strict";
 	var ROOT_CLASS = "hb-dark";
+	var ENGINE_STATE_ATTR = "hbEngine";
+	function markEngineReady() {
+		document.documentElement.dataset[ENGINE_STATE_ATTR] = "ready";
+	}
+	function clearEngineReady() {
+		delete document.documentElement.dataset[ENGINE_STATE_ATTR];
+	}
 	var STYLE_ID = "hb-dark-overrides";
 	var NAMED = {
 		white: [
@@ -769,6 +776,7 @@ html.${ROOT_CLASS} {
 		}
 		stats.keyframes = kf;
 		stats.tracked = ruleStyles.size + kfStyles.size;
+		markEngineReady();
 	}
 	function scheduleBuild(delay = 400) {
 		if (!enabled || retimer !== null) return;
@@ -784,6 +792,14 @@ html.${ROOT_CLASS} {
 		Promise.resolve().then(() => {
 			immediateQueued = false;
 			if (enabled) build();
+		});
+	}
+	var visibilityBound = false;
+	function startVisibilityCatchUp() {
+		if (visibilityBound) return;
+		visibilityBound = true;
+		document.addEventListener("visibilitychange", () => {
+			if (!document.hidden) scheduleImmediateBuild();
 		});
 	}
 	function startSheetObserver() {
@@ -853,12 +869,14 @@ html.${ROOT_CLASS} {
 		scheduleMilestones();
 		startInlineObserver();
 		startSheetObserver();
+		startVisibilityCatchUp();
 	}
 	function disableDarkEngine() {
 		enabled = false;
 		document.documentElement.classList.remove(ROOT_CLASS);
 		document.documentElement.classList.remove("dark");
 		document.documentElement.style.colorScheme = "";
+		clearEngineReady();
 		stopInlineObserver();
 		if (headObserver) {
 			headObserver.disconnect();

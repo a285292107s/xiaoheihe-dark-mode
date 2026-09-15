@@ -556,6 +556,7 @@ node research/repro-placeholder.mjs    # 图片占位块可见度复现（本地
 node research/repro-canvas-flip.mjs    # ★ 整屏底色层「首轮 == 重建」复现（离线 + 阴性对照）
 node research/probe-nav-flash.mjs      # ★ 换路由白闪取证：逐帧统计浅色面积占比（真实站点）
 node research/probe-build-cost.mjs     # 即时重建的首屏代价核算（长任务对照）
+node research/probe-cssom-injection.mjs # 站点是否用 insertRule/replaceSync 改 CSSOM（实测 0 次）
 node research/repro-floor.mjs          # 用真实楼层 HTML 复现（生成 floor-snippet.html）
 node research/repro-stack.mjs          # elementsFromPoint 元素栈（谁压在文字上）
 node research/test-cssom-write.mjs     # 跨域样式表可写性验证（异源 + ACAO）
@@ -763,5 +764,32 @@ function scheduleImmediateBuild() {   // 微任务合并：同一任务里到达
   补丁字符串与产物代码不一致时脚本直接以退出码 2 报错，避免产物重构后对照静默失效。
 - `node research/probe-nav-flash.mjs`（真实站点）：两次导航（首次联网加载分片 / 缓存命中），
   修复后浅色帧 0，峰值 frac=0、maxL=43（卡片色）。
+
+### 同一类盲区的补强：后台标签页与状态出口
+
+写这一节时对照了桌面上另一个项目（`油猴脚本-推特网页优化`，`src/lib/spa-route.ts` /
+`src/lib/dom-watch.ts`），它的两条做法直接适用：
+
+1. **回前台补一次对账**。它的 `dom-watch.ts` 与各功能都在 `visibilitychange`（可见时）
+   补一次冲刷 / 全量对账，理由写在文档的「已修掉的坑」里：后台标签页 rAF 被冻结、
+   定时器被压到 1s 甚至 1/min。我们的 400ms 防抖兜底正长在 `setTimeout` 上，
+   所以后台到达的分片可能长时间不被映射，**切回前台的第一帧就是未映射的样式**。
+   现在可见时立刻重建一次（与其它即时路径同一个入口）。
+
+   顺带覆盖了一种引擎本来就看不见的变更：用 `insertRule` / `replaceSync` 改 CSSOM
+   不产生节点变更，两个观察器都看不见。`node research/probe-cssom-injection.mjs`
+   实测本站为 **0 次**（首页与换路由后都跑过），所以这是边界而非现状 ——
+   这条兜底不是为它加的，但它顺手能兜住。
+
+2. **状态出口用 `html[data-*]` 单一出口**。它把页面类型 / 时间线状态 / 主题都收在
+   `html[data-te-*]` 上，CSS 与门禁脚本只读属性，不各自复算。我们补了
+   `html[data-hb-engine="ready"]`（已完成至少一次规则映射）：
+   **缺这个属性**就是「深色已开启、站点样式尚未映射」的那段窗口，
+   `html.hb-dark:not([data-hb-engine])` 可以直接被 CSS 或验收脚本消费。
+
+回归：`verify:lifecycle` 新增场景五（断言数 16 → 23），先断言「运行时 `insertRule`
+的规则在 400ms 内确实没有任何路径能看见」，再派发 `visibilitychange` 断言它被映射 ——
+前半句就是这条判据的内建对照，避免它变成「反正过一会儿也会被映射」的空跑；
+同时断言状态出口随开关写入 / 撤掉。
 
 
