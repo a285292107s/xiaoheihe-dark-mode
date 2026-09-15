@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         小黑盒深色模式
 // @namespace    xiaoheihe-dark-mode
-// @version      0.3.1
+// @version      0.3.2
 // @author       油猴脚本-小黑盒页面优化
 // @description  为小黑盒网页版（xiaoheihe.cn）提供深色模式：按角色重映射站点 CSS 规则，覆盖伪元素与交互态，可一键切换并记住偏好。
 // @icon         https://cdn.max-c.com/heybox/logo/app_251.png
@@ -524,9 +524,14 @@
 			const current = style.getPropertyValue(prop);
 			if (!current) continue;
 			const entry = state?.get(prop);
-			const source = entry && current === entry.applied ? entry.orig : current;
+			const mine = !!entry && current === entry.applied;
+			const source = mine && entry ? entry.orig : current;
 			const next = transformDeclaration(prop, source, selector);
-			if (!next || next === current) continue;
+			if (!next) continue;
+			if (next === current) {
+				if (mine) changed++;
+				continue;
+			}
 			const priority = style.getPropertyPriority(prop);
 			if (!state) {
 				state = new Map();
@@ -750,9 +755,14 @@ html.${ROOT_CLASS} {
 				const current = style.getPropertyValue(prop);
 				if (!current) continue;
 				const entry = state?.get(prop);
-				const source = entry && current === entry.applied ? entry.orig : current;
+				const mine = !!entry && current === entry.applied;
+				const source = mine && entry ? entry.orig : current;
 				const next = transformDeclaration(prop, source);
-				if (!next || next === current) continue;
+				if (!next) continue;
+				if (next === current) {
+					if (mine) kf++;
+					continue;
+				}
 				const priority = style.getPropertyPriority(prop);
 				if (!state) {
 					state = new Map();

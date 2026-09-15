@@ -45,16 +45,24 @@
 export const ROOT_CLASS = 'hb-dark';
 
 const STYLE_ID = 'hb-dark-overrides';
+/**
+ * 引擎统计。
+ *
+ * `changed` / `declarations` / `keyframes` 的口径是「引擎当前持有的改动量」，
+ * 而不是「本次构建新写入的次数」：重建时，已由引擎写入的声明会被重算并计入。
+ * 若只计新写入，采样点一旦落在增量重建之后，数字就会塌缩
+ * （实测同一次页面加载内 421 -> 14），指标失去可比性。
+ */
 export interface EngineStats {
   /** 成功读取的样式表数量 */
   sheets: number;
   /** 遍历过的 CSS 规则数 */
   scanned: number;
-  /** 被改写的规则数 */
+  /** 引擎持有的改动：被改写的规则数 */
   changed: number;
-  /** 被改写的声明数（一条规则可含多条声明） */
+  /** 引擎持有的改动：被改写的声明数（一条规则可含多条声明） */
   declarations: number;
-  /** 就地改写的关键帧声明数 */
+  /** 引擎持有的改动：就地改写的关键帧声明数 */
   keyframes: number;
   /** 仍被跟踪以便还原的规则声明块数量（含关键帧） */
   tracked: number;
@@ -575,9 +583,16 @@ function transformStyle(style: CSSStyleDeclaration, selector: string): number {
 
     // 幂等：仍是我们写入的值 -> 从原值重算
     const entry = state?.get(prop);
-    const source = entry && current === entry.applied ? entry.orig : current;
+    const mine = !!entry && current === entry.applied;
+    const source = mine && entry ? entry.orig : current;
     const next = transformDeclaration(prop, source, selector);
-    if (!next || next === current) continue;
+    if (!next) continue;
+    if (next === current) {
+      // 无需写入。但这个值若仍由我们持有，它照样是「引擎持有的改动」，
+      // 必须计入；否则指标会随采样点是否落在增量重建之后而塌缩。
+      if (mine) changed++;
+      continue;
+    }
 
     // 关键：原样保留原有优先级。擅自加 !important 会击穿站点自己的状态规则
     // （例如 :hover），把半透明覆盖层变成不透明板（见文件顶部说明）。
@@ -888,9 +903,14 @@ function build(): void {
       if (!current) continue;
       const entry = state?.get(prop);
       // 仍是我们写入的值 -> 从原值重算，保证幂等
-      const source = entry && current === entry.applied ? entry.orig : current;
+      const mine = !!entry && current === entry.applied;
+      const source = mine && entry ? entry.orig : current;
       const next = transformDeclaration(prop, source);
-      if (!next || next === current) continue;
+      if (!next) continue;
+      if (next === current) {
+        if (mine) kf++; // 同 transformStyle：仍由引擎持有就计入
+        continue;
+      }
       const priority = style.getPropertyPriority(prop);
       if (!state) {
         state = new Map();
