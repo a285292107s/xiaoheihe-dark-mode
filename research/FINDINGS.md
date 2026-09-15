@@ -196,28 +196,31 @@
 | 2 | **删除 `src/dark-remap.ts`**（412 行逐元素扫描器），其有效思想（亮度映射的单调性）已并入引擎 | ✅ |
 | 3 | **删除 `src/dark-mode.css`**（123 行无效的 `--hb-*`/`--el-*` 覆盖），新建 `src/dark-base.css` 只留基础层 | ✅ |
 | 4 | `src/dark-mode.ts` 改为协调「类名 + 基础层 + 引擎启停」，保留 `localStorage` 偏好与系统默认值 | ✅ |
-| 5 | `src/main.tsx` 挂载切换按钮（Shadow DOM 隔离，`data-hb-own` 让引擎跳过），并暴露验收钩子 | ✅ |
+| 5 | `src/main.ts` 挂载切换按钮（Shadow DOM 隔离，`data-hb-own` 让引擎跳过），并暴露验收钩子 | ✅ |
 | 6 | SPA 换路由新增 CSS 分片 → 监听 `<head>` 增量重建 | ✅ |
-| 7 | 建立验收循环（`npm run verify` / `verify:idempotent`） | ✅ |
-| 8 | `vite.config.ts` 版本 0.2.0，去掉不再需要的 `GM_addStyle` 授权 | ✅ |
+| 7 | 建立验收循环（`npm run verify` / `verify:idempotent` / `verify:ui`） | ✅ |
+| 8 | `vite.config.ts` 版本 0.3.0，去掉不再需要的 `GM_addStyle` 授权 | ✅ |
+| 9 | **移除 React**：切换按钮改为原生 DOM（`src/ui.ts` + `src/ui.css`），产物 585.7KB → 26.3KB | ✅ |
 
 ### 验收结果（`node scripts/verify-dark.mjs`，加载 dist 产物）
 
 | 页面 | 指标 | 深色 | 关闭后 | 再开启 |
 |---|---|---|---|---|
-| 首页 `/app/bbs/home` | 浅色表面 | **0** | 25 | **0** |
+| 首页 `/app/bbs/home` | 浅色表面 | **0** | 30 | **0** |
 | | 低对比文本 | **0** | 8 | **0** |
 | | 泥泞中间调 | **0** | — | **0** |
-| | 扫描 / 改动规则 | 4739 / 296（6 关键帧） | — | — |
+| | 扫描 / 改动规则 | 4739 / 421（6 关键帧） | — | — |
 | 详情 `/app/bbs/link/189860812` | 浅色表面 | **0** | 14 | **0** |
 | | 低对比文本 | **0** | 8 | **0** |
 | | 泥泞中间调 | **0** | — | **0** |
-| | 扫描 / 改动规则 | 5501 / 419（11 关键帧） | — | — |
+| | 扫描 / 改动规则 | 5501 / 585（11 关键帧） | — | — |
 
-覆盖表体积 34.5KB（首页） / 51.2KB（详情），构建耗时 ~45ms，页面报错 0。
+例外层体积 1106 字节（两页相同，是就地改写之外的唯一额外 CSS），构建耗时 ~45ms，页面报错 0。
 
-`node scripts/verify-idempotent.mjs`：连续重建 6 次，渲染指纹与覆盖表字节完全不变
-（`ad77cb46` / 34562，6 轮一致）。
+`node scripts/verify-idempotent.mjs`：连续重建 6 次，渲染指纹与例外层字节完全不变
+（6 轮 `9c77b285` / 1106）。注意指纹取自**线上真实 DOM 的颜色计算值**，
+首页信息流每次加载的卡片数量不同，所以跨次运行的指纹值本身不构成基线 ——
+有意义的是「同一次页面加载内、6 轮重建前后完全一致」。
 
 > 幂等性不是可选项：关键帧与内联样式是**就地**改写的，站点样式表里存的就是我们写过的值。
 > 引擎用 `orig` / `applied` 记账，始终从原值重算；否则边框会被逐轮衰减到 `rgba(255,255,255,0.06)`，
@@ -232,8 +235,8 @@
 - **旧的一次性探测脚本**（`scripts/probe-*.mjs`、`verify-live.mjs`、`verify-interactive.mjs`、
   `inject-live.mjs` 等）属于上一版架构，已被 `verify-dark.mjs` 取代，可择机清理；
   其中 `capture-fixture.mjs`、`probe-native-dark.mjs` 仍然有用。
-- **产物 597KB** 主要来自 React（仅用于一个切换按钮）。若在意体积，可把按钮改为原生 DOM，
-  预计降到 ~35KB —— 与深色效果无关，属独立优化。
+- ~~**产物 597KB** 主要来自 React（仅用于一个切换按钮）。~~ **已解决**：按钮改为原生 DOM 后
+  产物 585.7KB → 26.3KB（gzip 8.3KB），详细测量见第十二节。
 
 ---
 
@@ -450,11 +453,12 @@ hover 前后像素差：14.23% 像素变化，最大通道差 12/765（即每通
 
 ```bash
 # 构建 + 验收（推荐）
-npm run verify:all   # = build + verify(浅色表面/对比度/中间调) + verify:idempotent + verify:cascade
+npm run verify:all   # = build + verify:ui + verify + verify:idempotent + verify:cascade
 
 # 单独运行
 npm run build
 npm run verify              # 真实页面量化 + 出图 -> output/verify/
+npm run verify:ui           # ★ 切换按钮回归（本地 HTTP，45 项断言）
 npm run verify:idempotent   # 反复重建的幂等性回归
 npm run verify:cascade      # ★ hover 层叠顺序回归（必须两条评论）
 
@@ -477,4 +481,76 @@ node research/test-cssom-write.mjs     # 跨域样式表可写性验证（异源
 node research/dump-runtime-css.mjs     # 抓运行时 CSS（含 JS 注入的 <style>）
 node research/proto-run.mjs            # 原型出图 + 量化 -> output/proto/
 ```
+
+---
+
+## 十二、移除 React：一个按钮不该背 95.6% 的体积
+
+### 测量（移除前）
+
+产物 `dist/xiaoheihe-dark-mode.user.js` 共 587,051 字符，按行切分归属：
+
+| 区段 | 字符数 | 占比 |
+|---|---|---|
+| userscript 头 + React + react-dom | 561,710 | **95.7%** |
+| 应用代码（引擎 + 状态 + UI） | 25,341 | 4.3% |
+
+其中 React 部分从正文第一行一直到 `require_client`（第 11373 行）都是 `react` / `react-dom/client`
+的生产包。**这个包只用来渲染右下角一个按钮**：一个 `<button>`、一个 `<svg>`、一个 click 回调。
+
+### 一个顺带发现：产物是未被压缩的
+
+`vite-plugin-monkey` 的默认值是 `build.minify ?? false`（`dist/node/index.mjs:826`），
+所以产物里的 react-dom 是**可读的多行**形式（平均行长 47 字符、最长 2043 字符），
+而不是压缩后的长行。也就是说 585.7KB 是"未压缩"的体积，这是该插件的有意选择
+（便于审查 userscript），不是配置事故。
+
+### 替换做法
+
+| 关注点 | React 版本 | 原生版本 |
+|---|---|---|
+| 渲染 | `createRoot().render(<App/>)` | `createElement` + `replaceChildren` |
+| 状态 | `useState` | 状态只有一份，存在 `applyDark()` 里 |
+| 状态同步 | React 内部 state | `onDarkChange()` 订阅（新增约 15 行） |
+| 图标 | JSX `<svg>` | `createElementNS` 拼 SVG |
+| 样式 | JS 模板字符串里的 `uiCss` | `src/ui.css`（经 `?inline` 导入，可被 CSS 压缩） |
+
+两点值得记下：
+
+1. **状态只留一份。** React 版把状态复制进了组件（`useState(() => isDarkEnabled())`），
+   于是"图标"和"真实是否深色"是两个可能不同步的东西 —— 在控制台调 `__hbSetDark(true)`
+   之后按钮图标就不会跟着变。改成 `onDarkChange` 订阅后，任何入口改状态都会通知到 UI。
+2. **图标不能用 `innerHTML` 拼。** 宿主站点若启用 Trusted Types，`innerHTML` 会被 CSP 直接拒绝；
+   `createElementNS` 没有这个风险。
+
+### 结果
+
+```
+移除前  585.7 KB（React 占 95.7%），未压缩
+移除后   26.3 KB，gzip 8.3 KB          —— 体积 -95.5%，gzip 约 -93%
+```
+
+产物中 `react` / `createRoot` / `useState` / `fiber` / `scheduler` 的出现次数均为 **0**。
+依赖从 5 个降到 3 个（`typescript`、`vite`、`vite-plugin-monkey`），运行时依赖归零。
+
+### 回归
+
+深色效果与体积无关，因此三项既有验收必须全部保持通过 —— 实测均通过：
+
+| 验收 | 结果 |
+|---|---|
+| `npm run verify`（真实首页 / 详情页） | 两页 PASS，浅色表面 0 / 低对比 0 / 泥泞 0，报错 0 |
+| `npm run verify:idempotent` | 6 轮重建指纹与例外层字节不变 |
+| `npm run verify:cascade` | 分隔线 `rgb(37,43,50)`、hover 覆盖层仍为 `rgba(20,25,30,0.016)` |
+| `npm run verify:ui`（新增，45 项断言） | 全通过 |
+
+新增的 `scripts/verify-ui.mjs` 用**本地 HTTP + 真实鼠标点击**覆盖按钮的全部行为：
+宿主挂载与 `data-hb-own`、Shadow DOM 隔离（含"shadow 内的 `<style>` 不在
+`document.styleSheets` 里，所以引擎碰不到它"）、初始态跟随系统 / 记忆优先、点击后
+类名+基础层+localStorage+图标+aria 同步、再次点击完整还原、控制台入口同步图标、刷新后记忆生效。
+
+> 这里必须用本地 HTTP 而不是 `file://` 或 `setContent`：`file://` 下同目录样式表在 Chrome 里
+> 算跨域，`cssRules` 抛异常，引擎会整片跳过；`about:blank` 下 `localStorage` 又不可靠。
+> 这个坑在早期已经让一次结论完全跑偏过。
+
 

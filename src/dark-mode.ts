@@ -20,6 +20,20 @@ import baseCss from './dark-base.css?inline';
 const STORAGE_KEY = 'heybox-dark-mode';
 const BASE_STYLE_ID = 'hb-dark-base';
 
+type DarkListener = (enabled: boolean) => void;
+const listeners = new Set<DarkListener>();
+
+/**
+ * 订阅开关状态。任何一处调用 applyDark（按钮、控制台 __hbSetDark、
+ * 将来的其它入口）都会通知到，UI 因此不需要自己存一份状态。
+ */
+export function onDarkChange(fn: DarkListener): () => void {
+  listeners.add(fn);
+  return () => {
+    listeners.delete(fn);
+  };
+}
+
 export function isDarkEnabled(): boolean {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -73,6 +87,15 @@ export function applyDark(enabled: boolean): void {
     localStorage.setItem(STORAGE_KEY, enabled ? '1' : '0');
   } catch {
     /* ignore */
+  }
+
+  // 复制一份再遍历：监听器里若反过来调用 applyDark，不会破坏本次遍历
+  for (const fn of [...listeners]) {
+    try {
+      fn(enabled);
+    } catch (err) {
+      console.error('[hb-dark] listener failed', err);
+    }
   }
 }
 

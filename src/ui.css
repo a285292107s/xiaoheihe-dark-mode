@@ -1,0 +1,59 @@
+/*
+ * 切换按钮的样式，注入在 Shadow DOM 内部。
+ * :host { all: initial } 把站点继承下来的字号/字族/颜色全部砍断，
+ * 保证按钮只受这份样式控制。
+ */
+:host {
+  all: initial;
+}
+
+#heybox-dark-toggle {
+  position: fixed;
+  right: 16px;
+  bottom: 24px;
+  z-index: 2147483646;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #14191e;
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#heybox-dark-toggle:hover {
+  transform: scale(1.06);
+}
+
+#heybox-dark-toggle:active {
+  transform: scale(0.96);
+}
+
+#heybox-dark-toggle:focus-visible {
+  outline: 2px solid #7aa2f7;
+  outline-offset: 2px;
+}
+
+#heybox-dark-toggle svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #heybox-dark-toggle {
+    transition: none;
+  }
+  #heybox-dark-toggle:hover,
+  #heybox-dark-toggle:active {
+    transform: none;
+  }
+}

@@ -89,8 +89,8 @@ const cssStable = rounds.every((r) => r.cssBytes === first.cssBytes);
 
 console.log('\n########## 幂等性结论 ##########');
 console.log(`渲染指纹: 首轮 ${first.hash} -> 末轮 ${rounds[rounds.length - 1].hash}`);
-console.log(`覆盖表字节: 首轮 ${first.cssBytes} -> 末轮 ${rounds[rounds.length - 1].cssBytes}`);
-console.log(`渲染${stable ? '稳定 ✅' : '漂移 ❌'} | 覆盖表${cssStable ? '稳定 ✅' : '漂移 ❌'} | 报错 ${errors.length}`);
+console.log(`例外层字节: 首轮 ${first.cssBytes} -> 末轮 ${rounds[rounds.length - 1].cssBytes}`);
+console.log(`渲染${stable ? '稳定 ✅' : '漂移 ❌'} | 例外层${cssStable ? '稳定 ✅' : '漂移 ❌'} | 报错 ${errors.length}`);
 if (!stable) {
   console.log('各轮指纹：', rounds.map((r) => r.hash).join(' '));
 }

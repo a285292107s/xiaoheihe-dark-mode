@@ -1,7 +1,7 @@
 {
   "name": "xiaoheihe",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.3.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,16 +10,10 @@
     "verify": "node scripts/verify-dark.mjs",
     "verify:idempotent": "node scripts/verify-idempotent.mjs",
     "verify:cascade": "node research/test-hover-cascade.mjs",
-    "verify:all": "npm run build && npm run verify && npm run verify:idempotent && npm run verify:cascade"
-  },
-  "dependencies": {
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6"
+    "verify:ui": "node scripts/verify-ui.mjs",
+    "verify:all": "npm run build && npm run verify:ui && npm run verify && npm run verify:idempotent && npm run verify:cascade"
   },
   "devDependencies": {
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^6.0.1",
     "typescript": "^6.0.3",
     "vite": "^8.0.11",
     "vite-plugin-monkey": "^8.0.0"
