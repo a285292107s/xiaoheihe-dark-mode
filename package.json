@@ -11,7 +11,9 @@
     "verify:idempotent": "node scripts/verify-idempotent.mjs",
     "verify:cascade": "node research/test-hover-cascade.mjs",
     "verify:ui": "node scripts/verify-ui.mjs",
-    "verify:all": "npm run build && npm run verify:ui && npm run verify && npm run verify:idempotent && npm run verify:cascade"
+    "verify:lifecycle": "node scripts/verify-lifecycle.mjs",
+    "verify:preview": "node scripts/verify-preview.mjs",
+    "verify:all": "npm run build && npm run verify:ui && npm run verify:lifecycle && npm run verify:preview && npm run verify && npm run verify:idempotent && npm run verify:cascade"
   },
   "devDependencies": {
     "typescript": "^6.0.3",

@@ -192,13 +192,13 @@
 
 | 步骤 | 动作 | 状态 |
 |---|---|---|
-| 1 | 引擎移植为 `src/dark-engine.ts`（分层：覆盖表 + 例外层 + 就地改写关键帧/内联样式） | ✅ |
+| 1 | 引擎移植为 `src/dark-engine.ts`（分层：就地改写站点声明 + 例外层 + 关键帧/内联样式） | ✅ |
 | 2 | **删除 `src/dark-remap.ts`**（412 行逐元素扫描器），其有效思想（亮度映射的单调性）已并入引擎 | ✅ |
 | 3 | **删除 `src/dark-mode.css`**（123 行无效的 `--hb-*`/`--el-*` 覆盖），新建 `src/dark-base.css` 只留基础层 | ✅ |
 | 4 | `src/dark-mode.ts` 改为协调「类名 + 基础层 + 引擎启停」，保留 `localStorage` 偏好与系统默认值 | ✅ |
 | 5 | `src/main.ts` 挂载切换按钮（Shadow DOM 隔离，`data-hb-own` 让引擎跳过），并暴露验收钩子 | ✅ |
 | 6 | SPA 换路由新增 CSS 分片 → 监听 `<head>` 增量重建 | ✅ |
-| 7 | 建立验收循环（`npm run verify` / `verify:idempotent` / `verify:ui`） | ✅ |
+| 7 | 建立验收循环：`verify`（真实页面）/ `verify:idempotent` / `verify:cascade` / `verify:ui` / `verify:lifecycle` / `verify:preview`，全部挂在 `verify:all` | ✅ |
 | 8 | `vite.config.ts` 版本 0.3.0，去掉不再需要的 `GM_addStyle` 授权 | ✅ |
 | 9 | **移除 React**：切换按钮改为原生 DOM（`src/ui.ts` + `src/ui.css`），产物 585.7KB → 26.3KB | ✅ |
 
@@ -209,11 +209,15 @@
 | 首页 `/app/bbs/home` | 浅色表面 | **0** | 30 | **0** |
 | | 低对比文本 | **0** | 8 | **0** |
 | | 泥泞中间调 | **0** | — | **0** |
-| | 扫描 / 改动规则 | 4739 / 421（6 关键帧） | — | — |
+| | 扫描规则 / 改动规则 / 改动声明 | 4739 / 296 / 421（6 关键帧） | — | — |
 | 详情 `/app/bbs/link/189860812` | 浅色表面 | **0** | 14 | **0** |
 | | 低对比文本 | **0** | 8 | **0** |
 | | 泥泞中间调 | **0** | — | **0** |
-| | 扫描 / 改动规则 | 5501 / 585（11 关键帧） | — | — |
+| | 扫描规则 / 改动规则 / 改动声明 | 5501 / 419 / 585（11 关键帧） | — | — |
+
+「改动规则」是 `stats.changed`（含至少一条被改声明的规则数），「改动声明」是
+`stats.declarations`（被改写的声明总数，一条规则可含多条）—— 两者不是同一个量，
+早期表格曾把后者写在「改动规则」标签下，已更正。
 
 例外层体积 1106 字节（两页相同，是就地改写之外的唯一额外 CSS），构建耗时 ~45ms，页面报错 0。
 
@@ -232,9 +236,11 @@
   首页（用户指定的目标页）是完整验证的。
 - **`.nav--home` 变体**（透明导航压封面图）：引擎会把它的白底按钮转成深底浅字，
   压在照片上对比可能偏低，需要接入真实封面图页面后决定是否加例外。
-- **旧的一次性探测脚本**（`scripts/probe-*.mjs`、`verify-live.mjs`、`verify-interactive.mjs`、
-  `inject-live.mjs` 等）属于上一版架构，已被 `verify-dark.mjs` 取代，可择机清理；
-  其中 `capture-fixture.mjs`、`probe-native-dark.mjs` 仍然有用。
+- **旧的一次性探测脚本已清理**（`verify-live.mjs`、`verify-interactive.mjs`、`inject-live.mjs`、
+  `probe-identity.mjs`、`probe-stuck.mjs`、`chrome-headed.mjs`、`preview-test.mjs`、
+  `audit-desktop.mjs`、`dump-*.mjs`）：它们 shim 已被移除的 `GM_addStyle`，
+  并用旧类名 `heybox-dark` 判定深色，判定恒为「非深色」，报告必然失真。
+  `baseline-live.mjs` **保留** —— 它不注入任何脚本，不受本次架构变更影响。
 - ~~**产物 597KB** 主要来自 React（仅用于一个切换按钮）。~~ **已解决**：按钮改为原生 DOM 后
   产物 585.7KB → 26.3KB（gzip 8.3KB），详细测量见第十二节。
 
@@ -441,11 +447,14 @@ function surfaceCurve(t0) { const i = 1 - clamp(t0, 0, 1); return 1 - i * i; }
 非 hover：第二条评论 ::before = rgb(37,43,50)         1px      -> 分隔线改写生效 ✅
 hover   ：第二条评论 ::before = rgba(20,25,30,0.016)  1224x204 z-index:300
                               -> 覆盖层仍是站点原本的半透明值 ✅
-hover 前后像素差：14.23% 像素变化，最大通道差 12/765（即每通道 ≤4）-> 内容未被盖住 ✅
+hover 前后像素差：最大通道差 4/255、平均 1.181、100% 像素有变化 -> 内容未被盖住 ✅
+阴性对照：人为在 <body> 末尾追加同优先级覆盖规则后，覆盖层变成 rgb(38,44,51)，
+          最大通道差跳到 217/255 -> 像素判据确实能检出该缺陷 ✅
 ```
 
 回归：验收（首页/详情 浅色表面 0、低对比 0、泥泞中间调 0）+ 幂等性（6 轮指纹一致）
-全部通过；`emitted` 现为就地改写的声明数（首页 421 / 详情 585）。
+全部通过；`stats.declarations` 是就地改写的声明数（首页 421 / 详情 585），
+`stats.changed` 是其所属的规则数（296 / 419）。
 
 ---
 
@@ -453,14 +462,17 @@ hover 前后像素差：14.23% 像素变化，最大通道差 12/765（即每通
 
 ```bash
 # 构建 + 验收（推荐）
-npm run verify:all   # = build + verify:ui + verify + verify:idempotent + verify:cascade
+npm run verify:all   # = build + verify:ui + verify:lifecycle + verify:preview
+                     #   + verify + verify:idempotent + verify:cascade
 
 # 单独运行
 npm run build
 npm run verify              # 真实页面量化 + 出图 -> output/verify/
 npm run verify:ui           # ★ 切换按钮回归（本地 HTTP，45 项断言）
+npm run verify:lifecycle    # ★ 启动竞态 / 内联写循环 / 跟踪集 / url() 保护（16 项断言）
+npm run verify:preview      # ★ 预览壳 index.html 双向切换（8 项断言）
 npm run verify:idempotent   # 反复重建的幂等性回归
-npm run verify:cascade      # ★ hover 层叠顺序回归（必须两条评论）
+npm run verify:cascade      # ★ hover 层叠顺序回归（必须两条评论 + 阴性对照）
 
 # 研究用脚本（结论的证据来源）
 node research/fetch-css.mjs            # 拉取站点 16 个 CSS 分片 -> research/css/
@@ -551,6 +563,36 @@ node research/proto-run.mjs            # 原型出图 + 量化 -> output/proto/
 
 > 这里必须用本地 HTTP 而不是 `file://` 或 `setContent`：`file://` 下同目录样式表在 Chrome 里
 > 算跨域，`cssRules` 抛异常，引擎会整片跳过；`about:blank` 下 `localStorage` 又不可靠。
-> 这个坑在早期已经让一次结论完全跑偏过。
+> 还有一个容易空跑的前提：深色偏好必须在脚本执行**之前**写进 `localStorage`，
+> 否则引擎默认关闭，断言会因为「页面本来就是浅色」而全部通过。
+
+---
+
+## 十三、代码审查发现与修复
+
+对全量源码做了一次审查（仓库没有 `AGENTS.md` / `docs/` / CI，故退回通用工程原则）。
+八个真实缺陷，全部修复并有对应回归：
+
+| # | 缺陷 | 证据 | 修复 | 回归 |
+|---|---|---|---|---|
+| 1 | `startSheetObserver` 在 `<head>` 尚未解析出来时直接返回，且无重试 —— 此后 SPA 换路由新增的 CSS 分片永不触发重建，整个会话漏样式 | 分块响应（先 `<html>`，150ms 后 `<head>`）复现：晚注入样式表保持 `rgb(255,255,255)`；同一页面整份送达时正常重映射 | 加 `headProbe`，等 `<head>` 出现后补装观察器 | `verify:lifecycle` 场景一 |
+| 2 | `COLOR_TOKEN` 的裸颜色名会命中 `url()` 路径（`icon_white.png`）与 SVG 引用（`url(#fade)`），破坏资源地址；模块注释却声称已避开 `url()` | 语料里 `url()` 含颜色词 1 处（`...-Black.ttf`），因落在 `@font-face` 的 `src`（非颜色属性）而未爆 | 替换前先摘出 `url(...)` 片段，替换完逐字节放回 | `verify:lifecycle` 场景四 |
+| 3 | `EngineStats.emitted` 注释为「生成的覆盖规则数」，但就地改写后不再生成任何规则 | 字段实际值是声明数（421/585），与 `changed`（296/419）不同；FINDINGS 三处标签互相矛盾 | 改名 `declarations`，`changed`/`declarations` 分别注明规则数与声明数 | `verify:idempotent` 输出两值 |
+| 4 | `mutations` 注释为「最近若干条」，实为首轮前 60 条且 `collect()` 从不清空 —— 首轮之后的重建在调试接口里完全不可见 | 代码路径：`if (mutations.length < 60)` 只增不减 | `collect()` 里清空，语义变为「最近一次构建」 | — |
+| 5 | 三处改写点用 `next === source` 作判据，在「值已是我们写的那个」时判定为需写入，重复写同一个值（实测 45 次写入中 26 次冗余）；内联写入会触发 `style` 属性变更记录，是否演变成 80ms 常驻写循环取决于浏览器特定行为 | 空闲 3 秒实测 0 次写入（Chromium 不派发相同值变更）—— 当前安全但依赖未定义行为 | 判据改为 `next === current` | `verify:lifecycle` 场景二 |
+| 6 | `ruleStyles` 只增不减，被迫强引用已卸载的样式表 | 实测确认：`<style>` 被 `remove()` 后 Chrome 把该表 `ownerNode` 置为 `null`（`ownerNode && !isConnected` 的判据永不触发） | 每次重建剪除已脱离文档的表；`ownerNode === null` 时排除 `adoptedStyleSheets` 以免误剪 | `verify:lifecycle` 场景三 |
+| 7 | `index.html` 预览壳：调用已不存在的 `__hbRefresh`；用旧类名 `heybox-dark` 判状态，导致自己的按钮**只能单向打开**、回不到浅色；用 `data-hb-skip` 标记自身，而引擎认的是 `data-hb-own`，排除机制未生效 | 浏览器实测：修复前按钮恒 `setTheme(true)` | 用 `__hbIsDark()` 读状态、`style[data-hb-own]` 排除、删死钩子 | `verify:preview`（8 项） |
+| 8 | `test-hover-cascade.mjs` 声明了「hover 前后像素差必须很小」但**未实现**（两张截图从未比对）；分隔线断言只检查「不等于 `#f3f4f5`」，映射成白色也会通过 | 逐行阅读 | 落地像素比对（解码交给浏览器 canvas，不引入 PNG 解码器）+ **阴性对照**（人为复现末尾覆盖表，要求判据必须超标）；分隔线改为断言亮度 < 90 | `verify:cascade` |
+
+另外清理了 10 个**已不可能工作**的脚本：它们 shim 已被移除的 `GM_addStyle`，
+并用旧类名 `heybox-dark` 判定深色，判定恒为「非深色」却仍输出报告。
+`baseline-live.mjs` 保留 —— 它不注入任何脚本，不受架构变更影响。
+
+`src/` 里 6 处把设计会话历史写进代码的注释（「最初的实现……」「早先写成……」「改用……」）
+按散文标准重述为现在时的约束与反事实，事故经过仍由第八至十节单独承载。
+
+> 一条被撤销的怀疑：`enableDarkEngine` 会无条件添加/移除 `<html>` 上的 `dark` 类。
+> 精确检索站点 JS 后确认站点既不管 `dark` 类也不管 `data-theme`（命中数全为 0），
+> 且全站只有 2 条 `.dark` 规则（EP 颜色选择器），因此**没有现冲突**，未作修改。
 
 

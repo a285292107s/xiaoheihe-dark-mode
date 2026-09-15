@@ -13,25 +13,24 @@
  * 所以正确做法是：把站点的样式表当数据读出来，按「角色」把字面量颜色
  * 映射为深色等价。一次遍历 4700~5500 条规则约 45ms，零元素级开销。
  *
- * ## 就地改写，而不是生成一张覆盖表（这条很重要）
+ * ## 必须就地改写，不能生成覆盖表
  *
- * 最初的实现把改写结果汇总成一张覆盖表，挂在 `<body>` 末尾 —— 排在站点所有
- * 样式表之后。这在同优先级下会**抢赢站点自己的状态规则**，破坏层叠顺序。实测
- * 后果：站点用
+ * 覆盖表只能挂在站点所有样式表之后，于是在同优先级下会**抢赢站点自己的状态规则**。
+ * 站点用两条**优先级完全相同**（(0,2,1)）的规则、靠先后顺序决定 hover 的表现：
  *
  *   .link-comment__comment-item + .link-comment__comment-item:before { background:#f3f4f5 }   （1px 分隔线）
  *   .link-comment__comment-item:hover:before  { background:rgba(20,25,30,.016); z-index:300; width/height:100% }
  *
- * 两条**优先级完全相同**（(0,2,1)）的规则，靠先后顺序决定胜负。我们改写了靠前那条
- * 分隔线的颜色并放进末尾覆盖表，于是 hover 时我们的不透明色赢了 —— hover 覆盖层
- * 被替换成一块不透明板（尺寸与 z-index 仍来自 hover 规则），鼠标一移上去整层楼
- * 就被盖住。
+ * 把分隔线的深色改写放进末尾的覆盖表，hover 时它就会赢过 hover 规则：覆盖层被换成
+ * 不透明色，而尺寸与 z-index 仍来自 hover 规则 —— 鼠标一移上去整层楼被盖住。
  *
- * 因此现在**直接就地改写站点的声明**（`CSSStyleDeclaration.setProperty`）：
+ * 因此**直接就地改写站点的声明**（`CSSStyleDeclaration.setProperty`）：
  *   - 层叠顺序、`@media`/`@supports` 条件块、规则位置全部原样保留；
- *   - 不产生重复 CSS（覆盖表从 ~34KB 降到 ~1KB 的例外层）；
+ *   - 不产生重复 CSS（只剩 ~1KB 的例外层）；
  *   - **绝不擅自追加 `!important`** —— 只原样保留原有优先级，否则同样会击穿状态规则。
  * 跨域（CORS）样式表可写，已用「异源 + ACAO」实测验证。
+ *
+ * 事故经过见 research/FINDINGS.md 第十节；research/test-hover-cascade.mjs 是这条约束的看门人。
  *
  * 前提：站点样式表跨域可读（`crossorigin` + CORS）。已实测 16/16 可读。
  *
@@ -53,10 +52,12 @@ export interface EngineStats {
   scanned: number;
   /** 被改写的规则数 */
   changed: number;
-  /** 生成的覆盖规则数 */
-  emitted: number;
+  /** 被改写的声明数（一条规则可含多条声明） */
+  declarations: number;
   /** 就地改写的关键帧声明数 */
   keyframes: number;
+  /** 仍被跟踪以便还原的规则声明块数量（含关键帧） */
+  tracked: number;
   /** 无法读取的样式表数（理论上应为 0） */
   errors: number;
 }
@@ -214,11 +215,10 @@ function roleOfProp(prop: string): Role | null {
 /**
  * 自定义属性：先按名字判定角色，名字无信息时返回 null 交给明度推断。
  *
- * 片段必须整体匹配（`(^|-)` … `($|-)`）。早先写成 `/color-/` 只能命中
- * `--el-text-color-primary` 这类「color 在中间」的名字，会漏掉
- * `--publish-color` 这种「color 在结尾」的，于是落到明度推断，
- * 把浅色的前景令牌误判成表面色 —— 导航登录按钮的文字因此变成
- * 与深色渐变底同色，整颗按钮看不见。
+ * 片段必须整体匹配（`(^|-)` … `($|-)`）。只做子串匹配会漏掉 `--publish-color`
+ * 这类「color 在结尾」的名字（却命中 `--el-text-color-primary`）；
+ * 漏掉的令牌会落到明度推断，浅色前景令牌被误判成表面色 ——
+ * 导航登录按钮的文字会变成与深色渐变底同色，整颗按钮看不见。
  */
 function roleOfVar(name: string): Role | null {
   if (/shadow/.test(name)) return 'shadow';
@@ -246,13 +246,13 @@ const CARD: RGBA = { r: 38, g: 44, b: 51, a: 1 }; // #262c33
  * 判定颜色是否为「中性」。
  *
  * 这里**不能**用 HSL 饱和度。接近白色时 HSL 的分母 `2-max-min` 趋近于 0，
- * 会把极微弱的色偏放大成很高的饱和度：站点页面底色 `#f7f8f9` 与纯白只差
- * 2 个色阶，HSL 饱和度却算到 0.143，于是被判成"彩色"，走进了彩色表面分支，
- * 被映射成偏蓝的 `rgb(55,64,74)` —— 而 `#f7f8f9` 用在信息流 4px 分隔条和
- * `#page-bbs-community::before`（position:fixed;height:146px;width:100%）
- * 这类整屏色带上，结果就是满屏突兀的灰色色块。
+ * 会把极微弱的色偏放大成很高的饱和度：`#f7f8f9` 与纯白只差 2 个色阶，
+ * HSL 饱和度却算到 0.143 —— 足以让页面底色被判成「彩色」、走进彩色表面分支。
+ * 而页面底色会用在信息流 4px 分隔条与 `#page-bbs-community::before`
+ * （position:fixed;height:146px;width:100%）这类整屏色带上，
+ * 误判的代价是满屏突兀的灰色色块（见 research/FINDINGS.md 第八节）。
  *
- * 改用「绝对彩度 + HSV 饱和度」双条件：近白色天然被判为中性。
+ * 判据用「绝对彩度 + HSV 饱和度」双条件：近白色天然被判为中性。
  */
 function isNeutral(c: RGBA): boolean {
   const max = Math.max(c.r, c.g, c.b);
@@ -280,16 +280,16 @@ function lerpRgb(a: RGBA, b: RGBA, t: number, alpha: number): RGBA {
 /**
  * 表面梯度的缓出曲线。
  *
- * 最初的实现是线性的：把源亮度 L∈[185,255] 线性压进深色带。这在深色下会
- * **放大近白色的差异**，而站点的表面几乎全部聚集在近白区间
+ * 必须是缓出，不能线性：把源亮度 L∈[185,255] 线性压进深色带会**放大近白色的
+ * 差异**，而站点的表面几乎全部聚集在近白区间
  * （#fff / #fafbfc / #f7f8f9 / #f5f7fa / #f3f4f5 / #f1f2f3 都在 L 241~255）。
  *
- * 实测后果：`.hb-cpt__image--default` 的图片占位块 `#f3f4f5` 在浅色下只比
- * 卡片 `#fff` 暗 4.4%（几乎不可见），线性映射后变成暗 11.5% —— 放大 2.6 倍。
- * 详情页的 4:3 图片网格把两张占位块并排放大到 1256x460，在深色下就成了
- * 一整块突兀的灰板，看起来像"内容被遮住"。
+ * 量级：`.hb-cpt__image--default` 的图片占位块 `#f3f4f5` 在浅色下只比卡片 `#fff`
+ * 暗 4.4%（几乎不可见），线性映射后变成暗 11.5% —— 放大 2.6 倍。详情页的 4:3
+ * 图片网格把两张占位块并排放大到 1256x460，在深色下就是一整块突兀的灰板。
  *
- * 改用 ease-out：近白区间收敛到卡片色，中低亮度仍保留可分辨的"下沉表面"。
+ * 缓出让近白区间收敛到卡片色，中低亮度仍保留可分辨的「下沉表面」。
+ * 保真度审计见 research/surface-ramp.mjs。
  */
 function surfaceCurve(t0: number): number {
   const t = clamp(t0, 0, 1);
@@ -385,11 +385,20 @@ function mapColor(role: Role, c: RGBA, selector: string): RGBA | null {
 /**
  * 颜色 token 正则。
  *
- * 刻意不匹配 `var(...)` —— 自定义属性的解析交给 roleOfVar；
- * 也刻意不匹配函数式颜色之外的标识符，避免误伤 url() 里的路径。
+ * 刻意不匹配 `var(...)` —— 自定义属性的解析交给 roleOfVar。
+ * 裸颜色名（`white`/`black`/…）必须列进来，因为站点用它们写颜色；
+ * 代价是同一个词也会出现在 url() 里（`icon_white.png`）或引用里（`#fade`），
+ * 所以替换前先把 url() 片段摘出去 —— 见 transformDeclaration。
  */
 const COLOR_TOKEN =
   /#[0-9a-fA-F]{3,8}\b|rgba?\([^)]*\)|hsla?\([^)]*\)|\b(?:white|black|whitesmoke|gainsboro|lightgray|lightgrey|silver|darkgray|darkgrey|dimgray|dimgrey|gray|grey|orange|gold|pink|tomato|crimson|seagreen|teal|navy|purple|maroon|olive|lime|aqua|cyan|fuchsia|magenta|red|green|blue|yellow)\b/gi;
+
+/** `url(...)` 片段：里面的颜色词是文件名，不是颜色 */
+const URL_SPAN = /url\([^)]*\)/gi;
+
+/** 摘出 url() 时的占位符。CSS 值里不可能出现 \u0001，不会与真实内容冲突 */
+const MASK = '\u0001';
+const MASK_SPAN = /\u0001(\d+)\u0001/g;
 
 /** 自定义属性的值是否为「纯颜色」（排除 var() / 渐变 / url / 颜色三元组） */
 function plainColorOf(value: string): RGBA | null {
@@ -421,8 +430,16 @@ function transformDeclaration(prop: string, value: string, selector = ''): strin
     return mapped ? fmt(mapped) : null;
   }
 
+  // url() 里的内容逐字节保留：`url(icon_white.png)` 的 white 是文件名，
+  // `url(#fade)` 是 SVG 引用，都不是颜色。先摘出、替换完再放回。
+  const urls: string[] = [];
+  const masked = String(value).replace(URL_SPAN, (m) => {
+    urls.push(m);
+    return `${MASK}${urls.length - 1}${MASK}`;
+  });
+
   let changed = false;
-  const out = String(value).replace(COLOR_TOKEN, (tok) => {
+  const out = masked.replace(COLOR_TOKEN, (tok) => {
     const c = parseColor(tok);
     if (!c) return tok;
     const mapped = mapColor(role as Role, c, selector);
@@ -430,7 +447,8 @@ function transformDeclaration(prop: string, value: string, selector = ''): strin
     changed = true;
     return fmt(mapped);
   });
-  return changed ? out : null;
+  if (!changed) return null;
+  return urls.length ? out.replace(MASK_SPAN, (_m, i: string) => urls[+i]) : out;
 }
 
 // ---------------------------------------------------------------------------
@@ -474,6 +492,13 @@ function isInteractiveSelector(selector: string): boolean {
  *
  * 所以这里记录 orig（原值）与 applied（我们写入的值）：
  * 只要当前值仍等于 applied，就始终从 orig 重新计算。
+ *
+ * 三处改写点都用 `next === current` 作为「无需写入」的判据，而不是
+ * `next === source`：后者在「值已经是我们写的那个」时会判定为需要写入，
+ * 于是重复写入同一个值。内联样式写入会触发 style 属性变更记录，
+ * 而内联观察器正监听该属性 —— 重复写入是否演变成常驻写循环，
+ * 取决于「写入相同值是否派发变更记录」这一浏览器特定行为。
+ * 与 current 比较可让该路径与浏览器语义无关。
  */
 interface RewriteState {
   orig: string;
@@ -490,14 +515,14 @@ const canvasKeys = new Set<string>();
 /** 就地改写的幂等状态（同 kfState），并提供精确还原 */
 const ruleState = new WeakMap<CSSStyleDeclaration, Map<string, RewriteState>>();
 const ruleStyles = new Set<CSSStyleDeclaration>();
-/** 调试用：最近若干条改动的可读记录 */
+/** 调试用：最近一次构建里被改写的前若干条声明 */
 const mutations: string[] = [];
 
 const kfState = new WeakMap<CSSStyleDeclaration, Map<string, RewriteState>>();
 const kfStyles = new Set<CSSStyleDeclaration>();
 
 function emptyStats(): EngineStats {
-  return { sheets: 0, scanned: 0, changed: 0, emitted: 0, keyframes: 0, errors: 0 };
+  return { sheets: 0, scanned: 0, changed: 0, declarations: 0, keyframes: 0, tracked: 0, errors: 0 };
 }
 
 /** 阶段一：只收集，不改写。识别画布色必须先看过全部规则。 */
@@ -552,11 +577,10 @@ function transformStyle(style: CSSStyleDeclaration, selector: string): number {
     const entry = state?.get(prop);
     const source = entry && current === entry.applied ? entry.orig : current;
     const next = transformDeclaration(prop, source, selector);
-    if (!next || next === source) continue;
+    if (!next || next === current) continue;
 
-    // 关键：原样保留原有优先级。
-    // 擅自加 !important 会击穿站点自己的状态规则（例如 :hover）——
-    // 这正是「hover 时整层楼被不透明板盖住」的成因。
+    // 关键：原样保留原有优先级。擅自加 !important 会击穿站点自己的状态规则
+    // （例如 :hover），把半透明覆盖层变成不透明板（见文件顶部说明）。
     const priority = style.getPropertyPriority(prop);
     if (!state) {
       state = new Map();
@@ -583,7 +607,38 @@ function transform(): void {
     const n = transformStyle(item.style, item.selector);
     if (!n) continue;
     stats.changed++;
-    stats.emitted += n;
+    stats.declarations += n;
+  }
+}
+
+/**
+ * 丢掉已脱离文档的样式表在 ruleStyles / kfStyles 里的强引用。
+ *
+ * collect() 只遍历 document.styleSheets，被卸载的样式表不会再出现在其中，
+ * 此后也无法（且没有意义）还原它；继续强引用只会让已卸载的样式表无法回收。
+ * 每次重建清一次，把跟踪集约束在当前文档的规模内。
+ *
+ * 判定用 parentRule -> parentStyleSheet -> ownerNode，嵌套在 @media/@supports
+ * 里的规则同样能解析到所属 <style>/<link>。注意 ownerNode 为 null 有两种含义：
+ *   - 元素被 remove() 掉：Chrome 实测会把 ownerNode 置为 null（已实测确认）
+ *   - 由 API 创建（adoptedStyleSheets / new CSSStyleSheet）：这个 null 是常态，不该剪
+ * 所以只剪「ownerNode 为 null 且不属于 adoptedStyleSheets」和「ownerNode 已断开」两种。
+ */
+function pruneDetachedStyles(): void {
+  const isAttachedOwnerless = (sheet: CSSStyleSheet): boolean =>
+    document.adoptedStyleSheets.includes(sheet);
+
+  for (const styles of [ruleStyles, kfStyles]) {
+    styles.forEach((style) => {
+      const sheet = style.parentRule?.parentStyleSheet;
+      if (!sheet) return; // 内联样式 / 构造式声明块：不归这里管
+      const owner = sheet.ownerNode;
+      if (owner === null) {
+        if (!isAttachedOwnerless(sheet)) styles.delete(style);
+        return;
+      }
+      if (!owner.isConnected) styles.delete(style);
+    });
   }
 }
 
@@ -591,6 +646,7 @@ function collect(): void {
   keyframeRules = [];
   pending = [];
   canvasKeys.clear();
+  mutations.length = 0;
   stats = emptyStats();
 
   const sheets = document.styleSheets;
@@ -615,6 +671,7 @@ function collect(): void {
     }
   }
 
+  pruneDetachedStyles();
   transform();
 }
 
@@ -657,7 +714,7 @@ function fixInlineStyle(el: HTMLElement): void {
     const entry = state?.get(prop);
     const source = entry && current === entry.applied ? entry.orig : current;
     const next = transformDeclaration(prop, source);
-    if (!next || next === source) continue;
+    if (!next || next === current) continue;
 
     const priority = el.style.getPropertyPriority(prop);
     if (!state) {
@@ -794,6 +851,8 @@ html.${ROOT_CLASS} {
 
 let styleEl: HTMLStyleElement | null = null;
 let headObserver: MutationObserver | null = null;
+/** 等 <head> 出现的探针，装上 headObserver 之前临时存在 */
+let headProbe: MutationObserver | null = null;
 let retimer: number | null = null;
 let enabled = false;
 
@@ -806,9 +865,8 @@ function build(): void {
     styleEl.setAttribute('data-hb-own', '');
   }
 
-  // 引擎只保留一层很小的例外表：站点声明本身已被就地改写，
-  // 不再需要（也不应该）生成一张排在末尾的大覆盖表 ——
-  // 那会打乱站点自己的层叠顺序（详见文件顶部说明）。
+  // 例外表刻意保持很小：站点声明本身已被就地改写；生成一张排在末尾的大覆盖表
+  // 会打乱站点自己的层叠顺序（见文件顶部说明）。
   if (styleEl.textContent !== EXCEPTIONS_CSS) styleEl.textContent = EXCEPTIONS_CSS;
 
   // 例外层用更高优先级的选择器（html.hb-dark …），因此挂在哪里都能生效
@@ -832,7 +890,7 @@ function build(): void {
       // 仍是我们写入的值 -> 从原值重算，保证幂等
       const source = entry && current === entry.applied ? entry.orig : current;
       const next = transformDeclaration(prop, source);
-      if (!next || next === source) continue;
+      if (!next || next === current) continue;
       const priority = style.getPropertyPriority(prop);
       if (!state) {
         state = new Map();
@@ -848,6 +906,7 @@ function build(): void {
     }
   }
   stats.keyframes = kf;
+  stats.tracked = ruleStyles.size + kfStyles.size;
 }
 
 function scheduleBuild(delay = 400): void {
@@ -862,7 +921,21 @@ function scheduleBuild(delay = 400): void {
 function startSheetObserver(): void {
   if (headObserver) return;
   const head = document.head;
-  if (!head) return;
+  if (!head) {
+    // document-start 时 <html> 已存在而 <head> 可能还没有被解析出来
+    //（与 dark-mode.ts 的 ensureBaseStyle 同一前提）。
+    // 这里不能直接放弃：一旦放弃，此后新增的 CSS 分片就再也不会触发重建，
+    // 整个会话都会漏掉换路由带来的样式。
+    if (headProbe) return;
+    headProbe = new MutationObserver(() => {
+      if (!document.head) return;
+      headProbe?.disconnect();
+      headProbe = null;
+      if (enabled) startSheetObserver();
+    });
+    headProbe.observe(document, { childList: true, subtree: true });
+    return;
+  }
   headObserver = new MutationObserver((records) => {
     for (const r of records) {
       for (const n of Array.from(r.addedNodes)) {
@@ -920,6 +993,10 @@ export function disableDarkEngine(): void {
     headObserver.disconnect();
     headObserver = null;
   }
+  if (headProbe) {
+    headProbe.disconnect();
+    headProbe = null;
+  }
   if (retimer !== null) {
     window.clearTimeout(retimer);
     retimer = null;
@@ -963,7 +1040,7 @@ export function rebuildDarkEngine(): void {
   if (enabled) build();
 }
 
-/** 仅用于调试/验收：例外表大小 + 最近若干条就地改动 */
+/** 仅用于调试/验收：例外表大小 + 最近一次构建中被改写的前若干条声明 */
 export function getEngineCss(): { bytes: number; sample: string[] } {
   return {
     bytes: styleEl?.textContent?.length ?? 0,

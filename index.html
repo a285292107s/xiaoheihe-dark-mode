@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#fafbfc" id="meta-theme" />
   <title>小黑盒深色模式 · 效果预览</title>
-  <style>
-    /* 预览壳自身样式（data-hb-skip 让脚本不处理它） */
+  <style data-hb-own>
+    /* 预览壳自身样式：data-hb-own 让引擎在遍历 document.styleSheets 时整块跳过它，
+       否则预览条的深色配色会被当成站点内容再映射一遍。 */
     html, body { margin: 0; padding: 0; }
     #hb-bar {
       position: fixed;
@@ -40,7 +41,7 @@
   </style>
 </head>
 <body>
-  <div id="hb-bar" data-hb-skip>
+  <div id="hb-bar" data-hb-own>
     <strong>小黑盒深色模式</strong>
     <button data-page="home" class="on">首页</button>
     <button data-page="detail">帖子详情</button>
@@ -84,30 +85,35 @@
       const doc = new DOMParser().parseFromString(html, 'text/html');
       adoptStyles(doc);
       stage.innerHTML = doc.body.innerHTML;
-      // 让脚本重新扫描新内容
-      window.dispatchEvent(new Event('hb-page-change'));
-      if (window.__hbRefresh) window.__hbRefresh();
+      // 换页只换 DOM，不换站点 CSS：引擎改的是规则而不是元素，
+      // 新增节点里的内联颜色由内联观察器处理，这里不需要做任何事。
     }
 
-    // 主题切换：优先调用脚本导出的接口，保证 remapper 正确启停
+    // 深色状态由脚本持有；脚本没加载时退回预览壳自己的类名与存储
+    const ROOT_CLASS = 'hb-dark';
+    const hasEngine = () => typeof window.__hbSetDark === 'function';
+    const isDarkNow = () =>
+      typeof window.__hbIsDark === 'function'
+        ? window.__hbIsDark()
+        : document.documentElement.classList.contains(ROOT_CLASS);
+
     function setTheme(dark) {
-      if (typeof window.__hbSetDark === 'function') {
+      if (hasEngine()) {
         window.__hbSetDark(dark);
       } else {
-        document.documentElement.classList.toggle('heybox-dark', dark);
-        document.documentElement.classList.toggle('dark', dark);
+        const root = document.documentElement;
+        root.classList.toggle(ROOT_CLASS, dark);
+        root.classList.toggle('dark', dark);
+        root.style.colorScheme = dark ? 'dark' : 'light';
+        try { localStorage.setItem(STORAGE_KEY, dark ? '1' : '0'); } catch (_) {}
       }
-      document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
-      stage.classList.toggle('is-dark', dark);
-      themeBtn.textContent = dark ? '浅色' : '深色';
-      metaTheme.setAttribute('content', dark ? '#0f1216' : '#fafbfc');
-      try { localStorage.setItem(STORAGE_KEY, dark ? '1' : '0'); } catch (_) {}
-      if (window.__hbRefresh) window.__hbRefresh();
+      const on = isDarkNow();
+      stage.classList.toggle('is-dark', on);
+      themeBtn.textContent = on ? '浅色' : '深色';
+      metaTheme.setAttribute('content', on ? '#0f1216' : '#fafbfc');
     }
 
-    themeBtn.addEventListener('click', () => {
-      setTheme(!document.documentElement.classList.contains('heybox-dark'));
-    });
+    themeBtn.addEventListener('click', () => setTheme(!isDarkNow()));
 
     let current = 'home';
     for (const btn of document.querySelectorAll('#hb-bar [data-page]')) {
@@ -120,11 +126,15 @@
       });
     }
 
-    // 预置主题：跟随脚本的存储键
+    // 深色已经由脚本在 document-start 应用过了，这里只把预览条同步到当前状态
     let startDark = false;
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      startDark = saved === '1' || (saved === null && matchMedia('(prefers-color-scheme: dark)').matches);
+      startDark = typeof window.__hbIsDark === 'function'
+        ? window.__hbIsDark()
+        : (() => {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            return saved === '1' || (saved === null && matchMedia('(prefers-color-scheme: dark)').matches);
+          })();
     } catch (_) {}
 
     await loadPage(current);

@@ -422,6 +422,9 @@
 		return mapText(c);
 	}
 	var COLOR_TOKEN = /#[0-9a-fA-F]{3,8}\b|rgba?\([^)]*\)|hsla?\([^)]*\)|\b(?:white|black|whitesmoke|gainsboro|lightgray|lightgrey|silver|darkgray|darkgrey|dimgray|dimgrey|gray|grey|orange|gold|pink|tomato|crimson|seagreen|teal|navy|purple|maroon|olive|lime|aqua|cyan|fuchsia|magenta|red|green|blue|yellow)\b/gi;
+	var URL_SPAN = /url\([^)]*\)/gi;
+	var MASK = "";
+	var MASK_SPAN = /\u0001(\d+)\u0001/g;
 	function plainColorOf(value) {
 		if (value.indexOf("var(") >= 0) return null;
 		if (value.indexOf("gradient") >= 0) return null;
@@ -439,8 +442,13 @@
 			const mapped = mapColor(role ?? (lum(only) > 170 ? "bg" : "fg"), only, selector);
 			return mapped ? fmt(mapped) : null;
 		}
+		const urls = [];
+		const masked = String(value).replace(URL_SPAN, (m) => {
+			urls.push(m);
+			return `${MASK}${urls.length - 1}${MASK}`;
+		});
 		let changed = false;
-		const out = String(value).replace(COLOR_TOKEN, (tok) => {
+		const out = masked.replace(COLOR_TOKEN, (tok) => {
 			const c = parseColor(tok);
 			if (!c) return tok;
 			const mapped = mapColor(role, c, selector);
@@ -448,7 +456,8 @@
 			changed = true;
 			return fmt(mapped);
 		});
-		return changed ? out : null;
+		if (!changed) return null;
+		return urls.length ? out.replace(MASK_SPAN, (_m, i) => urls[+i]) : out;
 	}
 	var CANVAS_SELECTOR = /^(?::root|html|body)(\s*,\s*(?::root|html|body))*$/i;
 	var INTERACTIVE_SELECTOR = /:hover|:focus|:active|\.is-active|\.is-open|\.is-selected|\.is-current|(^|[\s.])active([\s.:,]|$)/;
@@ -469,8 +478,9 @@
 			sheets: 0,
 			scanned: 0,
 			changed: 0,
-			emitted: 0,
+			declarations: 0,
 			keyframes: 0,
+			tracked: 0,
 			errors: 0
 		};
 	}
@@ -513,7 +523,7 @@
 			const entry = state?.get(prop);
 			const source = entry && current === entry.applied ? entry.orig : current;
 			const next = transformDeclaration(prop, source, selector);
-			if (!next || next === source) continue;
+			if (!next || next === current) continue;
 			const priority = style.getPropertyPriority(prop);
 			if (!state) {
 				state = new Map();
@@ -538,13 +548,27 @@
 			const n = transformStyle(item.style, item.selector);
 			if (!n) continue;
 			stats.changed++;
-			stats.emitted += n;
+			stats.declarations += n;
 		}
+	}
+	function pruneDetachedStyles() {
+		const isAttachedOwnerless = (sheet) => document.adoptedStyleSheets.includes(sheet);
+		for (const styles of [ruleStyles, kfStyles]) styles.forEach((style) => {
+			const sheet = style.parentRule?.parentStyleSheet;
+			if (!sheet) return;
+			const owner = sheet.ownerNode;
+			if (owner === null) {
+				if (!isAttachedOwnerless(sheet)) styles.delete(style);
+				return;
+			}
+			if (!owner.isConnected) styles.delete(style);
+		});
 	}
 	function collect() {
 		keyframeRules = [];
 		pending = [];
 		canvasKeys.clear();
+		mutations.length = 0;
 		stats = emptyStats();
 		const sheets = document.styleSheets;
 		for (let i = 0; i < sheets.length; i++) {
@@ -566,6 +590,7 @@
 				stats.errors++;
 			}
 		}
+		pruneDetachedStyles();
 		transform();
 	}
 	var INLINE_PROPS = [
@@ -589,7 +614,7 @@
 			const entry = state?.get(prop);
 			const source = entry && current === entry.applied ? entry.orig : current;
 			const next = transformDeclaration(prop, source);
-			if (!next || next === source) continue;
+			if (!next || next === current) continue;
 			const priority = el.style.getPropertyPriority(prop);
 			if (!state) {
 				state = new Map();
@@ -698,6 +723,7 @@ html.${ROOT_CLASS} {
 `;
 	var styleEl = null;
 	var headObserver = null;
+	var headProbe = null;
 	var retimer = null;
 	var enabled = false;
 	function build() {
@@ -723,7 +749,7 @@ html.${ROOT_CLASS} {
 				const entry = state?.get(prop);
 				const source = entry && current === entry.applied ? entry.orig : current;
 				const next = transformDeclaration(prop, source);
-				if (!next || next === source) continue;
+				if (!next || next === current) continue;
 				const priority = style.getPropertyPriority(prop);
 				if (!state) {
 					state = new Map();
@@ -741,6 +767,7 @@ html.${ROOT_CLASS} {
 			}
 		}
 		stats.keyframes = kf;
+		stats.tracked = ruleStyles.size + kfStyles.size;
 	}
 	function scheduleBuild(delay = 400) {
 		if (!enabled || retimer !== null) return;
@@ -752,7 +779,20 @@ html.${ROOT_CLASS} {
 	function startSheetObserver() {
 		if (headObserver) return;
 		const head = document.head;
-		if (!head) return;
+		if (!head) {
+			if (headProbe) return;
+			headProbe = new MutationObserver(() => {
+				if (!document.head) return;
+				headProbe?.disconnect();
+				headProbe = null;
+				if (enabled) startSheetObserver();
+			});
+			headProbe.observe(document, {
+				childList: true,
+				subtree: true
+			});
+			return;
+		}
 		headObserver = new MutationObserver((records) => {
 			for (const r of records) for (const n of Array.from(r.addedNodes)) {
 				if (!(n instanceof Element)) continue;
@@ -805,6 +845,10 @@ html.${ROOT_CLASS} {
 		if (headObserver) {
 			headObserver.disconnect();
 			headObserver = null;
+		}
+		if (headProbe) {
+			headProbe.disconnect();
+			headProbe = null;
 		}
 		if (retimer !== null) {
 			window.clearTimeout(retimer);

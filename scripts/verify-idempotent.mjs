@@ -79,7 +79,15 @@ for (let i = 0; i < 6; i++) {
   const fp = await page.evaluate(FINGERPRINT);
   const cssBytes = await page.evaluate(() => window.__hbEngineCss().bytes);
   const stats = await page.evaluate(() => window.__hbEngineStats());
-  rounds.push({ round: i, ...fp, cssBytes, keyframes: stats.keyframes, emitted: stats.emitted });
+  rounds.push({
+    round: i,
+    ...fp,
+    cssBytes,
+    changed: stats.changed,
+    declarations: stats.declarations,
+    keyframes: stats.keyframes,
+    tracked: stats.tracked,
+  });
   console.log(JSON.stringify(rounds[rounds.length - 1]));
 }
 
