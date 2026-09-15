@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#fafbfc" id="meta-theme" />
+  <title>小黑盒深色模式 · 效果预览</title>
+  <style>
+    /* 预览壳自身样式（data-hb-skip 让脚本不处理它） */
+    html, body { margin: 0; padding: 0; }
+    #hb-bar {
+      position: fixed;
+      left: 0; right: 0; top: 0;
+      z-index: 2147483600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      font: 12px/1.4 "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      background: rgba(20, 24, 29, 0.94);
+      color: #f0f2f5;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+    }
+    #hb-bar strong { font-weight: 700; margin-right: 6px; }
+    #hb-bar button {
+      font: inherit;
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+    }
+    #hb-bar button.on { background: #f0f2f5; color: #14191e; border-color: transparent; font-weight: 600; }
+    #hb-bar .spacer { flex: 1; }
+    #hb-bar .hint { opacity: 0.7; }
+    #hb-stage { padding-top: 44px; }
+    #hb-stage.is-dark { background: #0f1216; }
+  </style>
+</head>
+<body>
+  <div id="hb-bar" data-hb-skip>
+    <strong>小黑盒深色模式</strong>
+    <button data-page="home" class="on">首页</button>
+    <button data-page="detail">帖子详情</button>
+    <span class="spacer"></span>
+    <span class="hint">真实页面 DOM 快照 · 深色由油猴脚本驱动</span>
+    <button id="hb-theme">深色</button>
+  </div>
+  <div id="hb-stage"></div>
+
+  <script type="module">
+    const stage = document.getElementById('hb-stage');
+    const themeBtn = document.getElementById('hb-theme');
+    const metaTheme = document.getElementById('meta-theme');
+    const STORAGE_KEY = 'heybox-dark-mode';
+
+    const loaded = {
+      styleNodes: [],
+    };
+
+    function clearSiteStyles() {
+      for (const n of loaded.styleNodes) n.remove();
+      loaded.styleNodes = [];
+    }
+
+    function adoptStyles(doc) {
+      clearSiteStyles();
+      const nodes = [
+        ...doc.querySelectorAll('link[rel="stylesheet"]'),
+        ...doc.querySelectorAll('style'),
+      ];
+      for (const node of nodes) {
+        const clone = node.cloneNode(true);
+        document.head.appendChild(clone);
+        loaded.styleNodes.push(clone);
+      }
+    }
+
+    async function loadPage(name) {
+      const res = await fetch(`fixtures/${name}.html`);
+      const html = await res.text();
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      adoptStyles(doc);
+      stage.innerHTML = doc.body.innerHTML;
+      // 让脚本重新扫描新内容
+      window.dispatchEvent(new Event('hb-page-change'));
+      if (window.__hbRefresh) window.__hbRefresh();
+    }
+
+    // 主题切换：优先调用脚本导出的接口，保证 remapper 正确启停
+    function setTheme(dark) {
+      if (typeof window.__hbSetDark === 'function') {
+        window.__hbSetDark(dark);
+      } else {
+        document.documentElement.classList.toggle('heybox-dark', dark);
+        document.documentElement.classList.toggle('dark', dark);
+      }
+      document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+      stage.classList.toggle('is-dark', dark);
+      themeBtn.textContent = dark ? '浅色' : '深色';
+      metaTheme.setAttribute('content', dark ? '#0f1216' : '#fafbfc');
+      try { localStorage.setItem(STORAGE_KEY, dark ? '1' : '0'); } catch (_) {}
+      if (window.__hbRefresh) window.__hbRefresh();
+    }
+
+    themeBtn.addEventListener('click', () => {
+      setTheme(!document.documentElement.classList.contains('heybox-dark'));
+    });
+
+    let current = 'home';
+    for (const btn of document.querySelectorAll('#hb-bar [data-page]')) {
+      btn.addEventListener('click', async () => {
+        current = btn.dataset.page;
+        document
+          .querySelectorAll('#hb-bar [data-page]')
+          .forEach((b) => b.classList.toggle('on', b === btn));
+        await loadPage(current);
+      });
+    }
+
+    // 预置主题：跟随脚本的存储键
+    let startDark = false;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      startDark = saved === '1' || (saved === null && matchMedia('(prefers-color-scheme: dark)').matches);
+    } catch (_) {}
+
+    await loadPage(current);
+    setTheme(startDark);
+  </script>
+
+  <!-- 油猴脚本本体（与装到浏览器里的是同一个产物） -->
+  <script src="dist/xiaoheihe-dark-mode.user.js"></script>
+</body>
+</html>

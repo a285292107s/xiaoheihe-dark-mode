@@ -1,0 +1,53 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# TypeScript 增量构建信息
+*.tsbuildinfo
+
+# ---------------------------------------------------------------
+# 生成物（可由脚本重建，不入库）
+# ---------------------------------------------------------------
+
+# 验收/探测产物：截图、报告、对比图
+output/
+
+# 复现页与截图（由 research/repro-*.mjs 生成）
+# 注意：必须写成目录内容通配——写成 `research/repro/` 会让 git 不进入该目录，
+# 下面的 `!` 反忽略就失效了。
+research/repro/*
+# …但楼层 HTML 片段要入库：verify:cascade 回归测试直接依赖它
+!research/repro/floor-snippet.html
+
+# 运行时抓取的 CSS（由 research/dump-runtime-css.mjs 生成）
+research/css-runtime/
+
+# 下载的站点 JS 分片（约 4MB，由 research/find-highlight.mjs 生成）
+research/js/
+
+# 说明：以下目录**刻意入库**，因为回归测试直接依赖它们，属可复现的证据：
+#   research/css/         首页 16 个 CSS 分片（research/fetch-css.mjs）
+#   research/css-detail/  详情页额外分片（research/fetch-detail-css.mjs）
+#   fixtures/             真实页面 DOM 快照
+

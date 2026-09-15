@@ -1,0 +1,6845 @@
+{
+  "totalBytes": 576957,
+  "customProps": [
+    {
+      "name": "--background-color",
+      "files": [
+        "index-B8IQS1Zj.css"
+      ],
+      "samples": [
+        "rgba(255, 255, 255, 1)"
+      ]
+    },
+    {
+      "name": "--circle-back-color",
+      "files": [
+        "index-B8IQS1Zj.css"
+      ],
+      "samples": [
+        "#DADDE0"
+      ]
+    },
+    {
+      "name": "--circle-front-color",
+      "files": [
+        "index-B8IQS1Zj.css"
+      ],
+      "samples": [
+        "#64696e"
+      ]
+    },
+    {
+      "name": "--cube-length",
+      "files": [
+        "index-BQE5Tmp4.css",
+        "index-Cv4ia_mR.css",
+        "safe-route-BVPxA3TQ.css"
+      ],
+      "samples": [
+        "18px",
+        "20px",
+        "14px"
+      ]
+    },
+    {
+      "name": "--heygirl-length",
+      "files": [
+        "index-BQE5Tmp4.css",
+        "index-Cv4ia_mR.css",
+        "safe-route-BVPxA3TQ.css"
+      ],
+      "samples": [
+        "18px",
+        "20px",
+        "14px"
+      ]
+    },
+    {
+      "name": "--hb-avatar-size",
+      "files": [
+        "index-C3LJfapH.css"
+      ],
+      "samples": [
+        "32px"
+      ]
+    },
+    {
+      "name": "--hb-avatar-deraction-size",
+      "files": [
+        "index-C3LJfapH.css"
+      ],
+      "samples": [
+        "48px"
+      ]
+    },
+    {
+      "name": "--nav-background",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(255, 255, 255, .92)",
+        "transparent"
+      ]
+    },
+    {
+      "name": "--nav-shadow",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "0 6px 8px rgba(0, 0, 0, .02), 0 0 16px r",
+        "none"
+      ]
+    },
+    {
+      "name": "--nav-link-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#8c9198",
+        "rgba(255, 255, 255, .66)"
+      ]
+    },
+    {
+      "name": "--nav-link-hover-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#14191e",
+        "#ffffff"
+      ]
+    },
+    {
+      "name": "--nav-link-active-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#14191e",
+        "#ffffff"
+      ]
+    },
+    {
+      "name": "--nav-link-hover-bg",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "transparent",
+        "transparent"
+      ]
+    },
+    {
+      "name": "--nav-link-active-bg",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "transparent",
+        "transparent"
+      ]
+    },
+    {
+      "name": "--publish-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#ffffff",
+        "#14191e"
+      ]
+    },
+    {
+      "name": "--publish-bg",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "linear-gradient(46deg, #464b50 -.9%, #14",
+        "#ffffff"
+      ]
+    },
+    {
+      "name": "--publish-shadow",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "none",
+        "0 6px 18px rgba(0, 0, 0, .16)"
+      ]
+    },
+    {
+      "name": "--publish-hover-shadow",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "0 8px 18px rgba(20, 25, 30, .16)",
+        "0 10px 22px rgba(0, 0, 0, .22)"
+      ]
+    },
+    {
+      "name": "--nav-user-bg",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(20, 25, 30, .06)",
+        "rgba(255, 255, 255, .14)"
+      ]
+    },
+    {
+      "name": "--nav-user-bg-hover",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(20, 25, 30, .1)",
+        "rgba(255, 255, 255, .2)"
+      ]
+    },
+    {
+      "name": "--nav-user-divider-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(20, 25, 30, .08)",
+        "rgba(255,255,255,.14902)"
+      ]
+    },
+    {
+      "name": "--nav-user-name-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#14191e",
+        "#ffffff"
+      ]
+    },
+    {
+      "name": "--nav-user-arrow-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(20, 25, 30, .72)",
+        "rgba(255, 255, 255, .72)"
+      ]
+    },
+    {
+      "name": "--nav-logo-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#14191e",
+        "#fff"
+      ]
+    },
+    {
+      "name": "--nav-language-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#8c9198",
+        "rgba(255, 255, 255, .66)"
+      ]
+    },
+    {
+      "name": "--nav-language-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(140, 145, 152, .5)",
+        "rgba(255, 255, 255, .6)"
+      ]
+    },
+    {
+      "name": "--hb-primary--value",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "20, 25, 30"
+      ]
+    },
+    {
+      "name": "--hb-primary",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(var(--hb-primary--value))"
+      ]
+    },
+    {
+      "name": "--hb-primary-dynamic--value",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "20, 25, 30"
+      ]
+    },
+    {
+      "name": "--hb-primary-dynamic",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(var(--hb-primary-dynamic--value))"
+      ]
+    },
+    {
+      "name": "--hb-black-100--value",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "0, 0, 0"
+      ]
+    },
+    {
+      "name": "--hb-black-100",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(var(--hb-black-100--value))"
+      ]
+    },
+    {
+      "name": "--hb-white-100--value",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "255, 255, 255"
+      ]
+    },
+    {
+      "name": "--hb-white-100",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(var(--hb-white-100--value))"
+      ]
+    },
+    {
+      "name": "--hb-neutral-800--value",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "100, 105, 110"
+      ]
+    },
+    {
+      "name": "--hb-neutral-800",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(var(--hb-neutral-800--value))"
+      ]
+    },
+    {
+      "name": "--hb-neutral-700--value",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "140, 145, 150"
+      ]
+    },
+    {
+      "name": "--hb-neutral-700",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(var(--hb-neutral-700--value))"
+      ]
+    },
+    {
+      "name": "--hb-neutral-600--value",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "200, 205, 210"
+      ]
+    },
+    {
+      "name": "--hb-neutral-600",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(var(--hb-neutral-600--value))"
+      ]
+    },
+    {
+      "name": "--hb-neutral-500--value",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "218, 221, 224"
+      ]
+    },
+    {
+      "name": "--hb-neutral-500",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(var(--hb-neutral-500--value))"
+      ]
+    },
+    {
+      "name": "--hb-neutral-400--value",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "241, 242, 243"
+      ]
+    },
+    {
+      "name": "--hb-neutral-400",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(var(--hb-neutral-400--value))"
+      ]
+    },
+    {
+      "name": "--hb-neutral-300--value",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "243, 244, 245"
+      ]
+    },
+    {
+      "name": "--hb-neutral-300",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(var(--hb-neutral-300--value))"
+      ]
+    },
+    {
+      "name": "--hb-neutral-200--value",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "247, 248, 249"
+      ]
+    },
+    {
+      "name": "--hb-neutral-200",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(var(--hb-neutral-200--value))"
+      ]
+    },
+    {
+      "name": "--hb-neutral-100--value",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "250, 251, 252"
+      ]
+    },
+    {
+      "name": "--hb-neutral-100",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(var(--hb-neutral-100--value))"
+      ]
+    },
+    {
+      "name": "--hb-blue-100--value",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "0, 75, 150"
+      ]
+    },
+    {
+      "name": "--hb-blue-100",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(var(--hb-blue-100--value))"
+      ]
+    },
+    {
+      "name": "--hb-green-100--value",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "0, 144, 21"
+      ]
+    },
+    {
+      "name": "--hb-green-100",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(var(--hb-green-100--value))"
+      ]
+    },
+    {
+      "name": "--hb-green-0--value",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "50, 184, 70"
+      ]
+    },
+    {
+      "name": "--hb-green-0",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(var(--hb-green-0--value))"
+      ]
+    },
+    {
+      "name": "--hb-red-100--value",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "250, 60, 75"
+      ]
+    },
+    {
+      "name": "--hb-red-100",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(var(--hb-red-100--value))"
+      ]
+    },
+    {
+      "name": "--hb-orange-100--value",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "246, 112, 16"
+      ]
+    },
+    {
+      "name": "--hb-orange-100",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(var(--hb-orange-100--value))"
+      ]
+    },
+    {
+      "name": "--hb-yellow-100--value",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "246, 157, 53"
+      ]
+    },
+    {
+      "name": "--hb-yellow-100",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(var(--hb-yellow-100--value))"
+      ]
+    },
+    {
+      "name": "--hb-gradient-1",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "linear-gradient(45deg, #FF6771 0%, #F53E"
+      ]
+    },
+    {
+      "name": "--hb-gradient-2",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "linear-gradient(45deg, #FF9F00 0%, #F580"
+      ]
+    },
+    {
+      "name": "--hb-gradient-3",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "linear-gradient(45deg, #FA6EFF 0%, #CB33"
+      ]
+    },
+    {
+      "name": "--hb-gradient-4",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "linear-gradient(45deg, #52B7FF 0%, #1A91"
+      ]
+    },
+    {
+      "name": "--hb-gradient-5",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "linear-gradient(45deg, #8FD427 0%, #59D0"
+      ]
+    },
+    {
+      "name": "--hb-gradient-6",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "linear-gradient(45deg, #464B50 0%, #1419"
+      ]
+    },
+    {
+      "name": "--hb-gradient-7",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "linear-gradient(45deg, #736E7D 0%, #1B20"
+      ]
+    },
+    {
+      "name": "--hb-gradient-8",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "linear-gradient(45deg, #5A5D5B 0%, #3F41"
+      ]
+    },
+    {
+      "name": "--hb-gradient-9",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "linear-gradient(135deg, #01D09E 0%, #01D"
+      ]
+    },
+    {
+      "name": "--hb-gradient-10",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "linear-gradient(90deg, #FF5094 0%, #FF72"
+      ]
+    },
+    {
+      "name": "--hb-other-1--value",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "57, 61, 64"
+      ]
+    },
+    {
+      "name": "--hb-other-1",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(var(--hb-other-1--value))"
+      ]
+    },
+    {
+      "name": "--hb-general-color-primary",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--hb-primary-dynamic)"
+      ]
+    },
+    {
+      "name": "--hb-general-color-danger",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--hb-red-100)"
+      ]
+    },
+    {
+      "name": "--hb-general-color-success",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--hb-green-100)"
+      ]
+    },
+    {
+      "name": "--hb-general-color-plain",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--hb-white-100)"
+      ]
+    },
+    {
+      "name": "--hb-general-color-text-1",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--hb-primary-dynamic)"
+      ]
+    },
+    {
+      "name": "--hb-general-color-text-2",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--hb-neutral-800)"
+      ]
+    },
+    {
+      "name": "--hb-general-color-text-3",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--hb-neutral-700)"
+      ]
+    },
+    {
+      "name": "--hb-general-color-text-4",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--hb-neutral-600)"
+      ]
+    },
+    {
+      "name": "--hb-general-color-text-5",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--hb-blue-100)"
+      ]
+    },
+    {
+      "name": "--hb-general-color-text-6",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--hb-white-100)"
+      ]
+    },
+    {
+      "name": "--hb-general-color-stroke-0",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--hb-neutral-500)"
+      ]
+    },
+    {
+      "name": "--hb-general-color-stroke-1",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--hb-neutral-400)"
+      ]
+    },
+    {
+      "name": "--hb-general-color-stroke-2",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--hb-neutral-300)"
+      ]
+    },
+    {
+      "name": "--hb-general-color-stroke-3",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--hb-neutral-100)"
+      ]
+    },
+    {
+      "name": "--hb-general-color-bg-0",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--hb-neutral-400)"
+      ]
+    },
+    {
+      "name": "--hb-general-color-bg-1",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--hb-neutral-300)"
+      ]
+    },
+    {
+      "name": "--hb-general-color-bg-2",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--hb-neutral-200)"
+      ]
+    },
+    {
+      "name": "--hb-general-color-bg-3",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--hb-neutral-100)"
+      ]
+    },
+    {
+      "name": "--hb-general-color-bg-4",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--hb-white-100)"
+      ]
+    },
+    {
+      "name": "--hb-general-color-bg-5",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-other-1--value), .9)"
+      ]
+    },
+    {
+      "name": "--hb-general-color-bg-6",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-primary--value), .1)"
+      ]
+    },
+    {
+      "name": "--hb-game-color-super-lowest",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--hb-green-100)"
+      ]
+    },
+    {
+      "name": "--hb-game-color-lowest",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--hb-green-100)"
+      ]
+    },
+    {
+      "name": "--hb-game-color-sale",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--hb-orange-100)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-white-01a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-white-100--value), .01)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-white-02a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-white-100--value), .02)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-white-03a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-white-100--value), .03)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-white-05a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-white-100--value), .05)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-white-08a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-white-100--value), .08)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-white-10a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-white-100--value), .1)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-white-15a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-white-100--value), .15)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-white-20a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-white-100--value), .2)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-white-30a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-white-100--value), .3)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-white-40a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-white-100--value), .4)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-white-50a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-white-100--value), .5)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-white-60a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-white-100--value), .6)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-white-70a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-white-100--value), .7)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-white-80a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-white-100--value), .8)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-white-90a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-white-100--value), .9)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-white-100a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-white-100--value), 1)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-black-01a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-black-100--value), .01)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-black-02a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-black-100--value), .02)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-black-03a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-black-100--value), .03)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-black-05a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-black-100--value), .05)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-black-08a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-black-100--value), .08)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-black-10a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-black-100--value), .1)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-black-15a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-black-100--value), .15)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-black-20a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-black-100--value), .2)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-black-30a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-black-100--value), .3)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-black-40a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-black-100--value), .4)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-black-50a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-black-100--value), .5)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-black-60a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-black-100--value), .6)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-black-70a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-black-100--value), .7)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-black-80a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-black-100--value), .8)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-black-90a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-black-100--value), .9)"
+      ]
+    },
+    {
+      "name": "--hb-gamerecord-color-black-100a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(var(--hb-black-100--value), 1)"
+      ]
+    },
+    {
+      "name": "--el-color-white",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#ffffff"
+      ]
+    },
+    {
+      "name": "--el-color-black",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#000000"
+      ]
+    },
+    {
+      "name": "--el-color-primary-rgb",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "20, 25, 30"
+      ]
+    },
+    {
+      "name": "--el-color-success-rgb",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "103, 194, 58"
+      ]
+    },
+    {
+      "name": "--el-color-warning-rgb",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "230, 162, 60"
+      ]
+    },
+    {
+      "name": "--el-color-danger-rgb",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "245, 108, 108"
+      ]
+    },
+    {
+      "name": "--el-color-error-rgb",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "245, 108, 108"
+      ]
+    },
+    {
+      "name": "--el-color-info-rgb",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "144, 147, 153"
+      ]
+    },
+    {
+      "name": "--el-font-size-extra-large",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "20px"
+      ]
+    },
+    {
+      "name": "--el-font-size-large",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "18px"
+      ]
+    },
+    {
+      "name": "--el-font-size-medium",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "16px"
+      ]
+    },
+    {
+      "name": "--el-font-size-base",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "14px"
+      ]
+    },
+    {
+      "name": "--el-font-size-small",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "13px"
+      ]
+    },
+    {
+      "name": "--el-font-size-extra-small",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "12px"
+      ]
+    },
+    {
+      "name": "--el-font-family",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "\"Helvetica Neue\", Helvetica, \"PingFang S"
+      ]
+    },
+    {
+      "name": "--el-font-weight-primary",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "500"
+      ]
+    },
+    {
+      "name": "--el-font-line-height-primary",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "24px"
+      ]
+    },
+    {
+      "name": "--el-index-normal",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "1"
+      ]
+    },
+    {
+      "name": "--el-index-top",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "1000"
+      ]
+    },
+    {
+      "name": "--el-index-popper",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "2000"
+      ]
+    },
+    {
+      "name": "--el-border-radius-base",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "4px"
+      ]
+    },
+    {
+      "name": "--el-border-radius-small",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "2px"
+      ]
+    },
+    {
+      "name": "--el-border-radius-round",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "20px"
+      ]
+    },
+    {
+      "name": "--el-border-radius-circle",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "100%"
+      ]
+    },
+    {
+      "name": "--el-transition-duration",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        ".3s"
+      ]
+    },
+    {
+      "name": "--el-transition-duration-fast",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        ".2s"
+      ]
+    },
+    {
+      "name": "--el-transition-function-ease-in-out-bezier",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "cubic-bezier(.645, .045, .355, 1)"
+      ]
+    },
+    {
+      "name": "--el-transition-function-fast-bezier",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "cubic-bezier(.23, 1, .32, 1)"
+      ]
+    },
+    {
+      "name": "--el-transition-all",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "all var(--el-transition-duration) var(--"
+      ]
+    },
+    {
+      "name": "--el-transition-fade",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "opacity var(--el-transition-duration) va"
+      ]
+    },
+    {
+      "name": "--el-transition-md-fade",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "transform var(--el-transition-duration) "
+      ]
+    },
+    {
+      "name": "--el-transition-fade-linear",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "opacity var(--el-transition-duration-fas"
+      ]
+    },
+    {
+      "name": "--el-transition-border",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "border-color var(--el-transition-duratio"
+      ]
+    },
+    {
+      "name": "--el-transition-box-shadow",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "box-shadow var(--el-transition-duration-"
+      ]
+    },
+    {
+      "name": "--el-transition-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "color var(--el-transition-duration-fast)"
+      ]
+    },
+    {
+      "name": "--el-component-size-large",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "40px"
+      ]
+    },
+    {
+      "name": "--el-component-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "32px"
+      ]
+    },
+    {
+      "name": "--el-component-size-small",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "24px"
+      ]
+    },
+    {
+      "name": "--csstools-color-scheme--light",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "initial"
+      ]
+    },
+    {
+      "name": "--el-color-primary",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#14191E"
+      ]
+    },
+    {
+      "name": "--el-color-primary-light-3",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(91, 94, 98)"
+      ]
+    },
+    {
+      "name": "--el-color-primary-light-5",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(138, 140, 143)"
+      ]
+    },
+    {
+      "name": "--el-color-primary-light-7",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(185, 186, 188)"
+      ]
+    },
+    {
+      "name": "--el-color-primary-light-8",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(208, 209, 210)"
+      ]
+    },
+    {
+      "name": "--el-color-primary-light-9",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(232, 232, 233)"
+      ]
+    },
+    {
+      "name": "--el-color-primary-dark-2",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(16, 20, 24)"
+      ]
+    },
+    {
+      "name": "--el-color-success",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#67c23a"
+      ]
+    },
+    {
+      "name": "--el-color-success-light-3",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(149, 212, 117)"
+      ]
+    },
+    {
+      "name": "--el-color-success-light-5",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(179, 225, 157)"
+      ]
+    },
+    {
+      "name": "--el-color-success-light-7",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(209, 237, 196)"
+      ]
+    },
+    {
+      "name": "--el-color-success-light-8",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(225, 243, 216)"
+      ]
+    },
+    {
+      "name": "--el-color-success-light-9",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(240, 249, 235)"
+      ]
+    },
+    {
+      "name": "--el-color-success-dark-2",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(82, 155, 46)"
+      ]
+    },
+    {
+      "name": "--el-color-warning",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#e6a23c"
+      ]
+    },
+    {
+      "name": "--el-color-warning-light-3",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(238, 190, 119)"
+      ]
+    },
+    {
+      "name": "--el-color-warning-light-5",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(243, 209, 158)"
+      ]
+    },
+    {
+      "name": "--el-color-warning-light-7",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(248, 227, 197)"
+      ]
+    },
+    {
+      "name": "--el-color-warning-light-8",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(250, 236, 216)"
+      ]
+    },
+    {
+      "name": "--el-color-warning-light-9",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(253, 246, 236)"
+      ]
+    },
+    {
+      "name": "--el-color-warning-dark-2",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(184, 130, 48)"
+      ]
+    },
+    {
+      "name": "--el-color-danger",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#f56c6c"
+      ]
+    },
+    {
+      "name": "--el-color-danger-light-3",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(248, 152, 152)"
+      ]
+    },
+    {
+      "name": "--el-color-danger-light-5",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(250, 182, 182)"
+      ]
+    },
+    {
+      "name": "--el-color-danger-light-7",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(252, 211, 211)"
+      ]
+    },
+    {
+      "name": "--el-color-danger-light-8",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(253, 226, 226)"
+      ]
+    },
+    {
+      "name": "--el-color-danger-light-9",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(254, 240, 240)"
+      ]
+    },
+    {
+      "name": "--el-color-danger-dark-2",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(196, 86, 86)"
+      ]
+    },
+    {
+      "name": "--el-color-error",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#f56c6c"
+      ]
+    },
+    {
+      "name": "--el-color-error-light-3",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(248, 152, 152)"
+      ]
+    },
+    {
+      "name": "--el-color-error-light-5",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(250, 182, 182)"
+      ]
+    },
+    {
+      "name": "--el-color-error-light-7",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(252, 211, 211)"
+      ]
+    },
+    {
+      "name": "--el-color-error-light-8",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(253, 226, 226)"
+      ]
+    },
+    {
+      "name": "--el-color-error-light-9",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(254, 240, 240)"
+      ]
+    },
+    {
+      "name": "--el-color-error-dark-2",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(196, 86, 86)"
+      ]
+    },
+    {
+      "name": "--el-color-info",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#909399"
+      ]
+    },
+    {
+      "name": "--el-color-info-light-3",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(177, 179, 184)"
+      ]
+    },
+    {
+      "name": "--el-color-info-light-5",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(200, 201, 204)"
+      ]
+    },
+    {
+      "name": "--el-color-info-light-7",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(222, 223, 224)"
+      ]
+    },
+    {
+      "name": "--el-color-info-light-8",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(233, 233, 235)"
+      ]
+    },
+    {
+      "name": "--el-color-info-light-9",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(244, 244, 245)"
+      ]
+    },
+    {
+      "name": "--el-color-info-dark-2",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgb(115, 118, 122)"
+      ]
+    },
+    {
+      "name": "--el-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#ffffff"
+      ]
+    },
+    {
+      "name": "--el-bg-color-page",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#f2f3f5"
+      ]
+    },
+    {
+      "name": "--el-bg-color-overlay",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#ffffff"
+      ]
+    },
+    {
+      "name": "--el-text-color-primary",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#303133"
+      ]
+    },
+    {
+      "name": "--el-text-color-regular",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#606266"
+      ]
+    },
+    {
+      "name": "--el-text-color-secondary",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#909399"
+      ]
+    },
+    {
+      "name": "--el-text-color-placeholder",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#a8abb2"
+      ]
+    },
+    {
+      "name": "--el-text-color-disabled",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#c0c4cc"
+      ]
+    },
+    {
+      "name": "--el-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#dcdfe6"
+      ]
+    },
+    {
+      "name": "--el-border-color-light",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#e4e7ed"
+      ]
+    },
+    {
+      "name": "--el-border-color-lighter",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#ebeef5"
+      ]
+    },
+    {
+      "name": "--el-border-color-extra-light",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#f2f6fc"
+      ]
+    },
+    {
+      "name": "--el-border-color-dark",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#d4d7de"
+      ]
+    },
+    {
+      "name": "--el-border-color-darker",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#cdd0d6"
+      ]
+    },
+    {
+      "name": "--el-fill-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#f0f2f5"
+      ]
+    },
+    {
+      "name": "--el-fill-color-light",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#f5f7fa"
+      ]
+    },
+    {
+      "name": "--el-fill-color-lighter",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#fafafa"
+      ]
+    },
+    {
+      "name": "--el-fill-color-extra-light",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#fafcff"
+      ]
+    },
+    {
+      "name": "--el-fill-color-dark",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#ebedf0"
+      ]
+    },
+    {
+      "name": "--el-fill-color-darker",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#e6e8eb"
+      ]
+    },
+    {
+      "name": "--el-fill-color-blank",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#ffffff",
+        "var(--el-colorpicker-bg-color)",
+        "var(--el-datepicker-bg-color)"
+      ]
+    },
+    {
+      "name": "--el-box-shadow",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "0px 12px 32px 4px rgba(0, 0, 0, .04), 0p"
+      ]
+    },
+    {
+      "name": "--el-box-shadow-light",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "0px 0px 12px rgba(0, 0, 0, .12)"
+      ]
+    },
+    {
+      "name": "--el-box-shadow-lighter",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "0px 0px 6px rgba(0, 0, 0, .12)"
+      ]
+    },
+    {
+      "name": "--el-box-shadow-dark",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "0px 16px 48px 16px rgba(0, 0, 0, .08), 0"
+      ]
+    },
+    {
+      "name": "--el-disabled-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-light)"
+      ]
+    },
+    {
+      "name": "--el-disabled-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-placeholder)"
+      ]
+    },
+    {
+      "name": "--el-disabled-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color-light)"
+      ]
+    },
+    {
+      "name": "--el-overlay-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(0, 0, 0, .8)"
+      ]
+    },
+    {
+      "name": "--el-overlay-color-light",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(0, 0, 0, .7)"
+      ]
+    },
+    {
+      "name": "--el-overlay-color-lighter",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(0, 0, 0, .5)"
+      ]
+    },
+    {
+      "name": "--el-mask-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(255, 255, 255, .9)"
+      ]
+    },
+    {
+      "name": "--el-mask-color-extra-light",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(255, 255, 255, .3)"
+      ]
+    },
+    {
+      "name": "--el-border-width",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "1px"
+      ]
+    },
+    {
+      "name": "--el-border-style",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "solid"
+      ]
+    },
+    {
+      "name": "--el-border-color-hover",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-disabled)"
+      ]
+    },
+    {
+      "name": "--el-border",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-width) var(--el-border-s"
+      ]
+    },
+    {
+      "name": "--el-svg-monochrome-grey",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color)"
+      ]
+    },
+    {
+      "name": "--color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "inherit"
+      ]
+    },
+    {
+      "name": "--el-alert-padding",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "8px 16px"
+      ]
+    },
+    {
+      "name": "--el-alert-border-radius-base",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-radius-base)"
+      ]
+    },
+    {
+      "name": "--el-alert-title-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "14px"
+      ]
+    },
+    {
+      "name": "--el-alert-title-with-description-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "16px"
+      ]
+    },
+    {
+      "name": "--el-alert-description-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "14px"
+      ]
+    },
+    {
+      "name": "--el-alert-close-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "16px"
+      ]
+    },
+    {
+      "name": "--el-alert-close-customed-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "14px"
+      ]
+    },
+    {
+      "name": "--el-alert-icon-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "16px"
+      ]
+    },
+    {
+      "name": "--el-alert-icon-large-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "28px"
+      ]
+    },
+    {
+      "name": "--el-alert-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary-light-9)",
+        "var(--el-color-success-light-9)",
+        "var(--el-color-info-light-9)"
+      ]
+    },
+    {
+      "name": "--el-input-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-regular)",
+        "var(--el-text-color-regular)",
+        "var(--el-text-color-regular)"
+      ]
+    },
+    {
+      "name": "--el-input-border",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border)",
+        "var(--el-border)",
+        "var(--el-border)"
+      ]
+    },
+    {
+      "name": "--el-input-hover-border",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color-hover)",
+        "var(--el-border-color-hover)",
+        "var(--el-border-color-hover)"
+      ]
+    },
+    {
+      "name": "--el-input-focus-border",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)",
+        "var(--el-color-primary)",
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-input-transparent-border",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "0 0 0 1px transparent inset",
+        "0 0 0 1px transparent inset",
+        "0 0 0 1px transparent inset"
+      ]
+    },
+    {
+      "name": "--el-input-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color)",
+        "var(--el-border-color)",
+        "var(--el-border-color)"
+      ]
+    },
+    {
+      "name": "--el-input-border-radius",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-radius-base)",
+        "var(--el-border-radius-base)",
+        "var(--el-border-radius-base)"
+      ]
+    },
+    {
+      "name": "--el-input-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-blank)",
+        "var(--el-fill-color-blank)",
+        "var(--el-fill-color-blank)"
+      ]
+    },
+    {
+      "name": "--el-input-icon-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-placeholder)",
+        "var(--el-text-color-placeholder)",
+        "var(--el-text-color-placeholder)"
+      ]
+    },
+    {
+      "name": "--el-input-placeholder-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-placeholder)",
+        "var(--el-text-color-placeholder)",
+        "var(--el-text-color-placeholder)"
+      ]
+    },
+    {
+      "name": "--el-input-hover-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color-hover)",
+        "var(--el-border-color-hover)",
+        "var(--el-border-color-hover)"
+      ]
+    },
+    {
+      "name": "--el-input-clear-hover-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-secondary)",
+        "var(--el-text-color-secondary)",
+        "var(--el-text-color-secondary)"
+      ]
+    },
+    {
+      "name": "--el-input-focus-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)",
+        "var(--el-color-primary)",
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-input-width",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "100%",
+        "100%",
+        "100%"
+      ]
+    },
+    {
+      "name": "--el-avatar-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-white)"
+      ]
+    },
+    {
+      "name": "--el-avatar-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-disabled)"
+      ]
+    },
+    {
+      "name": "--el-avatar-text-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "14px"
+      ]
+    },
+    {
+      "name": "--el-avatar-icon-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "18px"
+      ]
+    },
+    {
+      "name": "--el-avatar-border-radius",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-radius-base)"
+      ]
+    },
+    {
+      "name": "--el-avatar-size-large",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "56px"
+      ]
+    },
+    {
+      "name": "--el-avatar-size-small",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "24px"
+      ]
+    },
+    {
+      "name": "--el-avatar-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "40px",
+        "24px",
+        "56px"
+      ]
+    },
+    {
+      "name": "--el-avatar-group-item-gap",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "-8px",
+        "-8px"
+      ]
+    },
+    {
+      "name": "--el-avatar-group-collapse-item-gap",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "4px",
+        "4px"
+      ]
+    },
+    {
+      "name": "--el-backtop-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-bg-color-overlay)"
+      ]
+    },
+    {
+      "name": "--el-backtop-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-backtop-hover-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color-extra-light)"
+      ]
+    },
+    {
+      "name": "--el-badge-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-danger)"
+      ]
+    },
+    {
+      "name": "--el-badge-radius",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "10px"
+      ]
+    },
+    {
+      "name": "--el-badge-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "12px"
+      ]
+    },
+    {
+      "name": "--el-badge-padding",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "6px"
+      ]
+    },
+    {
+      "name": "--el-badge-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "18px"
+      ]
+    },
+    {
+      "name": "--el-button-font-weight",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-font-weight-primary)"
+      ]
+    },
+    {
+      "name": "--el-button-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color)",
+        "var(--el-color-primary)",
+        "var(--el-color-primary-light-5)"
+      ]
+    },
+    {
+      "name": "--el-button-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-blank)",
+        "var(--el-color-primary)",
+        "var(--el-color-primary-light-9)"
+      ]
+    },
+    {
+      "name": "--el-button-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-regular)",
+        "var(--el-color-white)",
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-button-disabled-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-disabled-text-color)",
+        "var(--el-color-white)",
+        "var(--el-color-white)"
+      ]
+    },
+    {
+      "name": "--el-button-disabled-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-blank)",
+        "var(--el-color-primary-light-5)",
+        "var(--el-color-success-light-5)"
+      ]
+    },
+    {
+      "name": "--el-button-disabled-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color-light)",
+        "var(--el-color-primary-light-5)",
+        "var(--el-color-success-light-5)"
+      ]
+    },
+    {
+      "name": "--el-button-divide-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(255, 255, 255, .5)"
+      ]
+    },
+    {
+      "name": "--el-button-hover-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)",
+        "var(--el-color-primary)",
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-button-hover-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary-light-9)",
+        "var(--el-fill-color-blank)",
+        "var(--el-fill-color-blank)"
+      ]
+    },
+    {
+      "name": "--el-button-hover-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary-light-7)",
+        "var(--el-color-primary)",
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-button-active-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-button-hover-text-color)",
+        "var(--el-color-white)",
+        "var(--el-color-primary-dark-2)"
+      ]
+    },
+    {
+      "name": "--el-button-active-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)",
+        "var(--el-color-primary-dark-2)",
+        "var(--el-color-primary-dark-2)"
+      ]
+    },
+    {
+      "name": "--el-button-active-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-button-hover-bg-color)",
+        "var(--el-color-primary-dark-2)",
+        "var(--el-color-primary-light-9)"
+      ]
+    },
+    {
+      "name": "--el-button-outline-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary-light-5)",
+        "var(--el-color-primary-light-5)",
+        "var(--el-color-success-light-5)"
+      ]
+    },
+    {
+      "name": "--el-button-hover-link-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-secondary)",
+        "var(--el-color-primary-light-5)",
+        "var(--el-color-success-light-5)"
+      ]
+    },
+    {
+      "name": "--el-button-active-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-primary)",
+        "var(--el-color-primary-dark-2)",
+        "var(--el-color-success-dark-2)"
+      ]
+    },
+    {
+      "name": "--el-button-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "40px",
+        "24px"
+      ]
+    },
+    {
+      "name": "--el-calendar-border",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-table-border, 1px solid var(--e"
+      ]
+    },
+    {
+      "name": "--el-calendar-header-border-bottom",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-calendar-border)"
+      ]
+    },
+    {
+      "name": "--el-calendar-selected-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary-light-9)"
+      ]
+    },
+    {
+      "name": "--el-calendar-cell-width",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "85px"
+      ]
+    },
+    {
+      "name": "--el-card-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color-light)"
+      ]
+    },
+    {
+      "name": "--el-card-border-radius",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "4px"
+      ]
+    },
+    {
+      "name": "--el-card-padding",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "20px"
+      ]
+    },
+    {
+      "name": "--el-card-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-blank)"
+      ]
+    },
+    {
+      "name": "--el-carousel-arrow-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "12px"
+      ]
+    },
+    {
+      "name": "--el-carousel-arrow-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "36px"
+      ]
+    },
+    {
+      "name": "--el-carousel-arrow-background",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(31, 45, 61, .11)"
+      ]
+    },
+    {
+      "name": "--el-carousel-arrow-hover-background",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "rgba(31, 45, 61, .23)"
+      ]
+    },
+    {
+      "name": "--el-carousel-indicator-width",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "30px"
+      ]
+    },
+    {
+      "name": "--el-carousel-indicator-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "2px"
+      ]
+    },
+    {
+      "name": "--el-carousel-indicator-padding-horizontal",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "4px"
+      ]
+    },
+    {
+      "name": "--el-carousel-indicator-padding-vertical",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "12px"
+      ]
+    },
+    {
+      "name": "--el-carousel-indicator-out-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color-hover)"
+      ]
+    },
+    {
+      "name": "--el-cascader-menu-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-regular)",
+        "var(--el-text-color-regular)",
+        "var(--el-text-color-regular)"
+      ]
+    },
+    {
+      "name": "--el-cascader-menu-selected-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)",
+        "var(--el-color-primary)",
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-cascader-menu-fill",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-bg-color-overlay)",
+        "var(--el-bg-color-overlay)",
+        "var(--el-bg-color-overlay)"
+      ]
+    },
+    {
+      "name": "--el-cascader-menu-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-font-size-base)",
+        "var(--el-font-size-base)",
+        "var(--el-font-size-base)"
+      ]
+    },
+    {
+      "name": "--el-cascader-menu-radius",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-radius-base)",
+        "var(--el-border-radius-base)",
+        "var(--el-border-radius-base)"
+      ]
+    },
+    {
+      "name": "--el-cascader-menu-border",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "solid 1px var(--el-border-color-light)",
+        "solid 1px var(--el-border-color-light)",
+        "solid 1px var(--el-border-color-light)"
+      ]
+    },
+    {
+      "name": "--el-cascader-menu-shadow",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-box-shadow-light)",
+        "var(--el-box-shadow-light)",
+        "var(--el-box-shadow-light)"
+      ]
+    },
+    {
+      "name": "--el-cascader-node-background-hover",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-light)",
+        "var(--el-fill-color-light)",
+        "var(--el-fill-color-light)"
+      ]
+    },
+    {
+      "name": "--el-cascader-node-color-disabled",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-placeholder)",
+        "var(--el-text-color-placeholder)",
+        "var(--el-text-color-placeholder)"
+      ]
+    },
+    {
+      "name": "--el-cascader-color-empty",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-placeholder)",
+        "var(--el-text-color-placeholder)",
+        "var(--el-text-color-placeholder)"
+      ]
+    },
+    {
+      "name": "--el-cascader-tag-background",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color)",
+        "var(--el-fill-color)",
+        "var(--el-fill-color)"
+      ]
+    },
+    {
+      "name": "--el-checkbox-button-checked-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-checkbox-button-checked-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-white)"
+      ]
+    },
+    {
+      "name": "--el-checkbox-button-checked-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-checkbox-button-disabled-checked-fill",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color-extra-light)"
+      ]
+    },
+    {
+      "name": "--el-checkbox-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "14px"
+      ]
+    },
+    {
+      "name": "--el-checkbox-font-weight",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-font-weight-primary)"
+      ]
+    },
+    {
+      "name": "--el-checkbox-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-regular)"
+      ]
+    },
+    {
+      "name": "--el-checkbox-input-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "14px"
+      ]
+    },
+    {
+      "name": "--el-checkbox-input-width",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "14px"
+      ]
+    },
+    {
+      "name": "--el-checkbox-border-radius",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-radius-small)"
+      ]
+    },
+    {
+      "name": "--el-checkbox-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-blank)"
+      ]
+    },
+    {
+      "name": "--el-checkbox-input-border",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border)"
+      ]
+    },
+    {
+      "name": "--el-checkbox-disabled-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color)"
+      ]
+    },
+    {
+      "name": "--el-checkbox-disabled-input-fill",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-light)"
+      ]
+    },
+    {
+      "name": "--el-checkbox-disabled-icon-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-placeholder)"
+      ]
+    },
+    {
+      "name": "--el-checkbox-disabled-checked-input-fill",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color-extra-light)"
+      ]
+    },
+    {
+      "name": "--el-checkbox-disabled-checked-input-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color)"
+      ]
+    },
+    {
+      "name": "--el-checkbox-disabled-checked-icon-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-placeholder)"
+      ]
+    },
+    {
+      "name": "--el-checkbox-checked-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-checkbox-checked-input-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-checkbox-checked-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-checkbox-checked-icon-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-white)"
+      ]
+    },
+    {
+      "name": "--el-checkbox-input-border-color-hover",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-collapse-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color-lighter)"
+      ]
+    },
+    {
+      "name": "--el-collapse-header-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "48px"
+      ]
+    },
+    {
+      "name": "--el-collapse-header-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-blank)"
+      ]
+    },
+    {
+      "name": "--el-collapse-header-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-collapse-header-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "13px"
+      ]
+    },
+    {
+      "name": "--el-collapse-content-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-blank)"
+      ]
+    },
+    {
+      "name": "--el-collapse-content-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "13px"
+      ]
+    },
+    {
+      "name": "--el-collapse-content-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-colorpicker-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-bg-color-overlay)"
+      ]
+    },
+    {
+      "name": "--el-color-picker-alpha-bg-a",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#ccc",
+        "#333333",
+        "#ccc"
+      ]
+    },
+    {
+      "name": "--el-color-picker-alpha-bg-b",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "transparent",
+        "transparent"
+      ]
+    },
+    {
+      "name": "--el-datepicker-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-disabled-border-color)",
+        "var(--el-disabled-border-color)",
+        "var(--el-disabled-border-color)"
+      ]
+    },
+    {
+      "name": "--el-date-editor-width",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "220px",
+        "var(--el-date-editor-monthrange-width)",
+        "var(--el-date-editor-daterange-width)"
+      ]
+    },
+    {
+      "name": "--el-date-editor-monthrange-width",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "300px"
+      ]
+    },
+    {
+      "name": "--el-date-editor-daterange-width",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "350px"
+      ]
+    },
+    {
+      "name": "--el-date-editor-datetimerange-width",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "400px"
+      ]
+    },
+    {
+      "name": "--el-datepicker-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-regular)",
+        "var(--el-text-color-regular)"
+      ]
+    },
+    {
+      "name": "--el-datepicker-off-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-placeholder)",
+        "var(--el-text-color-placeholder)"
+      ]
+    },
+    {
+      "name": "--el-datepicker-header-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-regular)",
+        "var(--el-text-color-regular)"
+      ]
+    },
+    {
+      "name": "--el-datepicker-icon-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-primary)",
+        "var(--el-text-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-datepicker-inner-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color-light)",
+        "var(--el-border-color-light)"
+      ]
+    },
+    {
+      "name": "--el-datepicker-inrange-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color-extra-light)",
+        "var(--el-border-color-extra-light)"
+      ]
+    },
+    {
+      "name": "--el-datepicker-inrange-hover-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color-extra-light)",
+        "var(--el-border-color-extra-light)"
+      ]
+    },
+    {
+      "name": "--el-datepicker-active-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)",
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-datepicker-hover-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)",
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-datepicker-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-bg-color-overlay)",
+        "var(--el-bg-color-overlay)"
+      ]
+    },
+    {
+      "name": "--el-descriptions-table-border",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "1px solid var(--el-border-color-lighter)"
+      ]
+    },
+    {
+      "name": "--el-descriptions-item-bordered-label-background",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-light)"
+      ]
+    },
+    {
+      "name": "--el-popup-modal-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-black)"
+      ]
+    },
+    {
+      "name": "--el-popup-modal-opacity",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        ".5"
+      ]
+    },
+    {
+      "name": "--el-dialog-width",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "50%",
+        "100%"
+      ]
+    },
+    {
+      "name": "--el-dialog-margin-top",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "15vh",
+        "0"
+      ]
+    },
+    {
+      "name": "--el-dialog-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-bg-color)"
+      ]
+    },
+    {
+      "name": "--el-dialog-box-shadow",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-box-shadow)"
+      ]
+    },
+    {
+      "name": "--el-dialog-title-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-font-size-large)"
+      ]
+    },
+    {
+      "name": "--el-dialog-content-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "14px"
+      ]
+    },
+    {
+      "name": "--el-dialog-font-line-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-font-line-height-primary)"
+      ]
+    },
+    {
+      "name": "--el-dialog-padding-primary",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "16px"
+      ]
+    },
+    {
+      "name": "--el-dialog-border-radius",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-radius-base)"
+      ]
+    },
+    {
+      "name": "--el-drawer-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-dialog-bg-color, var(--el-bg-co"
+      ]
+    },
+    {
+      "name": "--el-drawer-padding-primary",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-dialog-padding-primary, 20px)"
+      ]
+    },
+    {
+      "name": "--el-drawer-dragger-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "8px"
+      ]
+    },
+    {
+      "name": "--el-dropdown-menu-box-shadow",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-box-shadow-light)",
+        "var(--el-box-shadow-light)"
+      ]
+    },
+    {
+      "name": "--el-dropdown-menuItem-hover-fill",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary-light-9)",
+        "var(--el-color-primary-light-9)"
+      ]
+    },
+    {
+      "name": "--el-dropdown-menuItem-hover-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)",
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-dropdown-menu-index",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "10",
+        "10"
+      ]
+    },
+    {
+      "name": "--el-empty-padding",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "40px 0"
+      ]
+    },
+    {
+      "name": "--el-empty-image-width",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "160px"
+      ]
+    },
+    {
+      "name": "--el-empty-description-margin-top",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "20px"
+      ]
+    },
+    {
+      "name": "--el-empty-bottom-margin-top",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "20px"
+      ]
+    },
+    {
+      "name": "--el-empty-fill-color-0",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-white)"
+      ]
+    },
+    {
+      "name": "--el-empty-fill-color-1",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#fcfcfd"
+      ]
+    },
+    {
+      "name": "--el-empty-fill-color-2",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#f8f9fb"
+      ]
+    },
+    {
+      "name": "--el-empty-fill-color-3",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#f7f8fc"
+      ]
+    },
+    {
+      "name": "--el-empty-fill-color-4",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#eeeff3"
+      ]
+    },
+    {
+      "name": "--el-empty-fill-color-5",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#edeef2"
+      ]
+    },
+    {
+      "name": "--el-empty-fill-color-6",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#e9ebef"
+      ]
+    },
+    {
+      "name": "--el-empty-fill-color-7",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#e5e7e9"
+      ]
+    },
+    {
+      "name": "--el-empty-fill-color-8",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#e0e3e9"
+      ]
+    },
+    {
+      "name": "--el-empty-fill-color-9",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#d5d7de"
+      ]
+    },
+    {
+      "name": "--el-footer-padding",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "0 20px"
+      ]
+    },
+    {
+      "name": "--el-footer-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "60px"
+      ]
+    },
+    {
+      "name": "--font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "14px",
+        "14px",
+        "14px"
+      ]
+    },
+    {
+      "name": "--el-form-label-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--font-size)",
+        "var(--font-size)",
+        "var(--font-size)"
+      ]
+    },
+    {
+      "name": "--el-form-inline-content-width",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "220px"
+      ]
+    },
+    {
+      "name": "--el-header-padding",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "0 20px"
+      ]
+    },
+    {
+      "name": "--el-header-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "60px"
+      ]
+    },
+    {
+      "name": "--el-input-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-component-size)",
+        "var(--el-component-size-large)",
+        "var(--el-component-size-small)"
+      ]
+    },
+    {
+      "name": "--el-input-inner-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "calc(var(--el-input-height, 32px) - 2px)",
+        "calc(var(--el-input-height, 40px) - 2px)",
+        "calc(var(--el-input-height, 24px) - 2px)"
+      ]
+    },
+    {
+      "name": "--el-input-number-controls-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "15px",
+        "19px",
+        "11px"
+      ]
+    },
+    {
+      "name": "--el-input-tag-border-color-hover",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color-hover)"
+      ]
+    },
+    {
+      "name": "--el-input-tag-placeholder-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-placeholder)"
+      ]
+    },
+    {
+      "name": "--el-input-tag-disabled-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-disabled-text-color)"
+      ]
+    },
+    {
+      "name": "--el-input-tag-disabled-border",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-disabled-border-color)"
+      ]
+    },
+    {
+      "name": "--el-input-tag-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-font-size-base)",
+        "14px",
+        "12px"
+      ]
+    },
+    {
+      "name": "--el-input-tag-close-hover-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-secondary)"
+      ]
+    },
+    {
+      "name": "--el-input-tag-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-regular)"
+      ]
+    },
+    {
+      "name": "--el-input-tag-input-focus-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-input-tag-width",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "100%"
+      ]
+    },
+    {
+      "name": "--el-input-tag-mini-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-component-size)",
+        "var(--el-component-size-small)"
+      ]
+    },
+    {
+      "name": "--el-input-tag-gap",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "6px",
+        "6px",
+        "4px"
+      ]
+    },
+    {
+      "name": "--el-input-tag-padding",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "4px",
+        "8px",
+        "2px"
+      ]
+    },
+    {
+      "name": "--el-input-tag-inner-padding",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "8px"
+      ]
+    },
+    {
+      "name": "--el-input-tag-line-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "24px",
+        "20px"
+      ]
+    },
+    {
+      "name": "--el-input-tag-padding-left",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "8px",
+        "6px"
+      ]
+    },
+    {
+      "name": "--el-input-otp-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-regular)"
+      ]
+    },
+    {
+      "name": "--el-input-otp-field-width",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "calc(var(--el-input-otp-size) - 4px)"
+      ]
+    },
+    {
+      "name": "--el-input-otp-gap",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "8px",
+        "12px",
+        "6px"
+      ]
+    },
+    {
+      "name": "--el-input-otp-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "14px",
+        "14px",
+        "12px"
+      ]
+    },
+    {
+      "name": "--el-input-otp-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "32px",
+        "40px",
+        "24px"
+      ]
+    },
+    {
+      "name": "--el-link-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-font-size-base)"
+      ]
+    },
+    {
+      "name": "--el-link-font-weight",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-font-weight-primary)"
+      ]
+    },
+    {
+      "name": "--el-link-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-regular)",
+        "var(--el-color-primary)",
+        "var(--el-color-success)"
+      ]
+    },
+    {
+      "name": "--el-link-hover-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)",
+        "var(--el-color-primary-light-3)",
+        "var(--el-color-success-light-3)"
+      ]
+    },
+    {
+      "name": "--el-link-disabled-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-placeholder)",
+        "var(--el-color-primary-light-5)",
+        "var(--el-color-success-light-5)"
+      ]
+    },
+    {
+      "name": "--el-loading-spinner-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "42px"
+      ]
+    },
+    {
+      "name": "--el-loading-fullscreen-spinner-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "50px"
+      ]
+    },
+    {
+      "name": "--el-main-padding",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "20px"
+      ]
+    },
+    {
+      "name": "--el-menu-active-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-menu-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-menu-hover-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-menu-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-blank)"
+      ]
+    },
+    {
+      "name": "--el-menu-hover-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary-light-9)"
+      ]
+    },
+    {
+      "name": "--el-menu-item-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "56px"
+      ]
+    },
+    {
+      "name": "--el-menu-sub-item-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "calc(var(--el-menu-item-height) - 6px)"
+      ]
+    },
+    {
+      "name": "--el-menu-horizontal-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "60px"
+      ]
+    },
+    {
+      "name": "--el-menu-horizontal-sub-item-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "36px"
+      ]
+    },
+    {
+      "name": "--el-menu-item-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-font-size-base)"
+      ]
+    },
+    {
+      "name": "--el-menu-item-hover-fill",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary-light-9)"
+      ]
+    },
+    {
+      "name": "--el-menu-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color)"
+      ]
+    },
+    {
+      "name": "--el-menu-base-level-padding",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "20px"
+      ]
+    },
+    {
+      "name": "--el-menu-level-padding",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "20px"
+      ]
+    },
+    {
+      "name": "--el-menu-icon-width",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "24px"
+      ]
+    },
+    {
+      "name": "--el-messagebox-title-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-messagebox-width",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "420px"
+      ]
+    },
+    {
+      "name": "--el-messagebox-border-radius",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "4px"
+      ]
+    },
+    {
+      "name": "--el-messagebox-box-shadow",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-box-shadow)"
+      ]
+    },
+    {
+      "name": "--el-messagebox-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-font-size-large)"
+      ]
+    },
+    {
+      "name": "--el-messagebox-content-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-font-size-base)"
+      ]
+    },
+    {
+      "name": "--el-messagebox-content-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-regular)"
+      ]
+    },
+    {
+      "name": "--el-messagebox-error-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "12px"
+      ]
+    },
+    {
+      "name": "--el-messagebox-padding-primary",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "12px"
+      ]
+    },
+    {
+      "name": "--el-messagebox-font-line-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-font-line-height-primary)"
+      ]
+    },
+    {
+      "name": "--el-messagebox-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)",
+        "var(--el-color-success)",
+        "var(--el-color-info)"
+      ]
+    },
+    {
+      "name": "--el-message-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-info-light-9)",
+        "var(--el-color-primary-light-9)",
+        "var(--el-color-success-light-9)"
+      ]
+    },
+    {
+      "name": "--el-message-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color-lighter)",
+        "var(--el-color-primary-light-8)",
+        "var(--el-color-success-light-8)"
+      ]
+    },
+    {
+      "name": "--el-message-padding",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "11px 15px"
+      ]
+    },
+    {
+      "name": "--el-message-close-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "16px"
+      ]
+    },
+    {
+      "name": "--el-message-close-icon-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-placeholder)"
+      ]
+    },
+    {
+      "name": "--el-message-close-hover-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-secondary)"
+      ]
+    },
+    {
+      "name": "--el-message-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)",
+        "var(--el-color-success)",
+        "var(--el-color-info)"
+      ]
+    },
+    {
+      "name": "--el-notification-width",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "330px"
+      ]
+    },
+    {
+      "name": "--el-notification-padding",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "14px 26px 14px 13px"
+      ]
+    },
+    {
+      "name": "--el-notification-radius",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "8px"
+      ]
+    },
+    {
+      "name": "--el-notification-shadow",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-box-shadow-light)"
+      ]
+    },
+    {
+      "name": "--el-notification-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color-lighter)"
+      ]
+    },
+    {
+      "name": "--el-notification-icon-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "24px"
+      ]
+    },
+    {
+      "name": "--el-notification-close-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-message-close-size, 16px)"
+      ]
+    },
+    {
+      "name": "--el-notification-group-margin-left",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "13px"
+      ]
+    },
+    {
+      "name": "--el-notification-group-margin-right",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "8px"
+      ]
+    },
+    {
+      "name": "--el-notification-content-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-font-size-base)"
+      ]
+    },
+    {
+      "name": "--el-notification-content-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-regular)"
+      ]
+    },
+    {
+      "name": "--el-notification-title-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "16px"
+      ]
+    },
+    {
+      "name": "--el-notification-title-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-notification-close-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-secondary)"
+      ]
+    },
+    {
+      "name": "--el-notification-close-hover-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-regular)"
+      ]
+    },
+    {
+      "name": "--el-notification-icon-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)",
+        "var(--el-color-success)",
+        "var(--el-color-info)"
+      ]
+    },
+    {
+      "name": "--el-pagination-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "14px"
+      ]
+    },
+    {
+      "name": "--el-pagination-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-blank)"
+      ]
+    },
+    {
+      "name": "--el-pagination-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-pagination-border-radius",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "2px"
+      ]
+    },
+    {
+      "name": "--el-pagination-button-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-pagination-button-width",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "32px"
+      ]
+    },
+    {
+      "name": "--el-pagination-button-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "32px"
+      ]
+    },
+    {
+      "name": "--el-pagination-button-disabled-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-placeholder)"
+      ]
+    },
+    {
+      "name": "--el-pagination-button-disabled-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-blank)"
+      ]
+    },
+    {
+      "name": "--el-pagination-button-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color)"
+      ]
+    },
+    {
+      "name": "--el-pagination-hover-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-pagination-font-size-small",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "12px"
+      ]
+    },
+    {
+      "name": "--el-pagination-button-width-small",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "24px"
+      ]
+    },
+    {
+      "name": "--el-pagination-button-height-small",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "24px"
+      ]
+    },
+    {
+      "name": "--el-pagination-button-width-large",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "40px"
+      ]
+    },
+    {
+      "name": "--el-pagination-button-height-large",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "40px"
+      ]
+    },
+    {
+      "name": "--el-pagination-item-gap",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "16px"
+      ]
+    },
+    {
+      "name": "--el-popover-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-bg-color-overlay)",
+        "var(--el-text-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-popover-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-font-size-base)"
+      ]
+    },
+    {
+      "name": "--el-popover-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color-lighter)",
+        "var(--el-text-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-popover-padding",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "12px"
+      ]
+    },
+    {
+      "name": "--el-popover-padding-large",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "18px 20px"
+      ]
+    },
+    {
+      "name": "--el-popover-title-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "16px"
+      ]
+    },
+    {
+      "name": "--el-popover-title-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-primary)",
+        "var(--el-bg-color)"
+      ]
+    },
+    {
+      "name": "--el-popover-border-radius",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "4px"
+      ]
+    },
+    {
+      "name": "--el-radio-button-checked-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-radio-button-checked-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-white)"
+      ]
+    },
+    {
+      "name": "--el-radio-button-checked-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-radio-button-disabled-checked-fill",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color-extra-light)"
+      ]
+    },
+    {
+      "name": "--el-radio-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-font-size-base)"
+      ]
+    },
+    {
+      "name": "--el-radio-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-regular)"
+      ]
+    },
+    {
+      "name": "--el-radio-font-weight",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-font-weight-primary)"
+      ]
+    },
+    {
+      "name": "--el-radio-input-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "14px"
+      ]
+    },
+    {
+      "name": "--el-radio-input-width",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "14px"
+      ]
+    },
+    {
+      "name": "--el-radio-input-border-radius",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-radius-circle)"
+      ]
+    },
+    {
+      "name": "--el-radio-input-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-blank)"
+      ]
+    },
+    {
+      "name": "--el-radio-input-border",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border)"
+      ]
+    },
+    {
+      "name": "--el-radio-input-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color)"
+      ]
+    },
+    {
+      "name": "--el-radio-input-border-color-hover",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-rate-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "20px"
+      ]
+    },
+    {
+      "name": "--el-rate-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-font-size-base)"
+      ]
+    },
+    {
+      "name": "--el-rate-icon-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "18px"
+      ]
+    },
+    {
+      "name": "--el-rate-icon-margin",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "6px"
+      ]
+    },
+    {
+      "name": "--el-rate-void-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color-darker)"
+      ]
+    },
+    {
+      "name": "--el-rate-fill-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#f7ba2a"
+      ]
+    },
+    {
+      "name": "--el-rate-disabled-void-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color)"
+      ]
+    },
+    {
+      "name": "--el-rate-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-rate-outline-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary-light-5)"
+      ]
+    },
+    {
+      "name": "--el-result-padding",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "40px 30px"
+      ]
+    },
+    {
+      "name": "--el-result-icon-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "64px"
+      ]
+    },
+    {
+      "name": "--el-result-title-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "20px"
+      ]
+    },
+    {
+      "name": "--el-result-title-margin-top",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "20px"
+      ]
+    },
+    {
+      "name": "--el-result-subtitle-margin-top",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "10px"
+      ]
+    },
+    {
+      "name": "--el-result-extra-margin-top",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "30px"
+      ]
+    },
+    {
+      "name": "--el-result-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)",
+        "var(--el-color-success)",
+        "var(--el-color-warning)"
+      ]
+    },
+    {
+      "name": "--el-scrollbar-opacity",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        ".3"
+      ]
+    },
+    {
+      "name": "--el-scrollbar-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-secondary)"
+      ]
+    },
+    {
+      "name": "--el-scrollbar-hover-opacity",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        ".5"
+      ]
+    },
+    {
+      "name": "--el-scrollbar-hover-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-secondary)"
+      ]
+    },
+    {
+      "name": "--el-select-border-color-hover",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color-hover)"
+      ]
+    },
+    {
+      "name": "--el-select-disabled-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-disabled-text-color)"
+      ]
+    },
+    {
+      "name": "--el-select-disabled-border",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-disabled-border-color)"
+      ]
+    },
+    {
+      "name": "--el-select-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-font-size-base)"
+      ]
+    },
+    {
+      "name": "--el-select-close-hover-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-secondary)"
+      ]
+    },
+    {
+      "name": "--el-select-input-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-placeholder)"
+      ]
+    },
+    {
+      "name": "--el-select-multiple-input-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-regular)"
+      ]
+    },
+    {
+      "name": "--el-select-input-focus-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-select-input-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "14px"
+      ]
+    },
+    {
+      "name": "--el-select-width",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "100%"
+      ]
+    },
+    {
+      "name": "--el-skeleton-circle-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-avatar-size)"
+      ]
+    },
+    {
+      "name": "--el-skeleton-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color)"
+      ]
+    },
+    {
+      "name": "--el-skeleton-to-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-darker)"
+      ]
+    },
+    {
+      "name": "--el-slider-main-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-slider-runway-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color-light)"
+      ]
+    },
+    {
+      "name": "--el-slider-stop-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-white)"
+      ]
+    },
+    {
+      "name": "--el-slider-disabled-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-placeholder)"
+      ]
+    },
+    {
+      "name": "--el-slider-border-radius",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "3px"
+      ]
+    },
+    {
+      "name": "--el-slider-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "6px"
+      ]
+    },
+    {
+      "name": "--el-slider-button-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "20px"
+      ]
+    },
+    {
+      "name": "--el-slider-button-wrapper-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "36px"
+      ]
+    },
+    {
+      "name": "--el-slider-button-wrapper-offset",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "-15px"
+      ]
+    },
+    {
+      "name": "--el-switch-on-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-switch-off-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color)"
+      ]
+    },
+    {
+      "name": "--el-table-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color-lighter)",
+        "var(--el-border-color-lighter)"
+      ]
+    },
+    {
+      "name": "--el-table-border",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "1px solid var(--el-table-border-color)",
+        "1px solid var(--el-table-border-color)"
+      ]
+    },
+    {
+      "name": "--el-table-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-regular)",
+        "var(--el-text-color-regular)"
+      ]
+    },
+    {
+      "name": "--el-table-header-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-secondary)",
+        "var(--el-text-color-secondary)"
+      ]
+    },
+    {
+      "name": "--el-table-row-hover-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-light)",
+        "var(--el-fill-color-light)"
+      ]
+    },
+    {
+      "name": "--el-table-current-row-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary-light-9)",
+        "var(--el-color-primary-light-9)"
+      ]
+    },
+    {
+      "name": "--el-table-header-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-blank)",
+        "var(--el-fill-color-blank)"
+      ]
+    },
+    {
+      "name": "--el-table-fixed-box-shadow",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-box-shadow-light)",
+        "var(--el-box-shadow-light)"
+      ]
+    },
+    {
+      "name": "--el-table-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-blank)",
+        "var(--el-fill-color-blank)"
+      ]
+    },
+    {
+      "name": "--el-table-tr-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-blank)",
+        "var(--el-fill-color-blank)"
+      ]
+    },
+    {
+      "name": "--el-table-expanded-cell-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-blank)",
+        "var(--el-fill-color-blank)"
+      ]
+    },
+    {
+      "name": "--el-table-fixed-left-column",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "inset 10px 0 10px -10px rgba(0, 0, 0, .1",
+        "inset 10px 0 10px -10px rgba(0, 0, 0, .1"
+      ]
+    },
+    {
+      "name": "--el-table-fixed-right-column",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "inset -10px 0 10px -10px rgba(0, 0, 0, .",
+        "inset -10px 0 10px -10px rgba(0, 0, 0, ."
+      ]
+    },
+    {
+      "name": "--el-table-index",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-index-normal)",
+        "var(--el-index-normal)"
+      ]
+    },
+    {
+      "name": "--el-tabs-header-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "40px"
+      ]
+    },
+    {
+      "name": "--el-tag-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "12px"
+      ]
+    },
+    {
+      "name": "--el-tag-border-radius",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "4px"
+      ]
+    },
+    {
+      "name": "--el-tag-border-radius-rounded",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "9999px"
+      ]
+    },
+    {
+      "name": "--el-icon-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "14px",
+        "16px",
+        "12px"
+      ]
+    },
+    {
+      "name": "--el-tag-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary-light-9)",
+        "var(--el-color-primary-light-9)",
+        "var(--el-color-success-light-9)"
+      ]
+    },
+    {
+      "name": "--el-tag-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary-light-8)",
+        "var(--el-color-primary-light-8)",
+        "var(--el-color-success-light-8)"
+      ]
+    },
+    {
+      "name": "--el-tag-hover-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)",
+        "var(--el-color-primary)",
+        "var(--el-color-success)"
+      ]
+    },
+    {
+      "name": "--el-tag-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)",
+        "var(--el-color-success)",
+        "var(--el-color-warning)"
+      ]
+    },
+    {
+      "name": "--el-text-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-font-size-base)",
+        "var(--el-font-size-medium)",
+        "var(--el-font-size-base)"
+      ]
+    },
+    {
+      "name": "--el-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-regular)",
+        "var(--el-color-primary)",
+        "var(--el-color-success)"
+      ]
+    },
+    {
+      "name": "--el-timeline-node-size-normal",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "12px"
+      ]
+    },
+    {
+      "name": "--el-timeline-node-size-large",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "14px"
+      ]
+    },
+    {
+      "name": "--el-timeline-node-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color-light)"
+      ]
+    },
+    {
+      "name": "--el-transfer-border-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-color-lighter)"
+      ]
+    },
+    {
+      "name": "--el-transfer-border-radius",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-border-radius-base)"
+      ]
+    },
+    {
+      "name": "--el-transfer-panel-width",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "200px"
+      ]
+    },
+    {
+      "name": "--el-transfer-panel-header-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "40px"
+      ]
+    },
+    {
+      "name": "--el-transfer-panel-header-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-light)"
+      ]
+    },
+    {
+      "name": "--el-transfer-panel-footer-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "40px"
+      ]
+    },
+    {
+      "name": "--el-transfer-panel-body-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "278px"
+      ]
+    },
+    {
+      "name": "--el-transfer-item-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "30px"
+      ]
+    },
+    {
+      "name": "--el-transfer-filter-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "32px"
+      ]
+    },
+    {
+      "name": "--el-tree-node-content-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "26px",
+        "26px"
+      ]
+    },
+    {
+      "name": "--el-tree-node-hover-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-light)",
+        "var(--el-fill-color-light)"
+      ]
+    },
+    {
+      "name": "--el-tree-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-regular)",
+        "var(--el-text-color-regular)"
+      ]
+    },
+    {
+      "name": "--el-tree-expand-icon-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-placeholder)",
+        "var(--el-text-color-placeholder)"
+      ]
+    },
+    {
+      "name": "--el-checkbox-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-tree-node-content-height)"
+      ]
+    },
+    {
+      "name": "--el-upload-dragger-padding-horizontal",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "10px",
+        "10px"
+      ]
+    },
+    {
+      "name": "--el-upload-dragger-padding-vertical",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "40px",
+        "40px"
+      ]
+    },
+    {
+      "name": "--el-upload-list-picture-card-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-upload-picture-card-size)",
+        "var(--el-upload-picture-card-size)"
+      ]
+    },
+    {
+      "name": "--el-upload-picture-card-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "148px",
+        "148px"
+      ]
+    },
+    {
+      "name": "--el-popper-border-radius",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-popover-border-radius, 4px)"
+      ]
+    },
+    {
+      "name": "--el-popper-bg-color-light",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-bg-color-overlay)"
+      ]
+    },
+    {
+      "name": "--el-popper-bg-color-dark",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-statistic-title-font-weight",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "400"
+      ]
+    },
+    {
+      "name": "--el-statistic-title-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-font-size-extra-small)"
+      ]
+    },
+    {
+      "name": "--el-statistic-title-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-regular)"
+      ]
+    },
+    {
+      "name": "--el-statistic-content-font-weight",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "400"
+      ]
+    },
+    {
+      "name": "--el-statistic-content-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-font-size-extra-large)"
+      ]
+    },
+    {
+      "name": "--el-statistic-content-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-tour-width",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "520px"
+      ]
+    },
+    {
+      "name": "--el-tour-padding-primary",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "12px"
+      ]
+    },
+    {
+      "name": "--el-tour-font-line-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-font-line-height-primary)"
+      ]
+    },
+    {
+      "name": "--el-tour-title-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "16px"
+      ]
+    },
+    {
+      "name": "--el-tour-title-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-primary)",
+        "#fff"
+      ]
+    },
+    {
+      "name": "--el-tour-title-font-weight",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "400"
+      ]
+    },
+    {
+      "name": "--el-tour-close-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-info)",
+        "#fff"
+      ]
+    },
+    {
+      "name": "--el-tour-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "14px"
+      ]
+    },
+    {
+      "name": "--el-tour-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-tour-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-bg-color)",
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-tour-border-radius",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "4px"
+      ]
+    },
+    {
+      "name": "--el-tour-text-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "#fff"
+      ]
+    },
+    {
+      "name": "--el-anchor-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-bg-color)"
+      ]
+    },
+    {
+      "name": "--el-anchor-padding-indent",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "14px"
+      ]
+    },
+    {
+      "name": "--el-anchor-line-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "22px"
+      ]
+    },
+    {
+      "name": "--el-anchor-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "12px"
+      ]
+    },
+    {
+      "name": "--el-anchor-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-secondary)"
+      ]
+    },
+    {
+      "name": "--el-anchor-active-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-anchor-hover-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-regular)"
+      ]
+    },
+    {
+      "name": "--el-anchor-marker-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-segmented-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-regular)"
+      ]
+    },
+    {
+      "name": "--el-segmented-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-light)"
+      ]
+    },
+    {
+      "name": "--el-segmented-padding",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "2px"
+      ]
+    },
+    {
+      "name": "--el-segmented-item-selected-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-white)"
+      ]
+    },
+    {
+      "name": "--el-segmented-item-selected-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-segmented-item-selected-disabled-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary-light-5)"
+      ]
+    },
+    {
+      "name": "--el-segmented-item-hover-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-segmented-item-hover-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-dark)"
+      ]
+    },
+    {
+      "name": "--el-segmented-item-active-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-darker)"
+      ]
+    },
+    {
+      "name": "--el-segmented-item-disabled-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-placeholder)"
+      ]
+    },
+    {
+      "name": "--el-mention-font-size",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-font-size-base)"
+      ]
+    },
+    {
+      "name": "--el-mention-bg-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-bg-color-overlay)"
+      ]
+    },
+    {
+      "name": "--el-mention-shadow",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-box-shadow-light)"
+      ]
+    },
+    {
+      "name": "--el-mention-border",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "1px solid var(--el-border-color-light)"
+      ]
+    },
+    {
+      "name": "--el-mention-option-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-regular)"
+      ]
+    },
+    {
+      "name": "--el-mention-option-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "34px"
+      ]
+    },
+    {
+      "name": "--el-mention-option-min-width",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "100px"
+      ]
+    },
+    {
+      "name": "--el-mention-option-hover-background",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-fill-color-light)"
+      ]
+    },
+    {
+      "name": "--el-mention-option-selected-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-color-primary)"
+      ]
+    },
+    {
+      "name": "--el-mention-option-disabled-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-placeholder)"
+      ]
+    },
+    {
+      "name": "--el-mention-option-loading-color",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "var(--el-text-color-secondary)"
+      ]
+    },
+    {
+      "name": "--el-mention-option-loading-padding",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "10px 0"
+      ]
+    },
+    {
+      "name": "--el-mention-max-height",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "174px"
+      ]
+    },
+    {
+      "name": "--el-mention-padding",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "6px 0"
+      ]
+    },
+    {
+      "name": "--el-mention-header-padding",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "10px"
+      ]
+    },
+    {
+      "name": "--el-mention-footer-padding",
+      "files": [
+        "index-Cv4ia_mR.css"
+      ],
+      "samples": [
+        "10px"
+      ]
+    },
+    {
+      "name": "--swiper-theme-color",
+      "files": [
+        "swiper-bundle-CK_Zgl0K.css"
+      ],
+      "samples": [
+        "#007aff"
+      ]
+    },
+    {
+      "name": "--swiper-preloader-color",
+      "files": [
+        "swiper-bundle-CK_Zgl0K.css"
+      ],
+      "samples": [
+        "#fff",
+        "#000"
+      ]
+    },
+    {
+      "name": "--swiper-navigation-size",
+      "files": [
+        "swiper-bundle-CK_Zgl0K.css"
+      ],
+      "samples": [
+        "44px"
+      ]
+    }
+  ],
+  "hexTop": [
+    [
+      "#14191e",
+      214
+    ],
+    [
+      "#fff",
+      192
+    ],
+    [
+      "#a8abb2",
+      81
+    ],
+    [
+      "#8c9196",
+      47
+    ],
+    [
+      "#e4e7ed",
+      47
+    ],
+    [
+      "#909399",
+      46
+    ],
+    [
+      "#606266",
+      43
+    ],
+    [
+      "#dcdfe6",
+      40
+    ],
+    [
+      "#f56c6c",
+      35
+    ],
+    [
+      "#303133",
+      35
+    ],
+    [
+      "#f5f7fa",
+      34
+    ],
+    [
+      "#c8cdd2",
+      32
+    ],
+    [
+      "#f3f4f5",
+      29
+    ],
+    [
+      "#000",
+      23
+    ],
+    [
+      "#67c23a",
+      22
+    ],
+    [
+      "#64696e",
+      21
+    ],
+    [
+      "#dadde0",
+      20
+    ],
+    [
+      "#ebeef5",
+      19
+    ],
+    [
+      "#fafbfc",
+      18
+    ],
+    [
+      "#c0c4cc",
+      18
+    ],
+    [
+      "#f7f8f9",
+      17
+    ],
+    [
+      "#e6a23c",
+      14
+    ],
+    [
+      "#ffffff",
+      10
+    ],
+    [
+      "#e8e8e9",
+      9
+    ],
+    [
+      "#464b50",
+      8
+    ],
+    [
+      "#3ddaf8",
+      8
+    ],
+    [
+      "#92e730",
+      8
+    ],
+    [
+      "#fde2e2",
+      8
+    ],
+    [
+      "#f4f4f5",
+      8
+    ],
+    [
+      "#7e7cf6",
+      7
+    ],
+    [
+      "#689cf6",
+      7
+    ],
+    [
+      "#8c96a0",
+      7
+    ],
+    [
+      "#9e7a22",
+      6
+    ],
+    [
+      "#004b96",
+      6
+    ],
+    [
+      "#8a8c8f",
+      6
+    ],
+    [
+      "#d0d1d2",
+      6
+    ],
+    [
+      "#fef0f0",
+      6
+    ],
+    [
+      "#32b846",
+      5
+    ],
+    [
+      "#cdd0d6",
+      5
+    ],
+    [
+      "#f0f2f5",
+      5
+    ],
+    [
+      "#e1f3d8",
+      5
+    ],
+    [
+      "#faecd8",
+      5
+    ],
+    [
+      "#e9e9eb",
+      5
+    ],
+    [
+      "#007aff",
+      5
+    ],
+    [
+      "#f1f2f3",
+      4
+    ],
+    [
+      "#f53e59",
+      4
+    ],
+    [
+      "#ebedf0",
+      4
+    ],
+    [
+      "#f0f9eb",
+      4
+    ],
+    [
+      "#fdf6ec",
+      4
+    ],
+    [
+      "#d1dbe5",
+      4
+    ],
+    [
+      "#ff6771",
+      3
+    ],
+    [
+      "#fafafa",
+      3
+    ],
+    [
+      "#cbcdd2",
+      2
+    ],
+    [
+      "#f850e2",
+      2
+    ],
+    [
+      "#100d05",
+      2
+    ],
+    [
+      "#b6923c",
+      2
+    ],
+    [
+      "#8fd427",
+      2
+    ],
+    [
+      "#59d01b",
+      2
+    ],
+    [
+      "#ff4636",
+      2
+    ],
+    [
+      "#fd960d",
+      2
+    ],
+    [
+      "#f964a5",
+      2
+    ],
+    [
+      "#6b5217",
+      2
+    ],
+    [
+      "#7e611b",
+      2
+    ],
+    [
+      "#5d4814",
+      2
+    ],
+    [
+      "#634c15",
+      2
+    ],
+    [
+      "#5c4714",
+      2
+    ],
+    [
+      "#654e16",
+      2
+    ],
+    [
+      "#e1e6eb",
+      2
+    ],
+    [
+      "#28323c",
+      2
+    ],
+    [
+      "#24a54d",
+      2
+    ],
+    [
+      "#8c9198",
+      2
+    ],
+    [
+      "#000000",
+      2
+    ],
+    [
+      "#f2f6fc",
+      2
+    ],
+    [
+      "#e6e8eb",
+      2
+    ],
+    [
+      "#5b5e62",
+      2
+    ],
+    [
+      "#b3e19d",
+      2
+    ],
+    [
+      "#f3d19e",
+      2
+    ],
+    [
+      "#fab6b6",
+      2
+    ],
+    [
+      "#c8c9cc",
+      2
+    ],
+    [
+      "#dedfe0",
+      2
+    ]
+  ],
+  "mediaQueries": [
+    [
+      "only screen and (max-width:460px)",
+      4
+    ],
+    [
+      "only screen and (max-width:1080px)",
+      2
+    ],
+    [
+      "screen and (max-width:360px)",
+      1
+    ],
+    [
+      "screen and (max-width:375px)",
+      1
+    ],
+    [
+      "only screen and (max-width:767px)",
+      1
+    ],
+    [
+      "only screen and (min-width:768px)",
+      1
+    ],
+    [
+      "only screen and (min-width:992px)",
+      1
+    ],
+    [
+      "only screen and (min-width:1200px)",
+      1
+    ],
+    [
+      "only screen and (min-width:1920px)",
+      1
+    ]
+  ]
+}

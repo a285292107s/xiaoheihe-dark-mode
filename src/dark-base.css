@@ -1,0 +1,53 @@
+/* 小黑盒深色模式 —— 基础层
+ *
+ * 这一层只负责「引擎跑起来之前」和「引擎管不到」的部分：
+ *   1) 页面画布底色 —— 站点 CSS 异步加载，先给画布上深色，消除首屏白闪
+ *   2) color-scheme     —— 让滚动条、原生表单控件、输入法候选框一并转深色
+ *   3) 滚动条 / placeholder / 选中文本等原生装饰
+ *
+ * 真正的组件配色由 src/dark-engine.ts 的规则重映射引擎负责。
+ *
+ * 注意：这里刻意 **不再** 覆盖 --hb-* / --el-* 等设计令牌。
+ * 实测（research/FINDINGS.md 实验 1、2）把两套令牌全部改成红色，页面上
+ * 0 个元素变色 —— 站点的令牌层对渲染是失效的，覆盖它只是空转。
+ */
+
+html.hb-dark {
+  color-scheme: dark;
+
+  /* 页面画布。子元素多为透明，画布色即页面底色；
+     用 !important 保证首屏先于站点样式生效，避免白闪。 */
+  background-color: #0e1116 !important;
+}
+
+/* 画布之上的根容器跟随（不加 !important，留给引擎覆盖具体表面） */
+html.hb-dark body {
+  background-color: #0e1116;
+}
+
+/* 滚动条 */
+html.hb-dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+html.hb-dark ::-webkit-scrollbar-track {
+  background: #0e1116;
+}
+html.hb-dark ::-webkit-scrollbar-thumb {
+  background: #333b45;
+  border-radius: 4px;
+}
+html.hb-dark ::-webkit-scrollbar-thumb:hover {
+  background: #4a5360;
+}
+
+/* 原生控件占位符（color-scheme 只管控件外观，不管占位符颜色） */
+html.hb-dark input::placeholder,
+html.hb-dark textarea::placeholder {
+  color: #6f7782;
+}
+
+/* 选中文本 */
+html.hb-dark ::selection {
+  background: rgba(94, 176, 255, 0.32);
+}

@@ -1,0 +1,246 @@
+{
+  "sheets": [
+    {
+      "href": "https://static.max-c.com/static/heybox/webapp/@heybox-spa/website/app/index-Cv4ia_mR.css",
+      "owner": true,
+      "rules": 3489,
+      "error": null,
+      "cors": null,
+      "coloredRules": 333,
+      "scanned": 3489
+    },
+    {
+      "href": "https://static.max-c.com/static/heybox/webapp/@heybox-spa/website/app/index-Dcvuqx_5.css",
+      "owner": true,
+      "rules": 23,
+      "error": null,
+      "cors": null,
+      "coloredRules": 9,
+      "scanned": 23
+    },
+    {
+      "href": "https://static.max-c.com/static/heybox/webapp/@heybox-spa/website/app/index-B8IQS1Zj.css",
+      "owner": true,
+      "rules": 17,
+      "error": null,
+      "cors": null,
+      "coloredRules": 3,
+      "scanned": 17
+    },
+    {
+      "href": "https://static.max-c.com/static/heybox/webapp/@heybox-spa/website/app/swiper-bundle-CK_Zgl0K.css",
+      "owner": true,
+      "rules": 133,
+      "error": null,
+      "cors": null,
+      "coloredRules": 13,
+      "scanned": 133
+    },
+    {
+      "href": "https://static.max-c.com/static/heybox/webapp/@heybox-spa/website/app/index-CrTeVX9h.css",
+      "owner": true,
+      "rules": 64,
+      "error": null,
+      "cors": null,
+      "coloredRules": 10,
+      "scanned": 64
+    },
+    {
+      "href": "https://static.max-c.com/static/heybox/webapp/@heybox-spa/website/app/index-Boh4dUKh.css",
+      "owner": true,
+      "rules": 9,
+      "error": null,
+      "cors": null,
+      "coloredRules": 1,
+      "scanned": 9
+    },
+    {
+      "href": "https://static.max-c.com/static/heybox/webapp/@heybox-spa/website/app/index-BQE5Tmp4.css",
+      "owner": true,
+      "rules": 19,
+      "error": null,
+      "cors": null,
+      "coloredRules": 8,
+      "scanned": 19
+    },
+    {
+      "href": "https://static.max-c.com/static/heybox/webapp/@heybox-spa/website/app/index-C3LJfapH.css",
+      "owner": true,
+      "rules": 3,
+      "error": null,
+      "cors": null,
+      "coloredRules": 0,
+      "scanned": 3
+    },
+    {
+      "href": "https://static.max-c.com/static/heybox/webapp/@heybox-spa/website/app/safe-route-BVPxA3TQ.css",
+      "owner": true,
+      "rules": 38,
+      "error": null,
+      "cors": null,
+      "coloredRules": 12,
+      "scanned": 38
+    },
+    {
+      "href": "https://static.max-c.com/static/heybox/webapp/@heybox-spa/website/app/index-IKeCUmqa.css",
+      "owner": true,
+      "rules": 11,
+      "error": null,
+      "cors": null,
+      "coloredRules": 5,
+      "scanned": 11
+    },
+    {
+      "href": "https://static.max-c.com/static/heybox/webapp/@heybox-spa/website/app/index-eib4pooy.css",
+      "owner": true,
+      "rules": 49,
+      "error": null,
+      "cors": null,
+      "coloredRules": 10,
+      "scanned": 49
+    },
+    {
+      "href": "https://static.max-c.com/static/heybox/webapp/@heybox-spa/website/app/index-7Ok5QYva.css",
+      "owner": true,
+      "rules": 10,
+      "error": null,
+      "cors": null,
+      "coloredRules": 4,
+      "scanned": 10
+    },
+    {
+      "href": "https://static.max-c.com/static/heybox/webapp/@heybox-spa/website/app/index-DBGubYmk.css",
+      "owner": true,
+      "rules": 10,
+      "error": null,
+      "cors": null,
+      "coloredRules": 4,
+      "scanned": 10
+    },
+    {
+      "href": "https://static.max-c.com/static/heybox/webapp/@heybox-spa/website/app/index-BTPs-g-G.css",
+      "owner": true,
+      "rules": 80,
+      "error": null,
+      "cors": null,
+      "coloredRules": 35,
+      "scanned": 80
+    },
+    {
+      "href": "https://static.max-c.com/static/heybox/webapp/@heybox-spa/website/app/index-bQ2BgbQz.css",
+      "owner": true,
+      "rules": 8,
+      "error": null,
+      "cors": null,
+      "coloredRules": 4,
+      "scanned": 8
+    },
+    {
+      "href": "https://static.max-c.com/static/heybox/webapp/@heybox-spa/website/app/index-DBcvV3KQ.css",
+      "owner": true,
+      "rules": 32,
+      "error": null,
+      "cors": null,
+      "coloredRules": 14,
+      "scanned": 32
+    }
+  ],
+  "fetchTests": [
+    {
+      "url": "index-Cv4ia_mR.css",
+      "ok": true,
+      "status": 200,
+      "acao": null,
+      "bytes": 507807
+    },
+    {
+      "url": "index-Dcvuqx_5.css",
+      "ok": true,
+      "status": 200,
+      "acao": null,
+      "bytes": 3040
+    },
+    {
+      "url": "index-B8IQS1Zj.css",
+      "ok": true,
+      "status": 200,
+      "acao": null,
+      "bytes": 1980
+    }
+  ],
+  "inline": {
+    "withStyleAttr": 122,
+    "inlineColor": 20,
+    "inlineBg": 10,
+    "inlineBgImg": 0,
+    "samples": [
+      {
+        "tag": "span",
+        "cls": "bbs-new-style-bottom__rich-stack",
+        "style": "display: inline-flex; flex-flow: row; align-items: center; min-width: 0px; max-width: 100%; box-sizing: border-box; padding: 0px 6px 0px 2px"
+      },
+      {
+        "tag": "span",
+        "cls": "bbs-new-style-bottom__rich-node",
+        "style": "color: rgb(100, 105, 110); font-size: 11px; line-height: 16px; font-family: PingFangSC-Regular;"
+      },
+      {
+        "tag": "span",
+        "cls": "bbs-new-style-bottom__rich-stack",
+        "style": "display: inline-flex; flex-flow: row; align-items: center; min-width: 0px; max-width: 100%; box-sizing: border-box; padding: 0px 6px 0px 2px"
+      },
+      {
+        "tag": "span",
+        "cls": "bbs-new-style-bottom__rich-node",
+        "style": "color: rgb(100, 105, 110); font-size: 11px; line-height: 16px; font-family: PingFangSC-Regular;"
+      },
+      {
+        "tag": "span",
+        "cls": "bbs-new-style-bottom__rich-stack",
+        "style": "display: inline-flex; flex-flow: row; align-items: center; min-width: 0px; max-width: 100%; box-sizing: border-box; padding: 0px 6px 0px 4px"
+      },
+      {
+        "tag": "span",
+        "cls": "bbs-new-style-bottom__rich-node",
+        "style": "color: rgb(100, 105, 110); font-size: 11px; line-height: 16px; font-family: PingFangSC-Regular;"
+      },
+      {
+        "tag": "span",
+        "cls": "bbs-new-style-bottom__rich-stack",
+        "style": "display: inline-flex; flex-flow: row; align-items: center; min-width: 0px; max-width: 100%; box-sizing: border-box; padding: 0px 6px 0px 2px"
+      },
+      {
+        "tag": "span",
+        "cls": "bbs-new-style-bottom__rich-node",
+        "style": "color: rgb(100, 105, 110); font-size: 11px; line-height: 16px; font-family: PingFangSC-Regular;"
+      },
+      {
+        "tag": "span",
+        "cls": "bbs-new-style-bottom__rich-stack",
+        "style": "display: inline-flex; flex-flow: row; align-items: center; min-width: 0px; max-width: 100%; box-sizing: border-box; padding: 0px 6px 0px 2px"
+      },
+      {
+        "tag": "span",
+        "cls": "bbs-new-style-bottom__rich-node",
+        "style": "color: rgb(100, 105, 110); font-size: 11px; line-height: 16px; font-family: PingFangSC-Regular;"
+      }
+    ]
+  },
+  "resources": {
+    "elements": 1347,
+    "imgs": 63,
+    "svgs": 55,
+    "canvases": 0,
+    "videos": 0,
+    "iframes": 0,
+    "elsWithBgUrl": 2
+  },
+  "meta": {
+    "htmlClass": "",
+    "colorScheme": "light",
+    "bodyBg": "rgba(0, 0, 0, 0)",
+    "bodyColor": "rgb(0, 0, 0)",
+    "sheetsCount": 16
+  },
+  "epVersion": null
+}
