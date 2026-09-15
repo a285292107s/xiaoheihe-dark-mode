@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         小黑盒深色模式
 // @namespace    xiaoheihe-dark-mode
-// @version      0.3.5
+// @version      0.3.6
 // @author       油猴脚本-小黑盒页面优化
 // @description  为小黑盒网页版（xiaoheihe.cn）提供深色模式：按角色重映射站点 CSS 规则，覆盖伪元素与交互态，可一键切换并记住偏好。
 // @license      MIT
@@ -647,27 +647,14 @@
 		for (const el of root.querySelectorAll("[style]")) fixInlineStyle(el);
 	}
 	var inlineObserver = null;
-	var inlineQueue = new Set();
-	var inlineTimer = null;
-	function flushInline() {
-		inlineTimer = null;
-		const items = inlineQueue;
-		inlineQueue = new Set();
-		items.forEach((el) => {
-			if (el.isConnected) fixInlineStyle(el);
-		});
-	}
-	function queueInline(el) {
-		inlineQueue.add(el);
-		if (inlineTimer === null) inlineTimer = window.setTimeout(flushInline, 80);
-	}
 	function startInlineObserver() {
 		if (inlineObserver) return;
 		fixInlineTree(document.body ?? document.documentElement);
 		inlineObserver = new MutationObserver((records) => {
 			for (const r of records) {
 				if (r.type === "attributes") {
-					queueInline(r.target);
+					const el = r.target;
+					if (el.isConnected) fixInlineStyle(el);
 					continue;
 				}
 				for (const n of Array.from(r.addedNodes)) if (n instanceof Element) fixInlineTree(n);
@@ -685,11 +672,6 @@
 			inlineObserver.disconnect();
 			inlineObserver = null;
 		}
-		if (inlineTimer !== null) {
-			window.clearTimeout(inlineTimer);
-			inlineTimer = null;
-		}
-		inlineQueue = new Set();
 	}
 	function restoreInline() {
 		for (const el of document.querySelectorAll("[style]")) {
@@ -795,6 +777,15 @@ html.${ROOT_CLASS} {
 			if (enabled) build();
 		}, delay);
 	}
+	var immediateQueued = false;
+	function scheduleImmediateBuild() {
+		if (!enabled || immediateQueued) return;
+		immediateQueued = true;
+		Promise.resolve().then(() => {
+			immediateQueued = false;
+			if (enabled) build();
+		});
+	}
 	function startSheetObserver() {
 		if (headObserver) return;
 		const head = document.head;
@@ -813,14 +804,22 @@ html.${ROOT_CLASS} {
 			return;
 		}
 		headObserver = new MutationObserver((records) => {
+			let landed = false;
 			for (const r of records) for (const n of Array.from(r.addedNodes)) {
 				if (!(n instanceof Element)) continue;
 				const tag = n.tagName.toLowerCase();
-				if (tag === "link" || tag === "style") {
-					scheduleBuild(400);
-					return;
+				if (tag === "style") {
+					landed = true;
+					continue;
 				}
+				if (tag !== "link") continue;
+				const link = n;
+				if ((link.getAttribute("rel") || "").toLowerCase() !== "stylesheet") continue;
+				if (link.sheet) landed = true;
+				else link.addEventListener("load", () => scheduleImmediateBuild(), { once: true });
 			}
+			scheduleBuild(400);
+			if (landed) scheduleImmediateBuild();
 		});
 		headObserver.observe(head, {
 			childList: true,

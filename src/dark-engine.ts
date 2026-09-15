@@ -766,22 +766,6 @@ function fixInlineTree(root: Element): void {
 }
 
 let inlineObserver: MutationObserver | null = null;
-let inlineQueue = new Set<HTMLElement>();
-let inlineTimer: number | null = null;
-
-function flushInline(): void {
-  inlineTimer = null;
-  const items = inlineQueue;
-  inlineQueue = new Set();
-  items.forEach((el) => {
-    if (el.isConnected) fixInlineStyle(el);
-  });
-}
-
-function queueInline(el: HTMLElement): void {
-  inlineQueue.add(el);
-  if (inlineTimer === null) inlineTimer = window.setTimeout(flushInline, 80);
-}
 
 function startInlineObserver(): void {
   if (inlineObserver) return;
@@ -789,7 +773,12 @@ function startInlineObserver(): void {
   inlineObserver = new MutationObserver((records) => {
     for (const r of records) {
       if (r.type === 'attributes') {
-        queueInline(r.target as HTMLElement);
+        // 同步改写，不能排队延后：站点用 JS 给新建的遮罩写内联底色
+        //（换路由时的整屏加载幕就是 `background-color: rgb(255,255,255)`），
+        // 排队等 80ms 就是一段实打实的白闪 —— 实测详情页白闪 783ms 里，
+        // 头 100ms 正是这层内联白。观察器回调是微任务，仍在本轮绘制之前。
+        const el = r.target as HTMLElement;
+        if (el.isConnected) fixInlineStyle(el);
         continue;
       }
       for (const n of Array.from(r.addedNodes)) {
@@ -810,11 +799,6 @@ function stopInlineObserver(): void {
     inlineObserver.disconnect();
     inlineObserver = null;
   }
-  if (inlineTimer !== null) {
-    window.clearTimeout(inlineTimer);
-    inlineTimer = null;
-  }
-  inlineQueue = new Set();
 }
 
 function restoreInline(): void {
@@ -956,6 +940,29 @@ function scheduleBuild(delay = 400): void {
   }, delay);
 }
 
+let immediateQueued = false;
+
+/**
+ * 新样式表「一到位」就重建，而不是等 400ms 防抖。
+ *
+ * 浏览器在新 CSS 分片可用的那一刻就会用它绘制，而防抖窗口里画的还是站点的浅色
+ * —— 站点换路由时实测白闪 783ms、覆盖 41% 屏幕（详情页头部整块 #fff）。
+ * 分片的可用时机有两个，都接上：
+ *   - `<style>`：插入即生效，在 head 观察器回调里请求（微任务，仍在本轮绘制前）
+ *   - `<link rel=stylesheet>`：加载完成才可读 CSSOM，在它的 load 事件里请求
+ *
+ * 用微任务而非定时器合并：同一个任务里到达的多个分片只重建一次，
+ * 且改写仍在浏览器开始绘制这一帧之前完成。
+ */
+function scheduleImmediateBuild(): void {
+  if (!enabled || immediateQueued) return;
+  immediateQueued = true;
+  Promise.resolve().then(() => {
+    immediateQueued = false;
+    if (enabled) build();
+  });
+}
+
 /** SPA 换路由会加载新的 CSS 分片，需要增量重建 */
 function startSheetObserver(): void {
   if (headObserver) return;
@@ -976,16 +983,28 @@ function startSheetObserver(): void {
     return;
   }
   headObserver = new MutationObserver((records) => {
+    let landed = false;
     for (const r of records) {
       for (const n of Array.from(r.addedNodes)) {
         if (!(n instanceof Element)) continue;
         const tag = n.tagName.toLowerCase();
-        if (tag === 'link' || tag === 'style') {
-          scheduleBuild(400);
-          return;
+        if (tag === 'style') {
+          // <style> 插入即生效：同步重建（微任务）才赶得上这一轮绘制
+          landed = true;
+          continue;
         }
+        if (tag !== 'link') continue;
+        const link = n as HTMLLinkElement;
+        const rel = (link.getAttribute('rel') || '').toLowerCase();
+        // 站点换路由会同时插进一堆 modulepreload，它们不产生 CSSOM
+        if (rel !== 'stylesheet') continue;
+        if (link.sheet) landed = true; // 已就绪（缓存命中）
+        else link.addEventListener('load', () => scheduleImmediateBuild(), { once: true });
       }
     }
+    // 兜底：与原先一致，仍然按 400ms 防抖重建一次（分片可能没触发上面任何一条路径）
+    scheduleBuild(400);
+    if (landed) scheduleImmediateBuild();
   });
   headObserver.observe(head, { childList: true, subtree: true });
 }

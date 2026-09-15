@@ -554,6 +554,8 @@ node research/trace-color.mjs 37404a   # 离线反查：哪个源色/规则产�
 node research/surface-ramp.mjs         # 表面调色板映射保真度审计
 node research/repro-placeholder.mjs    # 图片占位块可见度复现（本地 HTTP + 站点真实 CSS）
 node research/repro-canvas-flip.mjs    # ★ 整屏底色层「首轮 == 重建」复现（离线 + 阴性对照）
+node research/probe-nav-flash.mjs      # ★ 换路由白闪取证：逐帧统计浅色面积占比（真实站点）
+node research/probe-build-cost.mjs     # 即时重建的首屏代价核算（长任务对照）
 node research/repro-floor.mjs          # 用真实楼层 HTML 复现（生成 floor-snippet.html）
 node research/repro-stack.mjs          # elementsFromPoint 元素栈（谁压在文字上）
 node research/test-cssom-write.mjs     # 跨域样式表可写性验证（异源 + ACAO）
@@ -661,5 +663,105 @@ node research/proto-run.mjs            # 原型出图 + 量化 -> output/proto/
 > 一条被撤销的怀疑：`enableDarkEngine` 会无条件添加/移除 `<html>` 上的 `dark` 类。
 > 精确检索站点 JS 后确认站点既不管 `dark` 类也不管 `data-theme`（命中数全为 0），
 > 且全站只有 2 条 `.dark` 规则（EP 颜色选择器），因此**没有现冲突**，未作修改。
+
+---
+
+## 十四、第四次缺陷复盘：点进帖子时「先白闪一下」
+
+用户反馈：从首页点进某篇详情帖时，页面先变白，然后马上恢复深色。
+
+### 取证：单次采样看不见，必须逐帧
+
+既有的全部指标（浅色表面 / 低对比 / 泥泞）都是**页面稳定后采一次**，
+而这次缺陷只存在于**换路由的那几百毫秒**里 —— 原理上采不到。
+
+新工具 `node research/probe-nav-flash.mjs`：在真实站点上点进帖子，
+用页面内 rAF 在整屏密集网格（每 40~60px 一点）逐帧取「最上层不透明背景」，
+统计浅色（亮度 > 150）面积占比，并记录当时是谁在画那块浅色。
+
+修复前（0.3.5）实测：
+
+```
+帧数 218，浅色占比 >2% 的帧 16
+白闪区间: t=602ms -> t=1385ms（≈783ms）
+峰值: t=602ms frac=0.412 maxL=255 culprit=div.hb-cpt-page-header hb-bbs-link__header
+同期 scanned 停在 4739（首页的规则数）—— 说明画的是新分片里的原始浅色，引擎还没重建
+```
+
+另有第二处更短的白：同一轮采样记录到站点给整屏加载幕写的内联白底。
+
+```
+t=7596  .hb-loading-spinner | rgb(255,255,255) | inline=background-color: rgb(255, 255, 255)
+t=7633  .hb-loading-spinner | rgb(255,255,255) | inline=background-color: rgb(255, 255, 255)
+t=7700  .hb-loading-spinner | rgb(38,44,51)    | inline=background-color: rgb(38, 44, 51)   ← 我们晚 80ms 才改写
+```
+
+站点不给这个加载幕写类名，它由 JS 直接把 `background-color: rgb(255,255,255)` 写进
+`style` 属性 —— 引擎改的是 CSS 规则，规则打不过内联，只能走「内联样式改写」这条路。
+
+### 根因一：新 CSS 分片要等 400ms 防抖，而浏览器当场就用它绘制
+
+`startSheetObserver` 只在看到 `<head>` 新增 `<link>`/`<style>` 时 `scheduleBuild(400)`。
+可是分片**可用**（`<link>` 的 load 事件）的那一刻，浏览器就会拿它绘制 ——
+防抖窗口里画的正是站点的浅色。
+
+延迟还被放大了一次：分片**插入**时它往往还没加载完，那次构建扫不到规则（白跑），
+而重建之后没有任何新触发，于是实测一直拖到 1385ms（插入在 ~100ms）。
+
+### 根因二：内联样式改写被 80ms 定时器排队
+
+`queueInline()` 把 `style` 属性变更攒进 `setTimeout(…, 80)`。站点新建加载幕并写内联白底，
+这 80ms 就是白。
+
+### 修复
+
+```ts
+// 1) style 属性变更：同步改写。观察器回调是微任务，仍在本轮绘制之前。
+if (r.type === 'attributes') { if (el.isConnected) fixInlineStyle(el); continue; }
+
+// 2) 新样式表「一到位」就重建，而不是等 400ms 防抖
+//    <style> 插入即生效      -> head 观察器回调里请求
+//    <link rel=stylesheet>  -> 它的 load 事件里请求（此时 CSSOM 才可读）
+function scheduleImmediateBuild() {   // 微任务合并：同一任务里到达的多个分片只重建一次
+  if (!enabled || immediateQueued) return;
+  immediateQueued = true;
+  Promise.resolve().then(() => { immediateQueued = false; if (enabled) build(); });
+}
+```
+
+400ms 防抖与里程碑构建**原样保留**作为兜底（分片可能没走上面任何一条路径）。
+
+内联改写不再排队是安全的：判据早就是 `next === current`（第十三节缺陷 5），
+值不需要改时不会写入，也就不会因「写入 → 属性变更 → 再写入」形成循环；
+`verify:lifecycle` 场景二（空闲 3 秒 0 次写入）继续把守这条。
+
+### 代价
+
+一次完整重建实测 ~20ms（首页 4739 条规则）/ 25~34ms（详情页 5686 条，5 次采样），
+与 README 里 45ms 的差异来自机器与页面状态，量级一致。换路由时通常 7 个 CSS 分片，
+即约 150~200ms 主线程工作，摊在站点自己的加载幕期间。
+
+首屏加载有 16 个分片，会各自触发一次即时重建，因此单独核算过
+（`node research/probe-build-cost.mjs`，对照组 = 把即时重建改回「只等 400ms 防抖」）。
+两次测量：
+
+```
+即时重建      长任务 4 个 / 合计 573ms / 最长 238ms
+只等防抖      长任务 5 个 / 合计 611ms / 最长 170ms
+即时重建      长任务 4 个 / 合计 573ms / 最长 241ms
+只等防抖      长任务 5 个 / 合计 631ms / 最长 161ms
+```
+
+总时长相当、长任务数还少一个（大构建被提前拆开，不再挤在 400ms 那一刻）。
+
+### 回归
+
+- `npm run verify:flash`（离线、本地 HTTP，新增）：合成两种时机各跑一遍，
+  逐帧要求「全程无成片浅色」，并对每个场景配**阴性对照** ——
+  内联改回排队 80ms、分片改回只等 400ms 防抖，要求判据必须检出白闪
+  （实测对照峰值 frac=1.0 与 0.889，产物 0），否则判据只是空跑。
+  补丁字符串与产物代码不一致时脚本直接以退出码 2 报错，避免产物重构后对照静默失效。
+- `node research/probe-nav-flash.mjs`（真实站点）：两次导航（首次联网加载分片 / 缓存命中），
+  修复后浅色帧 0，峰值 frac=0、maxL=43（卡片色）。
 
 
