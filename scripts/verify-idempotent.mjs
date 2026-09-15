@@ -35,6 +35,17 @@ const FINGERPRINT = () => {
     );
   }
   parts.push(getComputedStyle(document.documentElement).backgroundColor);
+  // 整屏底色层全在伪元素上，元素级指纹看不见它们 —— 而这些色带正是
+  // 最容易被「第几轮构建」影响的地方（曾经第 2 轮就从画布色翻成卡片色）。
+  for (const [sel, pseudo] of [
+    ['#page-bbs-community', '::before'],
+    ['#page-bbs-community', '::after'],
+    ['.hb-bbs-home__splitline', '::after'],
+    ['.hb-bbs-home__feed-splitline', '::after'],
+  ]) {
+    const el = document.querySelector(sel);
+    if (el) parts.push(sel + pseudo, getComputedStyle(el, pseudo).backgroundColor);
+  }
   const s = parts.join('|');
   // 简单稳定哈希
   let h = 5381;
@@ -95,15 +106,56 @@ const first = rounds[0];
 const stable = rounds.every((r) => r.hash === first.hash);
 const cssStable = rounds.every((r) => r.cssBytes === first.cssBytes);
 
+// ---------------------------------------------------------------
+// 第二项：构建输出必须与「这是第几轮构建」无关。
+//
+// 引擎就地改写站点声明，所以站点样式表里存的就是我们写过的值。任何一处
+// 从「当前值」而不是「站点原值」推导结论，第 1 轮与第 2 轮就会给出不同的
+// 颜色 —— 实例：整屏固定色带 #page-bbs-community::before 第 1 轮是画布色，
+// 第 2 轮起翻成卡片色，因为画布色集合读到了引擎自己写进 :root 的值
+// （FINDINGS 第八节）。关掉再打开等于回到「首轮」，重建一轮等于「第二轮」，
+// 两者必须逐条相等。读取与构建放在同一次 evaluate 里，避免落在里程碑构建之后。
+// ---------------------------------------------------------------
+const LAYERS = [
+  ['#page-bbs-community', '::before'],
+  ['#page-bbs-community', '::after'],
+  ['.hb-bbs-home__splitline', '::after'],
+  ['.hb-bbs-home__feed-splitline', '::after'],
+];
+
+const LAYER_CYCLE = ({ pairs, action }) => {
+  const read = () =>
+    pairs.flatMap(([sel, pseudo]) => {
+      const el = document.querySelector(sel);
+      return el ? [[sel + pseudo, getComputedStyle(el, pseudo).backgroundColor]] : [];
+    });
+  if (action === 'fresh') {
+    window.__hbSetDark(false);
+    window.__hbSetDark(true); // 首轮构建在这次调用内同步完成
+  } else {
+    window.__hbRebuild();
+  }
+  return read();
+};
+
+const freshLayers = await page.evaluate(LAYER_CYCLE, { pairs: LAYERS, action: 'fresh' });
+const rebuiltLayers = await page.evaluate(LAYER_CYCLE, { pairs: LAYERS, action: 'rebuilt' });
+const layersStable =
+  freshLayers.length === LAYERS.length &&
+  JSON.stringify(freshLayers) === JSON.stringify(rebuiltLayers);
+
 console.log('\n########## 幂等性结论 ##########');
 console.log(`渲染指纹: 首轮 ${first.hash} -> 末轮 ${rounds[rounds.length - 1].hash}`);
 console.log(`例外层字节: 首轮 ${first.cssBytes} -> 末轮 ${rounds[rounds.length - 1].cssBytes}`);
-console.log(`渲染${stable ? '稳定 ✅' : '漂移 ❌'} | 例外层${cssStable ? '稳定 ✅' : '漂移 ❌'} | 报错 ${errors.length}`);
+console.log(`整屏底色层: 首轮构建 ${JSON.stringify(freshLayers)}`);
+console.log(`            重建之后 ${JSON.stringify(rebuiltLayers)}`);
+console.log(`渲染${stable ? '稳定 ✅' : '漂移 ❌'} | 例外层${cssStable ? '稳定 ✅' : '漂移 ❌'} | ` +
+  `底色层${layersStable ? '与构建轮次无关 ✅' : '随构建轮次改变 ❌'} | 报错 ${errors.length}`);
 if (!stable) {
   console.log('各轮指纹：', rounds.map((r) => r.hash).join(' '));
 }
 
 await browser.close();
-const pass = stable && cssStable && errors.length === 0;
+const pass = stable && cssStable && layersStable && errors.length === 0;
 console.log(pass ? '\nPASS ✅' : '\nFAIL ❌');
 process.exit(pass ? 0 : 1);

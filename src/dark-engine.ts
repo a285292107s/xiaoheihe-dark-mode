@@ -529,6 +529,24 @@ const mutations: string[] = [];
 const kfState = new WeakMap<CSSStyleDeclaration, Map<string, RewriteState>>();
 const kfStyles = new Set<CSSStyleDeclaration>();
 
+/**
+ * 读取「站点自己写的值」。
+ *
+ * 就地改写意味着站点样式表里存的就是我们写过的值，所以**凡是拿站点样式反推结论**
+ * 的地方都必须先经这里还原 —— 否则引擎会把自己的输出当成输入。识别页面画布色
+ * 正是这种地方：`:root` 的底色自己也在这轮被改写成画布色，第二次构建时
+ * `walk()` 就会把「上轮的输出」登记为画布色，于是画布色集合从 `#f7f8f9`
+ * 变成 `#0e1116`，此后整屏固定色带与信息流分隔条全部翻成卡片色 ——
+ * 一次构建正确、再构建就错，而构建次数由站点加载节奏决定（见 FINDINGS 第八节）。
+ *
+ * `transformStyle` / 关键帧 / 内联样式各自缓存了同一份 orig，不走这里。
+ */
+function sourceValue(style: CSSStyleDeclaration, prop: string): string {
+  const current = style.getPropertyValue(prop);
+  const entry = ruleState.get(style)?.get(prop);
+  return entry && current === entry.applied ? entry.orig : current;
+}
+
 function emptyStats(): EngineStats {
   return { sheets: 0, scanned: 0, changed: 0, declarations: 0, keyframes: 0, tracked: 0, errors: 0 };
 }
@@ -555,13 +573,14 @@ function walk(rules: CSSRuleList): void {
     if (!rule.selectorText || !rule.style) continue;
     pending.push({ selector: rule.selectorText, style: rule.style });
 
-    // 记录页面画布色
+    // 记录页面画布色。这里必须读站点原值（sourceValue）：这条声明本轮也会被
+    // 改写，读当前值会把引擎自己的输出登记成画布色。
     if (CANVAS_SELECTOR.test(rule.selectorText.trim())) {
       const style = rule.style;
       for (let j = 0; j < style.length; j++) {
         const prop = style[j].toLowerCase();
         if (prop !== 'background-color' && prop !== 'background') continue;
-        const only = plainColorOf(style.getPropertyValue(style[j]));
+        const only = plainColorOf(sourceValue(style, style[j]));
         if (only) canvasKeys.add(colorKey(only));
       }
     }

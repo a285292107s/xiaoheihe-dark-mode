@@ -7,6 +7,7 @@
  * 验收指标：
  *   - 浅色表面数（面积 > 40x20 且亮度 > 200）  -> 期望 0
  *   - 低对比文本数（前景与最近不透明背景对比 < 3.2，含 background-image 兜底）-> 期望 0
+ *   - 整屏底色层（固定色带 / 信息流分隔条）必须等于画布色，且**多轮构建后仍相等**
  *   - 引擎构建耗时 / 扫描规则数 / 改动规则数
  *   - 关闭深色后能否还原成浅色（验证 revert 逻辑）
  */
@@ -30,11 +31,41 @@ const outDir = path.resolve('output/verify');
 fs.mkdirSync(outDir, { recursive: true });
 
 const TARGETS = [
-  { name: 'home', url: 'https://www.xiaoheihe.cn/app/bbs/home' },
-  { name: 'detail', url: 'https://www.xiaoheihe.cn/app/bbs/link/189860812' },
+  { name: 'home', url: 'https://www.xiaoheihe.cn/app/bbs/home', canvasLayers: 4 },
+  { name: 'detail', url: 'https://www.xiaoheihe.cn/app/bbs/link/189860812', canvasLayers: 0 },
 ];
 const only = process.argv[2];
 const targets = only ? TARGETS.filter((t) => t.name === only) : TARGETS;
+
+/** 画布色：与 src/dark-base.css 的 html.hb-dark 底色一致 */
+const CANVAS_BG = 'rgb(14, 17, 22)';
+
+/**
+ * 站点用「页面底色」画的整屏层。已知四处，全在伪元素上：
+ *   固定色带（全宽 ×146px / ×22px）+ 信息流卡片之间 4px 的"间隙"。
+ * 浅色下它们等于页面底、看起来就是留白；深色下必须回到画布色，
+ * 一旦被映射成卡片色，页面上就会出现色块接缝（FINDINGS 第八节）。
+ *
+ * 断言用**计算值**，且在强制重建之后再采一次：这类色带曾经在「第二次构建」
+ * 时从画布色翻成卡片色 —— 只采一次、或只在首轮采样的断言都看不见它。
+ */
+const LAYERS = [
+  ['#page-bbs-community', '::before'],
+  ['#page-bbs-community', '::after'],
+  ['.hb-bbs-home__splitline', '::after'],
+  ['.hb-bbs-home__feed-splitline', '::after'],
+];
+
+const FIXED_LAYERS = (pairs) => {
+  const out = [];
+  for (const [sel, pseudo] of pairs) {
+    const el = document.querySelector(sel);
+    if (!el) continue;
+    const ps = getComputedStyle(el, pseudo);
+    out.push({ sel: sel + pseudo, bg: ps.backgroundColor, content: ps.content });
+  }
+  return out;
+};
 
 /**
  * 页面内测量函数：浅色表面 / 低对比文本 / 中间调泥泞色块
@@ -140,26 +171,11 @@ const MEASURE = () => {
     if (contrast(fg, behind) < 3.2) lowContrast++;
   }
 
-  // 已知的整屏底色层：必须等于画布色，不能是中间调
-  const fixedLayers = [];
-  for (const [sel, pseudo] of [
-    ['#page-bbs-community', '::before'],
-    ['#page-bbs-community', '::after'],
-    ['.hb-bbs-home__splitline', '::after'],
-    ['.hb-bbs-home__feed-splitline', '::after'],
-  ]) {
-    const el = document.querySelector(sel);
-    if (!el) continue;
-    const ps = getComputedStyle(el, pseudo);
-    fixedLayers.push({ sel: sel + pseudo, bg: ps.backgroundColor, content: ps.content });
-  }
-
   return {
     lightSurfaces,
     lowContrast,
     muddy,
     muddySamples,
-    fixedLayers,
     samples,
     nodes: document.querySelectorAll('body *').length,
     darkClass: document.documentElement.classList.contains('hb-dark'),
@@ -199,7 +215,13 @@ for (const t of targets) {
   const dark = await page.evaluate(MEASURE);
   const stats = await page.evaluate(() => (window.__hbEngineStats ? window.__hbEngineStats() : null));
   const cssInfo = await page.evaluate(() => (window.__hbEngineCss ? window.__hbEngineCss() : null));
+  const fixedLayers = await page.evaluate(FIXED_LAYERS, LAYERS);
   await page.screenshot({ path: path.join(outDir, `${t.name}-dark.png`) });
+
+  // 强制再构建一轮：引擎必须始终从站点原值推导，重建后不得换一套颜色。
+  await page.evaluate(() => { window.__hbRebuild(); });
+  await page.waitForTimeout(1200);
+  const fixedLayersRebuilt = await page.evaluate(FIXED_LAYERS, LAYERS);
 
   // 关闭深色，验证可还原
   await page.evaluate(() => { window.__hbSetDark(false); });
@@ -226,7 +248,15 @@ for (const t of targets) {
       darkClass: dark.darkClass,
     },
     muddySamples: dark.muddySamples,
-    fixedLayers: dark.fixedLayers,
+    canvasLayers: {
+      expected: t.canvasLayers,
+      found: fixedLayers.length,
+      afterRebuildFound: fixedLayersRebuilt.length,
+      layers: fixedLayers,
+      layersAfterRebuild: fixedLayersRebuilt,
+      allCanvas: fixedLayers.every((l) => l.bg === CANVAS_BG),
+      allCanvasAfterRebuild: fixedLayersRebuilt.every((l) => l.bg === CANVAS_BG),
+    },
     lightAfterDisable: { lightSurfaces: light.lightSurfaces, lowContrast: light.lowContrast, darkClass: light.darkClass },
     darkAgain: { lightSurfaces: dark2.lightSurfaces, lowContrast: dark2.lowContrast, muddy: dark2.muddy, darkClass: dark2.darkClass },
     lightSurfaceSamples: dark.samples,
@@ -234,10 +264,15 @@ for (const t of targets) {
   };
   results.push(row);
 
+  const canvas = row.canvasLayers;
   const pass =
     row.dark.lightSurfaces === 0 &&
     row.dark.lowContrast === 0 &&
     row.dark.muddy === 0 &&
+    canvas.found === canvas.expected &&
+    canvas.afterRebuildFound === canvas.expected &&
+    canvas.allCanvas &&
+    canvas.allCanvasAfterRebuild &&
     row.dark.darkClass === true &&
     row.lightAfterDisable.darkClass === false &&
     row.lightAfterDisable.lightSurfaces > 0 &&

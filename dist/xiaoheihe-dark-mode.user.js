@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         小黑盒深色模式
 // @namespace    xiaoheihe-dark-mode
-// @version      0.3.4
+// @version      0.3.5
 // @author       油猴脚本-小黑盒页面优化
 // @description  为小黑盒网页版（xiaoheihe.cn）提供深色模式：按角色重映射站点 CSS 规则，覆盖伪元素与交互态，可一键切换并记住偏好。
 // @license      MIT
@@ -477,6 +477,11 @@
 	var mutations = [];
 	var kfState = new WeakMap();
 	var kfStyles = new Set();
+	function sourceValue(style, prop) {
+		const current = style.getPropertyValue(prop);
+		const entry = ruleState.get(style)?.get(prop);
+		return entry && current === entry.applied ? entry.orig : current;
+	}
 	function emptyStats() {
 		return {
 			sheets: 0,
@@ -510,7 +515,7 @@
 				for (let j = 0; j < style.length; j++) {
 					const prop = style[j].toLowerCase();
 					if (prop !== "background-color" && prop !== "background") continue;
-					const only = plainColorOf(style.getPropertyValue(style[j]));
+					const only = plainColorOf(sourceValue(style, style[j]));
 					if (only) canvasKeys.add(colorKey(only));
 				}
 			}

@@ -1,7 +1,7 @@
 {
   "name": "xiaoheihe",
   "private": true,
-  "version": "0.3.4",
+  "version": "0.3.5",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -11,10 +11,11 @@
     "verify": "node scripts/verify-dark.mjs",
     "verify:idempotent": "node scripts/verify-idempotent.mjs",
     "verify:cascade": "node research/test-hover-cascade.mjs",
+    "verify:canvas": "node research/repro-canvas-flip.mjs",
     "verify:ui": "node scripts/verify-ui.mjs",
     "verify:lifecycle": "node scripts/verify-lifecycle.mjs",
     "verify:preview": "node scripts/verify-preview.mjs",
-    "verify:all": "npm run build && npm run verify:ui && npm run verify:lifecycle && npm run verify:preview && npm run verify && npm run verify:idempotent && npm run verify:cascade"
+    "verify:all": "npm run build && npm run verify:canvas && npm run verify:ui && npm run verify:lifecycle && npm run verify:preview && npm run verify && npm run verify:idempotent && npm run verify:cascade"
   },
   "devDependencies": {
     "typescript": "^6.0.3",

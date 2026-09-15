@@ -313,6 +313,65 @@ function isNeutral(c) {
 修复后：`#37404a` 反查命中 0 条；四个整屏底色层的伪元素全部回到 `rgb(14,17,22)`；
 `muddy = 0`（1440 / 1536 / 1728 / 1920 四个宽度均无异常色块）。
 
+### 回归：画布色集合把自己的输出当输入（0.3.5 修复）
+
+上一段结论只对**首轮构建**成立，这里更正。
+
+用户从 DevTools 报来 `#page-bbs-community[data-v-a4016135]::before` 的计算值：
+
+```css
+#page-bbs-community[data-v-a4016135]::before {   /* 整屏固定色带，全宽 ×146px */
+  position: fixed; top: 0px; width: 100%; height: 146px;
+  background-color: rgb(38, 44, 51);             /* ← 卡片色，应为画布色 */
+  z-index: 5;
+}
+```
+
+取证三件套：
+
+1. **历史记录里就是错的** —— `output/verify/verify-result.json` 的 `fixedLayers` 一直是
+   `rgb(38, 44, 51)`（当时的 `pass` 只记录、不断言这四个值，缺陷因此长期隐形）。
+2. **像素级定位** —— 对 `output/verify/home-dark.png` 逐像素取样：`x < 204` 的顶部是
+   `rgb(14,17,22)`，`x ≥ 204` 的顶部 146px 是 `rgb(38,44,51)`。204 正是
+   `(1440-1032)/2` —— 固定定位的伪元素没有 `left`，静态位置落在 `#page-bbs-community`
+   的左边缘、宽度仍是 100% 视口，于是这条色带**右移 204px**。浅色下它就是页面底
+   `#f7f8f9`，右移看不出来；深色下被映射成卡片色，接缝就露出来了。
+3. **逐轮复现** —— `node research/repro-canvas-flip.mjs`（离线、站点真实 CSS）：
+
+```
+（0.3.4 产物）首轮构建   四层全部 rgb(14, 17, 22)   ← 正确
+              重建之后   四层全部 rgb(38, 44, 51)   ← 翻车
+```
+
+**根因**：`walk()` 登记「页面画布色」时读的是声明的**当前值**。
+`:root{background-color:#f7f8f9}` 这一条本身也在被改写，第 2 轮构建时它已经是我们
+上一轮写进去的 `rgb(14,17,22)` —— 画布色集合因此从 `#f7f8f9` 变成 `#0e1116`，
+此后凡是「等于页面底色」的整屏层都掉进通用中性表面分支，拿到卡片色。
+一次构建正确、再构建就错，而构建次数由站点加载节奏决定（首屏里程碑 4 次 + 生命周期事件
++ `<head>` 新增分片），所以这个缺陷**不是每轮都出现，而是稳定地出现在最终态**。
+
+**修复**：新增 `sourceValue()` —— 凡是从站点样式反推结论的地方，都先经
+`orig` / `applied` 记账还原出站点原值，再把结论喂给映射。
+
+**为什么既有指标全都没拦住它**：
+
+| 指标 | 为什么放过 |
+|---|---|
+| `lightSurfaces` | 卡片色亮度 43，够暗 |
+| `muddy` | 判据是亮度 55~140，卡片色 43.2 **刚好在门槛之下** |
+| `verify:idempotent` | 指纹只拼元素节点，而整屏底色层全在伪元素上；且 6 轮都是「翻车后」的稳定态，自比自当然一致 |
+| `verify:dark` 的 `fixedLayers` | 只记录、不参与 `pass` |
+| 采样时机 | 指标只采一次（加载后 7s），此时多轮构建早已跑完 |
+
+**回归**（三处，各自覆盖一个盲区）：
+
+- `node research/repro-canvas-flip.mjs` —— 离线复现「首轮 == 重建」，
+  并带**阴性对照**：把引擎换回读当前值的实现，要求判据必须检出差异（否则断言是空跑）。
+- `npm run verify` —— 新增 `canvasLayers` 断言：四层必须全部命中、全部等于画布色，
+  且**强制重建之后仍然相等**（首页期望 4 层，详情页期望 0 层 —— 避免空集恒真的空跑）。
+- `npm run verify:idempotent` —— 指纹纳入四个伪元素底色层，
+  并新增「关掉再打开（首轮）== 强制重建」判据。
+
 ---
 
 ## 九、第二次缺陷复盘：图片占位块变成「大灰板」
@@ -494,6 +553,7 @@ node research/probe-slabs.mjs 1728     # 各宽度枚举大块背景 + 搜索区
 node research/trace-color.mjs 37404a   # 离线反查：哪个源色/规则产出目标颜色
 node research/surface-ramp.mjs         # 表面调色板映射保真度审计
 node research/repro-placeholder.mjs    # 图片占位块可见度复现（本地 HTTP + 站点真实 CSS）
+node research/repro-canvas-flip.mjs    # ★ 整屏底色层「首轮 == 重建」复现（离线 + 阴性对照）
 node research/repro-floor.mjs          # 用真实楼层 HTML 复现（生成 floor-snippet.html）
 node research/repro-stack.mjs          # elementsFromPoint 元素栈（谁压在文字上）
 node research/test-cssom-write.mjs     # 跨域样式表可写性验证（异源 + ACAO）
