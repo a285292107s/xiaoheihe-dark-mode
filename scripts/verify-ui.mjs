@@ -17,6 +17,7 @@
  *   7) 刷新后记忆生效
  *   8) 焦点环是「浅内圈 + 深外圈」双色，且不吃布局
  *   9) prefers-reduced-motion 下过渡与入场动画都归零
+ *  10) 静息态材质保持冷淡扁平：无 inset 内高光、只有一层接触影
  */
 import { createRequire } from 'node:module';
 import http from 'node:http';
@@ -86,6 +87,7 @@ const PROBE = () => {
     icon: svg ? [...svg.children].map((e) => e.tagName.toLowerCase()) : null,
     btnBg: cs ? cs.backgroundColor : null,
     btnText: cs ? cs.color : null,
+    btnShadow: cs ? cs.boxShadow : null,
     btnSize: btn ? [Math.round(btn.getBoundingClientRect().width), Math.round(btn.getBoundingClientRect().height)] : null,
     darkClass: document.documentElement.classList.contains('hb-dark'),
     baseStyle: !!document.getElementById('hb-dark-base'),
@@ -136,6 +138,12 @@ console.log('\n===== 场景一：首次访问（系统浅色，无记忆） ====
   check('初始文案为「切换到深色模式」', a.label === '切换到深色模式', `label=${a.label}`);
   check('aria-pressed=false', a.pressed === 'false', `pressed=${a.pressed}`);
   check('按钮尺寸 44x44', a.btnSize && a.btnSize[0] === 44 && a.btnSize[1] === 44, JSON.stringify(a.btnSize));
+  // 冷淡扁平是刻意的设计决定，这条断言防止它被改回「顶面内高光 + 多层投影」
+  check('静息态只有描边 + 一层接触影（无 inset / 无渐变）', (() => {
+    if (!a.btnShadow || a.btnShadow.includes('inset')) return false;
+    const layers = a.btnShadow.match(/rgba?\([^)]+\)/g) || [];
+    return layers.length === 2;
+  })(), a.btnShadow);
   check('Shadow 隔离：按钮底色未被站点/引擎改动', a.btnBg === 'rgb(20, 25, 30)', `btnBg=${a.btnBg}`);
   check('浅色下卡片是白的', a.cardLum > 240, `cardLum=${a.cardLum}`);
   check('无 JS 报错', errors.length === 0, errors.join(' | '));
@@ -174,7 +182,7 @@ console.log('\n===== 场景一：首次访问（系统浅色，无记忆） ====
   })(), `ctaBg=${b.ctaBg}`);
   check(
     '按钮自身仍未被重映射（面 / 墨色都是设计值）',
-    b.btnBg === 'rgb(20, 25, 30)' && b.btnText === 'rgb(238, 241, 245)',
+    b.btnBg === 'rgb(20, 25, 30)' && b.btnText === 'rgb(220, 227, 234)',
     `btnBg=${b.btnBg} btnText=${b.btnText}`,
   );
 
@@ -258,11 +266,21 @@ console.log('\n===== 场景八：Shadow DOM 样式表不被引擎触碰 =====');
 console.log('\n===== 场景九：focus-visible 双色焦点环 =====');
 {
   const { context, page, errors } = await newPage({ stored: '1' });
-  const r = await page.evaluate(() => {
+  const FOCUS = () => {
     const btn = document
       .getElementById('heybox-dark-mode-root')
       .shadowRoot.getElementById('heybox-dark-toggle');
     btn.focus({ focusVisible: true });
+  };
+  await page.evaluate(FOCUS);
+  // 焦点环是过渡出来的（160ms）：读得太早拿到的是过渡起点，也就是静息态那串
+  // shadow。早先这条断言能过，只是因为当时的静息态与聚焦态 inset 标志不同、
+  // 整条 box-shadow 不可插值，浏览器直接瞬间切换 —— 那是巧合，不是保证。
+  await page.waitForTimeout(260);
+  const r = await page.evaluate(() => {
+    const btn = document
+      .getElementById('heybox-dark-mode-root')
+      .shadowRoot.getElementById('heybox-dark-toggle');
     const cs = getComputedStyle(btn);
     const rect = btn.getBoundingClientRect();
     return {

@@ -87,16 +87,17 @@ npm run verify:all   # 构建 + 全部验收（推荐）
 | 命令 | 覆盖 | 断言数 |
 |---|---|---|
 | `npm run verify` | 真实首页 / 详情页：浅色表面、低对比文本、泥泞中间调、开关还原 | 出图 + 指标 |
-| `npm run verify:ui` | 切换按钮全部行为：Shadow DOM 隔离、初始态、记忆、图标/aria 同步、双色焦点环、reduced-motion | 54 |
+| `npm run verify:ui` | 切换按钮全部行为：Shadow DOM 隔离、初始态、记忆、图标/aria 同步、双色焦点环、冷淡扁平材质、reduced-motion | 55 |
 | `npm run verify:lifecycle` | `<head>` 启动竞态、内联写循环、跟踪集约束、`url()` 保护 | 16 |
-| `npm run verify:preview` | 预览壳双向切换与自身样式隔离 | 8 |
+| `npm run verify:preview` | 预览壳双向切换与自身样式隔离 | 9 |
 | `npm run verify:idempotent` | 反复重建 6 轮的渲染指纹与例外层字节稳定性 | 6 轮 |
 | `npm run verify:cascade` | hover 层叠顺序（含阴性对照，证明判据有判别力） | 4 判据 |
 
 四个「看起来只是小改动」的地方都有对应回归，改之前建议先看一眼它们的失败信息：
 `<head>` 竞态、内联写循环、`url()` 里的颜色词、hover 层叠顺序。
 按钮的焦点环另有一条门将：`verify:ui` 会断言它是「浅内圈 + 深外圈」两色，
-防止被改回单色 `outline`（单色环会在某些宿主底色上融掉）。
+防止被改回单色 `outline`（单色环会在某些宿主底色上融掉）。材质同理：
+断言静息态只有「1px 描边 + 一层接触影」，防止顶面内高光那类渐变被加回来。
 
 ### 目录
 
