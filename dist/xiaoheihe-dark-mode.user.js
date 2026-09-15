@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         小黑盒深色模式
 // @namespace    xiaoheihe-dark-mode
-// @version      0.3.3
+// @version      0.3.4
 // @author       油猴脚本-小黑盒页面优化
 // @description  为小黑盒网页版（xiaoheihe.cn）提供深色模式：按角色重映射站点 CSS 规则，覆盖伪元素与交互态，可一键切换并记住偏好。
 // @license      MIT
@@ -987,7 +987,7 @@ html.${ROOT_CLASS} {
 		w.__hbRebuild = () => rebuildDarkEngine();
 		w.__hbIsDark = () => isDarkEnabled();
 	}
-	var ui_default = ":host{all:initial}#heybox-dark-toggle{z-index:2147483646;cursor:pointer;color:#fff;pointer-events:auto;-webkit-tap-highlight-color:transparent;background:#14191e;border:none;border-radius:50%;justify-content:center;align-items:center;width:44px;height:44px;padding:0;transition:transform .2s,background .2s,box-shadow .2s;display:flex;position:fixed;bottom:24px;right:16px;box-shadow:0 8px 20px #00000047}#heybox-dark-toggle:hover{transform:scale(1.06)}#heybox-dark-toggle:active{transform:scale(.96)}#heybox-dark-toggle:focus-visible{outline-offset:2px;outline:2px solid #7aa2f7}#heybox-dark-toggle svg{width:20px;height:20px;display:block}@media (prefers-reduced-motion:reduce){#heybox-dark-toggle{transition:none}#heybox-dark-toggle:hover,#heybox-dark-toggle:active{transform:none}}";
+	var ui_default = ":host{all:initial;--hbd-face:#14191e;--hbd-face-hover:#1c242c;--hbd-ink:#eef1f5;--hbd-edge:#ffffff29;--hbd-edge-hover:#ffffff47;--hbd-ring-light:#f4f7fa;--hbd-ring-dark:#0b0f13;--hbd-size:44px;--hbd-icon-size:20px;--hbd-icon-stroke:1.75;--hbd-ease:cubic-bezier(.2, 0, 0, 1);--hbd-t-hover:.2s;--hbd-t-press:90ms;--hbd-t-icon:.18s}#heybox-dark-toggle{z-index:2147483646;box-sizing:border-box;width:var(--hbd-size);height:var(--hbd-size);background:var(--hbd-face);color:var(--hbd-ink);cursor:pointer;pointer-events:auto;-webkit-tap-highlight-color:transparent;box-shadow:inset 0 1px 0 #ffffff0f, 0 0 0 1px var(--hbd-edge), 0 2px 4px #00000057, 0 12px 26px -14px #0009;transition:background-color var(--hbd-t-hover) var(--hbd-ease), box-shadow var(--hbd-t-hover) var(--hbd-ease), transform var(--hbd-t-press) var(--hbd-ease);border:0;border-radius:50%;justify-content:center;align-items:center;padding:0;display:flex;position:fixed;bottom:24px;right:16px}#heybox-dark-toggle:hover{background:var(--hbd-face-hover);box-shadow:inset 0 1px 0 #ffffff17, 0 0 0 1px var(--hbd-edge-hover), 0 3px 6px #0000005c, 0 18px 34px -16px #0000009e}#heybox-dark-toggle:active{box-shadow:inset 0 1px 0 #ffffff0a, 0 0 0 1px var(--hbd-edge), 0 1px 2px #0006, 0 6px 14px -10px #00000080;transform:translateY(1px)}#heybox-dark-toggle:focus-visible{box-shadow:0 0 0 2px var(--hbd-ring-light), 0 0 0 4px var(--hbd-ring-dark), 0 2px 4px #00000057, 0 12px 26px -14px #0009;outline:none}#heybox-dark-toggle .hbd-icon{justify-content:center;align-items:center;display:flex}#heybox-dark-toggle svg{width:var(--hbd-icon-size);height:var(--hbd-icon-size);fill:none;stroke:currentColor;stroke-width:var(--hbd-icon-stroke);stroke-linecap:round;stroke-linejoin:round;animation:hbd-icon-in var(--hbd-t-icon) var(--hbd-ease) both;display:block}@keyframes hbd-icon-in{0%{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}@media (prefers-reduced-motion:reduce){#heybox-dark-toggle{transition:none}#heybox-dark-toggle svg{animation:none}}@media (forced-colors:active){#heybox-dark-toggle{color:buttontext;box-shadow:none;background:buttonface;border:1px solid buttontext}#heybox-dark-toggle:focus-visible{outline-offset:2px;outline:2px solid highlight}}";
 	var HOST_ID = "heybox-dark-mode-root";
 	var BUTTON_ID = "heybox-dark-toggle";
 	var SVG_NS = "http://www.w3.org/2000/svg";
@@ -996,11 +996,6 @@ html.${ROOT_CLASS} {
 	function buildIcon(dark) {
 		const svg = document.createElementNS(SVG_NS, "svg");
 		svg.setAttribute("viewBox", "0 0 24 24");
-		svg.setAttribute("fill", "none");
-		svg.setAttribute("stroke", "currentColor");
-		svg.setAttribute("stroke-width", "1.9");
-		svg.setAttribute("stroke-linecap", "round");
-		svg.setAttribute("stroke-linejoin", "round");
 		svg.setAttribute("aria-hidden", "true");
 		svg.setAttribute("focusable", "false");
 		if (dark) {
@@ -1023,12 +1018,12 @@ html.${ROOT_CLASS} {
 		}
 		return svg;
 	}
-	function paint(button, dark) {
+	function paint(iconSlot, button, dark) {
 		const label = dark ? "切换到浅色模式" : "切换到深色模式";
 		button.title = label;
 		button.setAttribute("aria-label", label);
 		button.setAttribute("aria-pressed", dark ? "true" : "false");
-		button.replaceChildren(buildIcon(dark));
+		iconSlot.replaceChildren(buildIcon(dark));
 	}
 	function mountToggle() {
 		if (document.getElementById(HOST_ID)) return;
@@ -1042,11 +1037,14 @@ html.${ROOT_CLASS} {
 		const button = document.createElement("button");
 		button.id = BUTTON_ID;
 		button.type = "button";
+		const iconSlot = document.createElement("span");
+		iconSlot.className = "hbd-icon";
 		button.addEventListener("click", () => {
 			applyDark(!isDarkEnabled());
 		});
-		onDarkChange((dark) => paint(button, dark));
-		paint(button, isDarkEnabled());
+		onDarkChange((dark) => paint(iconSlot, button, dark));
+		paint(iconSlot, button, isDarkEnabled());
+		button.appendChild(iconSlot);
 		shadow.appendChild(button);
 		document.documentElement.appendChild(host);
 	}

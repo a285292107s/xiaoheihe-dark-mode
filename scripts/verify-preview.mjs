@@ -72,6 +72,8 @@ const read = () =>
     engineDark: typeof window.__hbIsDark === 'function' ? window.__hbIsDark() : null,
     label: document.getElementById('hb-theme').textContent,
     barBg: getComputedStyle(document.getElementById('hb-bar')).backgroundColor,
+    barH: Math.round(document.getElementById('hb-bar').getBoundingClientRect().height),
+    stagePadTop: Math.round(parseFloat(getComputedStyle(document.getElementById('hb-stage')).paddingTop)),
     stageBg: getComputedStyle(document.getElementById('hb-stage')).backgroundColor,
     stored: localStorage.getItem('heybox-dark-mode'),
   }));
@@ -94,6 +96,7 @@ const checks = [
   ['再点一次回到初始态', s2.dark === s0.dark],
   ['按钮文案随状态双向变化', s1.label !== s0.label && s2.label === s0.label],
   ['预览条自身未被引擎重映射', s1.barBg === 'rgba(20, 24, 29, 0.94)' || s1.barBg === 'rgb(20, 24, 29)', s1.barBg],
+  ['舞台留白 ≥ 固定条高度（内容不被遮住）', s2.stagePadTop >= s2.barH, `padTop=${s2.stagePadTop} barH=${s2.barH}`],
   ['存储跟随状态', s1.stored === (s1.dark ? '1' : '0') && s2.stored === (s2.dark ? '1' : '0')],
   ['无 JS 报错', errors.length === 0, errors.join(' | ')],
   ['无资源加载失败', failed.length === 0, failed.join(' | ')],

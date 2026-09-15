@@ -15,6 +15,8 @@
  *   5) 再点击 -> 完整还原
  *   6) 控制台入口 __hbSetDark 也会同步图标（订阅机制）
  *   7) 刷新后记忆生效
+ *   8) 焦点环是「浅内圈 + 深外圈」双色，且不吃布局
+ *   9) prefers-reduced-motion 下过渡与入场动画都归零
  */
 import { createRequire } from 'node:module';
 import http from 'node:http';
@@ -149,6 +151,9 @@ console.log('\n===== 场景一：首次访问（系统浅色，无记忆） ====
   // 用真实鼠标事件点击，验证事件确实绑上了（而不是内部直接改状态）
   await page.mouse.click(shadow.x, shadow.y);
   await page.waitForTimeout(500);
+  // 指针停在按钮上会让 :hover 生效，读到的就不是静息态配色了；挪开再取数
+  await page.mouse.move(4, 4);
+  await page.waitForTimeout(300);
   const b = await page.evaluate(PROBE);
 
   check('点击后 <html> 有 hb-dark', b.darkClass);
@@ -167,12 +172,18 @@ console.log('\n===== 场景一：首次访问（系统浅色，无记忆） ====
     const [r, g, bl] = [+m[1], +m[2], +m[3]];
     return Math.max(r, g, bl) - Math.min(r, g, bl) > 40;
   })(), `ctaBg=${b.ctaBg}`);
-  check('按钮自身仍未被重映射', b.btnBg === 'rgb(20, 25, 30)' && b.btnText === 'rgb(255, 255, 255)', `btnBg=${b.btnBg}`);
+  check(
+    '按钮自身仍未被重映射（面 / 墨色都是设计值）',
+    b.btnBg === 'rgb(20, 25, 30)' && b.btnText === 'rgb(238, 241, 245)',
+    `btnBg=${b.btnBg} btnText=${b.btnText}`,
+  );
 
   // ---------- 场景三：再点一次还原 ----------
   console.log('\n===== 场景三：再点一次关闭深色 =====');
   await page.mouse.click(shadow.x, shadow.y);
   await page.waitForTimeout(500);
+  await page.mouse.move(4, 4);
+  await page.waitForTimeout(300);
   const c = await page.evaluate(PROBE);
   check('类名已移除', !c.darkClass);
   check('基础层已移除', !c.baseStyle);
@@ -238,6 +249,64 @@ console.log('\n===== 场景八：Shadow DOM 样式表不被引擎触碰 =====');
   check('shadow 内的 <style> 不在 document.styleSheets 里', r.inDoc === false);
   check('深色下按钮底色仍是设计值', r.btnColor === 'rgb(20, 25, 30)', `btnColor=${r.btnColor}`);
   check('引擎仍在工作（有扫描统计）', r.stats && r.stats.scanned > 0, JSON.stringify(r.stats));
+  await context.close();
+}
+
+// ---------- 场景九：焦点环必须双色，且不能改变按钮尺寸 ----------
+// 按钮浮在「不可知的宿主背景」上，单色 outline 会在某些底色上融掉；
+// 双色环保证任何底色上至少有一圈可见。这条断言是防止它被改回单色 outline 的门将。
+console.log('\n===== 场景九：focus-visible 双色焦点环 =====');
+{
+  const { context, page, errors } = await newPage({ stored: '1' });
+  const r = await page.evaluate(() => {
+    const btn = document
+      .getElementById('heybox-dark-mode-root')
+      .shadowRoot.getElementById('heybox-dark-toggle');
+    btn.focus({ focusVisible: true });
+    const cs = getComputedStyle(btn);
+    const rect = btn.getBoundingClientRect();
+    return {
+      focused: btn.matches(':focus-visible'),
+      shadow: cs.boxShadow,
+      outline: cs.outlineStyle,
+      size: [Math.round(rect.width), Math.round(rect.height)],
+    };
+  });
+  check(':focus-visible 命中', r.focused);
+  check('焦点环含浅内圈 rgb(244, 247, 250)', r.shadow.includes('rgb(244, 247, 250)'), r.shadow);
+  check('焦点环含深外圈 rgb(11, 15, 19)', r.shadow.includes('rgb(11, 15, 19)'), r.shadow);
+  check('不再使用单色 outline', r.outline === 'none', `outline=${r.outline}`);
+  check('聚焦时尺寸仍是 44x44（焦点环不吃布局）', r.size[0] === 44 && r.size[1] === 44, JSON.stringify(r.size));
+  check('无 JS 报错', errors.length === 0, errors.join(' | '));
+  await context.close();
+}
+
+// ---------- 场景十：prefers-reduced-motion 下动效归零 ----------
+console.log('\n===== 场景十：prefers-reduced-motion =====');
+{
+  const context = await browser.newContext({
+    viewport: { width: 900, height: 700 },
+    reducedMotion: 'reduce',
+  });
+  await context.addInitScript(code);
+  const page = await context.newPage();
+  await page.goto(origin, { waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(600);
+  const r = await page.evaluate(() => {
+    const btn = document
+      .getElementById('heybox-dark-mode-root')
+      .shadowRoot.getElementById('heybox-dark-toggle');
+    const svg = btn.querySelector('svg');
+    return {
+      transition: getComputedStyle(btn).transitionDuration,
+      animation: getComputedStyle(svg).animationName,
+      iconOpacity: getComputedStyle(svg).opacity,
+    };
+  });
+  check('过渡时长归零', r.transition === '0s', `transition=${r.transition}`);
+  check('图标入场动画关闭', r.animation === 'none', `animation=${r.animation}`);
+  // 关掉动画不能顺手把图标留在 from 帧（opacity 0）上
+  check('图标仍然可见', r.iconOpacity === '1', `opacity=${r.iconOpacity}`);
   await context.close();
 }
 

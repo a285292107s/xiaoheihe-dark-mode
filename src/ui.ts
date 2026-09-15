@@ -8,6 +8,8 @@
  *
  * 挂在 Shadow DOM 里，与站点样式彻底隔离；宿主打 data-hb-own，
  * 让深色引擎跳过它（否则按钮自身也会被引擎重映射）。
+ *
+ * 视觉规格全在 ui.css（含线宽、尺寸、动效令牌），这里只提供图标几何。
  */
 
 import { applyDark, isDarkEnabled, onDarkChange } from './dark-mode';
@@ -19,7 +21,7 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 
 /** 月亮：深色模式下点击可切回浅色 */
 const ICON_MOON = ['M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z'];
-/** 太阳：浅色模式下点击可切到深色 */
+/** 太阳：浅色模式下点击可切到深色。八条射线写成一条 path（多段 M）而不是八个节点 */
 const ICON_SUN = [
   'M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41',
 ];
@@ -27,15 +29,12 @@ const ICON_SUN = [
 /**
  * 用 createElementNS 而不是 innerHTML 拼图标：
  * 宿主站点若启用 Trusted Types，innerHTML 会被 CSP 直接拒绝。
+ *
+ * 只描述几何：线宽/端点/颜色都由 ui.css 的令牌决定，换视觉不用改这里。
  */
 function buildIcon(dark: boolean): SVGSVGElement {
   const svg = document.createElementNS(SVG_NS, 'svg');
   svg.setAttribute('viewBox', '0 0 24 24');
-  svg.setAttribute('fill', 'none');
-  svg.setAttribute('stroke', 'currentColor');
-  svg.setAttribute('stroke-width', '1.9');
-  svg.setAttribute('stroke-linecap', 'round');
-  svg.setAttribute('stroke-linejoin', 'round');
   svg.setAttribute('aria-hidden', 'true');
   svg.setAttribute('focusable', 'false');
 
@@ -61,12 +60,14 @@ function buildIcon(dark: boolean): SVGSVGElement {
   return svg;
 }
 
-function paint(button: HTMLButtonElement, dark: boolean): void {
+function paint(iconSlot: HTMLElement, button: HTMLButtonElement, dark: boolean): void {
   const label = dark ? '切换到浅色模式' : '切换到深色模式';
   button.title = label;
   button.setAttribute('aria-label', label);
   button.setAttribute('aria-pressed', dark ? 'true' : 'false');
-  button.replaceChildren(buildIcon(dark));
+  // 只换图标槽的内容：ui.css 靠「节点被替换」让入场动画重放，
+  // 按钮自身不重建，焦点也不会丢。
+  iconSlot.replaceChildren(buildIcon(dark));
 }
 
 export function mountToggle(): void {
@@ -85,14 +86,21 @@ export function mountToggle(): void {
   const button = document.createElement('button');
   button.id = BUTTON_ID;
   button.type = 'button';
+
+  const iconSlot = document.createElement('span');
+  iconSlot.className = 'hbd-icon';
+
   button.addEventListener('click', () => {
     // 以实际状态取反，而不是闭包里的旧值：控制台调用 __hbSetDark 后也不会错位
     applyDark(!isDarkEnabled());
   });
   // 订阅而不是各存一份状态：任何入口（按钮、控制台、未来其它 UI）改状态都会同步图标
-  onDarkChange((dark) => paint(button, dark));
-  paint(button, isDarkEnabled());
+  onDarkChange((dark) => paint(iconSlot, button, dark));
+  paint(iconSlot, button, isDarkEnabled());
+
+  button.appendChild(iconSlot);
   shadow.appendChild(button);
 
   document.documentElement.appendChild(host);
 }
+

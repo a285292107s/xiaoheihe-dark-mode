@@ -1,10 +1,39 @@
 /*
- * 切换按钮的样式，注入在 Shadow DOM 内部。
- * :host { all: initial } 把站点继承下来的字号/字族/颜色全部砍断，
- * 保证按钮只受这份样式控制。
+ * 深色模式开关按钮的样式，注入在 Shadow DOM 内部。
+ *
+ * 设计口径：单色仪器感 —— 靠 1px 描边与明度分层立形状，不用大而软的投影。
+ * 它要压在任何宿主页面上（纯白列表、深色详情页、游戏封面图）都读得出来，
+ * 又不能抢内容。
+ *
+ * 三条硬约定：
+ *   1) 视觉值全部走 :host 上的 --hbd-* 令牌，调配色只改这一块。
+ *   2) 宿主背景不可知，所以焦点环做成「浅内圈 + 深外圈」：任何底色上至少有一圈
+ *      可用（最坏情况是中间灰，较强的一圈仍有约 4.2:1）。单色也避免了一枚彩色
+ *      outline 在彩色封面图上融掉。
+ *   3) 动效只碰 background-color / box-shadow / transform，时长走令牌，
+ *      prefers-reduced-motion 下全部归零。
  */
 :host {
+  /* all: initial 砍断站点继承下来的字号 / 字族 / 颜色。
+     自定义属性不受 all 影响，所以令牌写在它后面。
+     令牌前缀用 --hbd- 而不是 --hb-：站点自己就有 695 个 --hb-* 自定义属性，
+     同名的话读代码时极易看混（隔离上没问题，inherit 打不过 :host 里的声明）。 */
   all: initial;
+
+  --hbd-face: #14191e; /* 按钮面，取站点品牌黑 */
+  --hbd-face-hover: #1c242c; /* hover 只抬明度，不换色相 */
+  --hbd-ink: #eef1f5; /* 图标墨色：不用纯白，免得和页面白字抢注意力 */
+  --hbd-edge: rgba(255, 255, 255, 0.16); /* 1px 外描边：深色底上靠它成形 */
+  --hbd-edge-hover: rgba(255, 255, 255, 0.28);
+  --hbd-ring-light: #f4f7fa; /* 焦点环内圈（深底上可见） */
+  --hbd-ring-dark: #0b0f13; /* 焦点环外圈（浅底上可见） */
+  --hbd-size: 44px; /* 触控目标，不要再调小 */
+  --hbd-icon-size: 20px;
+  --hbd-icon-stroke: 1.75; /* 20px 下等效约 1.46px，1x 屏不糊、2x 屏够精细 */
+  --hbd-ease: cubic-bezier(0.2, 0, 0, 1);
+  --hbd-t-hover: 200ms;
+  --hbd-t-press: 90ms;
+  --hbd-t-icon: 180ms;
 }
 
 #heybox-dark-toggle {
@@ -12,48 +41,123 @@
   right: 16px;
   bottom: 24px;
   z-index: 2147483646;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
+
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #14191e;
-  color: #ffffff;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
-  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  width: var(--hbd-size);
+  height: var(--hbd-size);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+
+  background: var(--hbd-face);
+  color: var(--hbd-ink);
+  cursor: pointer;
+  /* 页面把 pointer-events 关掉时（全屏遮罩）按钮也不该跟着失效 */
   pointer-events: auto;
   -webkit-tap-highlight-color: transparent;
+
+  /* 顶面内高光 + 1px 描边 + 两段方向一致的投影：
+     近处一段定住边缘，远处一段只用来和内容拉开距离。 */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 0 1px var(--hbd-edge),
+    0 2px 4px rgba(0, 0, 0, 0.34),
+    0 12px 26px -14px rgba(0, 0, 0, 0.6);
+
+  transition:
+    background-color var(--hbd-t-hover) var(--hbd-ease),
+    box-shadow var(--hbd-t-hover) var(--hbd-ease),
+    transform var(--hbd-t-press) var(--hbd-ease);
 }
 
+/* hover 不放大：缩放会让按钮在密集列表上方抖，也让按钮看起来在「呼吸」。
+   抬明度 + 提亮描边 + 投影外扩，读数一样清楚。 */
 #heybox-dark-toggle:hover {
-  transform: scale(1.06);
+  background: var(--hbd-face-hover);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 0 0 1px var(--hbd-edge-hover),
+    0 3px 6px rgba(0, 0, 0, 0.36),
+    0 18px 34px -16px rgba(0, 0, 0, 0.62);
 }
 
+/* 按压像按实体键：整体下沉 1px、投影收紧。90ms 内出反馈。 */
 #heybox-dark-toggle:active {
-  transform: scale(0.96);
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 0 0 1px var(--hbd-edge),
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    0 6px 14px -10px rgba(0, 0, 0, 0.5);
 }
 
+/* 双色焦点环：outline 只能是一色，做不到「任何底色上都可见」，所以用两圈
+   box-shadow。先画的在上层，读作「浅圈 0~2px、深圈 2~4px」。 */
 #heybox-dark-toggle:focus-visible {
-  outline: 2px solid #7aa2f7;
-  outline-offset: 2px;
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--hbd-ring-light),
+    0 0 0 4px var(--hbd-ring-dark),
+    0 2px 4px rgba(0, 0, 0, 0.34),
+    0 12px 26px -14px rgba(0, 0, 0, 0.6);
 }
 
+#heybox-dark-toggle .hbd-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 图标几何由 ui.ts 提供（path 数据），视觉规格留在这里：
+   改线宽 / 尺寸 / 圆角端点不用碰 TS。 */
 #heybox-dark-toggle svg {
-  width: 20px;
-  height: 20px;
   display: block;
+  width: var(--hbd-icon-size);
+  height: var(--hbd-icon-size);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--hbd-icon-stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* 换图标 = 换节点，动画因此在每次切换时重放一遍。
+     不依赖 animationend 做任何状态判定。 */
+  animation: hbd-icon-in var(--hbd-t-icon) var(--hbd-ease) both;
+}
+
+@keyframes hbd-icon-in {
+  from {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   #heybox-dark-toggle {
     transition: none;
   }
-  #heybox-dark-toggle:hover,
-  #heybox-dark-toggle:active {
-    transform: none;
+  #heybox-dark-toggle svg {
+    animation: none;
+  }
+}
+
+/* 强制配色下 box-shadow 会被系统丢掉，按钮会连形状一起消失。
+   这里换成系统色与真实边框，焦点环交给 Highlight。 */
+@media (forced-colors: active) {
+  #heybox-dark-toggle {
+    background: ButtonFace;
+    color: ButtonText;
+    border: 1px solid ButtonText;
+    box-shadow: none;
+  }
+  #heybox-dark-toggle:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
   }
 }

@@ -7,46 +7,80 @@
   <title>小黑盒深色模式 · 效果预览</title>
   <style data-hb-own>
     /* 预览壳自身样式：data-hb-own 让引擎在遍历 document.styleSheets 时整块跳过它，
-       否则预览条的深色配色会被当成站点内容再映射一遍。 */
+       否则预览条的深色配色会被当成站点内容再映射一遍。
+
+       视觉口径与 src/ui.css 的开关按钮一致：单色、1px 描边分层、不靠大投影。
+       条上的控件用 6px 圆角（贴合站点自己的 5px/8px 语言），
+       而浮在内容之上的那个开关是唯一的圆形 —— 形状差异本身就在表达「层级不同」。 */
     html, body { margin: 0; padding: 0; }
     #hb-bar {
       position: fixed;
       left: 0; right: 0; top: 0;
       z-index: 2147483600;
+      box-sizing: border-box;
+      height: 48px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      font: 12px/1.4 "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      gap: 6px;
+      padding: 0 14px;
+      font: 12px/1 system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      -webkit-font-smoothing: antialiased;
       background: rgba(20, 24, 29, 0.94);
       color: #f0f2f5;
-      backdrop-filter: blur(12px);
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(14px) saturate(140%);
+      /* 深色页面下条与本底几乎同色，靠这条 hairline 分界；浅色页面靠条自身的明度差 */
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
-    #hb-bar strong { font-weight: 700; margin-right: 6px; }
+    #hb-bar .brand {
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      margin-right: 10px;
+    }
     #hb-bar button {
       font: inherit;
-      padding: 5px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      padding: 6px 11px;
+      border-radius: 6px;
+      border: 1px solid transparent;
       background: transparent;
-      color: inherit;
+      color: rgba(240, 242, 245, 0.72);
       cursor: pointer;
+      transition: background-color 160ms cubic-bezier(0.2, 0, 0, 1), color 160ms cubic-bezier(0.2, 0, 0, 1);
     }
-    #hb-bar button.on { background: #f0f2f5; color: #14191e; border-color: transparent; font-weight: 600; }
+    #hb-bar button:hover { background: rgba(255, 255, 255, 0.07); color: #f0f2f5; }
+    #hb-bar button:active { background: rgba(255, 255, 255, 0.12); }
+    #hb-bar button.on {
+      background: #eef1f5;
+      color: #14191e;
+      border-color: transparent;
+      font-weight: 600;
+    }
+    /* 选中态是浅底，按压要压暗而不是再叠一层白 */
+    #hb-bar button.on:hover { background: #ffffff; }
+    #hb-bar button.on:active { background: #dde2e9; }
+    #hb-bar button:focus-visible { outline: 2px solid rgba(244, 247, 250, 0.9); outline-offset: 2px; }
+    #hb-bar .rule {
+      width: 1px;
+      height: 16px;
+      margin: 0 8px;
+      background: rgba(255, 255, 255, 0.12);
+    }
     #hb-bar .spacer { flex: 1; }
-    #hb-bar .hint { opacity: 0.7; }
-    #hb-stage { padding-top: 44px; }
-    #hb-stage.is-dark { background: #0f1216; }
+    #hb-bar .hint { color: rgba(240, 242, 245, 0.62); letter-spacing: 0.01em; }
+    @media (prefers-reduced-motion: reduce) {
+      #hb-bar button { transition: none; }
+    }
+    #hb-stage { padding-top: 48px; }
+    #hb-stage.is-dark { background: #0e1116; }
   </style>
 </head>
 <body>
   <div id="hb-bar" data-hb-own>
-    <strong>小黑盒深色模式</strong>
-    <button data-page="home" class="on">首页</button>
-    <button data-page="detail">帖子详情</button>
+    <strong class="brand">小黑盒深色模式</strong>
+    <button data-page="home" class="on" aria-pressed="true">首页</button>
+    <button data-page="detail" aria-pressed="false">帖子详情</button>
     <span class="spacer"></span>
     <span class="hint">真实页面 DOM 快照 · 深色由油猴脚本驱动</span>
+    <span class="rule"></span>
     <button id="hb-theme">深色</button>
   </div>
   <div id="hb-stage"></div>
@@ -109,8 +143,11 @@
       }
       const on = isDarkNow();
       stage.classList.toggle('is-dark', on);
+      // 文案本身就是动作名（点了会变成什么），所以不再叠 aria-pressed：
+      // 「名字在变 + 又说自己 pressed」会读成「浅色, 已按下」，语义打架。
       themeBtn.textContent = on ? '浅色' : '深色';
-      metaTheme.setAttribute('content', on ? '#0f1216' : '#fafbfc');
+      // 与引擎画布同色（src/dark-engine.ts 的 CANVAS），标签页配色要跟着一致
+      metaTheme.setAttribute('content', on ? '#0e1116' : '#fafbfc');
     }
 
     themeBtn.addEventListener('click', () => setTheme(!isDarkNow()));
@@ -119,9 +156,12 @@
     for (const btn of document.querySelectorAll('#hb-bar [data-page]')) {
       btn.addEventListener('click', async () => {
         current = btn.dataset.page;
-        document
-          .querySelectorAll('#hb-bar [data-page]')
-          .forEach((b) => b.classList.toggle('on', b === btn));
+        document.querySelectorAll('#hb-bar [data-page]').forEach((b) => {
+          const on = b === btn;
+          // 选中态不只靠底色：同时给出 aria-pressed，读屏与键盘用户拿得到同一个信息
+          b.classList.toggle('on', on);
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
         await loadPage(current);
       });
     }

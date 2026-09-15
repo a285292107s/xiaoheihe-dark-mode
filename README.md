@@ -5,7 +5,7 @@
 因此**伪元素、`:hover`/`:focus` 等交互态、`@keyframes`、JS 写入的内联颜色都能覆盖到**。
 
 ```
-产物     28.6 KB（gzip 8.8 KB），无运行时依赖
+产物     29.3 KB（gzip 9.3 KB），无运行时依赖
 开销     一次遍历 4700~5500 条规则约 45ms；元素级只处理「确实带内联颜色」的那约 20 个元素
 例外     1106 字节（人工审计的例外层，其余全部就地改写站点声明）
 ```
@@ -87,7 +87,7 @@ npm run verify:all   # 构建 + 全部验收（推荐）
 | 命令 | 覆盖 | 断言数 |
 |---|---|---|
 | `npm run verify` | 真实首页 / 详情页：浅色表面、低对比文本、泥泞中间调、开关还原 | 出图 + 指标 |
-| `npm run verify:ui` | 切换按钮全部行为：Shadow DOM 隔离、初始态、记忆、图标/aria 同步 | 45 |
+| `npm run verify:ui` | 切换按钮全部行为：Shadow DOM 隔离、初始态、记忆、图标/aria 同步、双色焦点环、reduced-motion | 54 |
 | `npm run verify:lifecycle` | `<head>` 启动竞态、内联写循环、跟踪集约束、`url()` 保护 | 16 |
 | `npm run verify:preview` | 预览壳双向切换与自身样式隔离 | 8 |
 | `npm run verify:idempotent` | 反复重建 6 轮的渲染指纹与例外层字节稳定性 | 6 轮 |
@@ -95,6 +95,8 @@ npm run verify:all   # 构建 + 全部验收（推荐）
 
 四个「看起来只是小改动」的地方都有对应回归，改之前建议先看一眼它们的失败信息：
 `<head>` 竞态、内联写循环、`url()` 里的颜色词、hover 层叠顺序。
+按钮的焦点环另有一条门将：`verify:ui` 会断言它是「浅内圈 + 深外圈」两色，
+防止被改回单色 `outline`（单色环会在某些宿主底色上融掉）。
 
 ### 目录
 
@@ -103,7 +105,7 @@ src/
   dark-engine.ts   引擎：角色判定 + 就地改写 + 例外层 + 生命周期
   dark-mode.ts     开关状态、偏好存储、基础层注入、订阅
   dark-base.css    基础层：画布底色、color-scheme、滚动条、placeholder、选区
-  ui.ts / ui.css   切换按钮（原生 DOM，挂在 Shadow DOM 里）
+  ui.ts / ui.css   切换按钮（原生 DOM，挂在 Shadow DOM 里；配色与动效令牌在 ui.css 顶部）
   main.ts          入口
 scripts/           验收脚本（见上表）
 research/          证据与复现：FINDINGS.md 是完整结论，其余是可重跑的取证脚本
