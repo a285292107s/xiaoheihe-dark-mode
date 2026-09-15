@@ -1,0 +1,40 @@
+/* 小黑盒页面精简 —— 只隐藏两处干扰源
+ *
+ * 顶部导航的「首页」入口（全站导航），以及社区页信息流右侧那一栏。
+ *
+ * 三条硬约定：
+ *   1) 不动站点任何声明、不加 !important。两条规则都比站点自己的规则更具体
+ *      （多一层 html.hb-declutter），赢在层叠上；站点原文保持原样，
+ *      整个样式表删掉就等于完全没发生过。
+ *   2) 右侧栏腾出的宽度要一起处理，否则列表被站点自己的 max-width:660px 卡住，
+ *      1032px 的容器里会空出 356px 右侧留白。下面三条与站点自己的
+ *      `@media only screen and (max-width:1080px)` 逐条同义 —— 站点在窄屏下
+ *      就是「侧栏隐藏 + 列表取消上限」，这里直接复用同一套布局。
+ *   3) 选择器都锚定在 #page-bbs-community / .nav 上，不碰其它页面。
+ */
+
+/* 顶部导航的「首页」入口。
+   站点的导航项由一个配置数组渲染，首项恒为「首页」（英文变体是 Home）——
+   取证见 research/probe-hide-targets.mjs 与 fixtures/home.html，
+   真实站点上的断言在 scripts/verify-declutter.mjs；而 CSS 无法按文本匹配，
+   位置是这里唯一稳定的表达。
+   站点规则 .nav .nav-content .nav-links .nav-link[data-v-*] 的权重是 (0,5,0)，
+   这里 (0,6,1) —— 无需 !important 即可压过它写的 display:inline-flex。 */
+html.hb-declutter .nav .nav-content .nav-links > .nav-link:first-child {
+  display: none;
+}
+
+/* 右侧栏（热门社区 + 下载 App 卡片 + 页脚）。
+   要对应的是 #page-bbs-community > div.content > div —— .content 下只有
+   main.list 与它两个元素子节点，div 型的那一个就是 .right。 */
+html.hb-declutter #page-bbs-community > .content > .right {
+  display: none;
+}
+
+/* 站点自己的 <1080px 布局：内容居中、列表取消 660px 上限，铺满 1032px 容器 */
+html.hb-declutter #page-bbs-community > .content {
+  justify-content: center;
+}
+html.hb-declutter #page-bbs-community > .content > .list {
+  max-width: none;
+}

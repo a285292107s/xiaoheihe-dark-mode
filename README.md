@@ -4,10 +4,14 @@
 不是简单反色：它把站点的 CSS 规则当作数据读出来，按「颜色角色」逐条重映射，
 因此**伪元素、`:hover`/`:focus` 等交互态、`@keyframes`、JS 写入的内联颜色都能覆盖到**。
 
+另带一个**精简模式**（右下角第二个开关，默认开启）：隐藏顶部导航的「首页」入口
+与社区页信息流右侧那一栏。两项互相独立，可单独开关。
+
 ```
-产物     30.7 KB（gzip 9.4 KB），无运行时依赖
+产物     34.1 KB（gzip 10.2 KB），无运行时依赖
 开销     一次遍历 4700~5500 条规则约 20~35ms（实测）；元素级只处理「确实带内联颜色」的那约 20 个元素
 例外     1106 字节（人工审计的例外层，其余全部就地改写站点声明）
+精简     274 字节（一层惰性规则，不改站点任何声明）
 ```
 
 ## 安装
@@ -26,25 +30,53 @@ https://raw.githubusercontent.com/a285292107s/xiaoheihe-dark-mode/main/dist/xiao
 
 ## 使用
 
-- 右下角圆形按钮切换深色/浅色。
-- 偏好记在 `localStorage` 的 `heybox-dark-mode` 键（`'1'` / `'0'`）。
-  **未设置过时跟随系统** `prefers-color-scheme`。
+右下角两个圆形按钮，上下叠成一列：
+
+| 按钮 | 作用 | 偏好键 |
+|---|---|---|
+| 下面那个（月亮 / 太阳） | 深色 / 浅色 | `localStorage` 的 `heybox-dark-mode`（`'1'` / `'0'`）。**未设置过时跟随系统** `prefers-color-scheme` |
+| 上面那个（面板） | 精简模式：隐藏首页入口与社区页右侧栏 | `localStorage` 的 `heybox-declutter`（`'1'` / `'0'`）。**未设置过时默认开启** |
+
+两个开关互不依赖：可以只深色、只精简，也可以都开。
+精简按钮的图标画的是**当前**布局（有右侧栏 / 已铺满），深色按钮的图标画的是**点击后**的样子 ——
+两个按钮的动作名都在 `title` / `aria-label` 里写全了。
+
 - 控制台调试接口（正常使用不需要）：
 
   | 接口 | 作用 |
   |---|---|
-  | `__hbSetDark(on)` | 开关（会同步按钮图标） |
+  | `__hbSetDark(on)` | 深色开关（会同步按钮图标） |
   | `__hbIsDark()` | 当前是否深色 |
+  | `__hbSetDeclutter(on)` | 精简开关（会同步按钮图标） |
+  | `__hbIsDeclutter()` | 当前是否精简 |
   | `__hbEngineStats()` | 本次构建：读取样式表数、扫描规则数、改动规则数、改动声明数、关键帧数、跟踪集大小、错误数 |
   | `__hbEngineCss()` | 例外层字节数 + 最近一次构建中被改写的前若干条声明 |
   | `__hbRebuild()` | 强制重建（换路由后样式没跟上时可用） |
 
-- 页面上的两个状态出口（CSS 与验收脚本都读它们，不必问引擎内部状态）：
+- 页面上的三个状态出口（CSS 与验收脚本都读它们，不必问内部状态）：
 
   | 标记 | 含义 |
   |---|---|
   | `html.hb-dark` | 深色是否已开启 |
+  | `html.hb-declutter` | 精简是否已开启 |
   | `html[data-hb-engine="ready"]` | 已完成至少一次规则映射；**缺这个属性**表示「已开启但站点样式还没被映射」 |
+
+## 精简模式隐藏了什么
+
+只有两处（全在 [`src/declutter.css`](src/declutter.css)）：
+
+| 选择器 | 位置 | 说明 |
+|---|---|---|
+| `.nav .nav-content .nav-links > .nav-link:first-child` | 全站顶部导航 | 「首页」入口。导航项由站点的配置数组渲染，首项恒为「首页」（英文变体是 Home）；CSS 无法按文本匹配，所以只能用位置表达 |
+| `#page-bbs-community > .content > .right` | 社区页信息流右侧 | 热门社区 / 下载 App / 页脚那一栏。等价于 `#page-bbs-community > div.content > div` —— `.content` 下只有 `main.list` 与它两个元素子节点 |
+
+只藏侧栏是不够的：容器宽 1032px，而列表被站点自己的 `max-width:660px` 卡着，
+藏完会在右边空出 356px。所以精简层同时复用了站点**自己的** `<1080px` 布局
+（侧栏隐藏 + 列表取消上限 + 内容居中），与站点在窄屏下的表现逐条一致。
+
+实现上只是 `<html>` 上一个类名 + 一层带 `data-hb-own` 的样式表：
+选择器都多一层 `html.hb-declutter` 前缀，权重高过站点规则，因此**不需要 `!important`**，
+站点原文一个字节都没动；关掉开关时类名与样式表一起撤除，页面回到站点原样。
 
 ## 为什么不是简单反色
 
@@ -79,6 +111,11 @@ https://raw.githubusercontent.com/a285292107s/xiaoheihe-dark-mode/main/dist/xiao
   尚未接入真实封面图页面决定是否加例外。
 - 详情页在无头浏览器下会撞腾讯验证码（全屏遮罩），因此**自动化验收**的详情页信号弱于首页；
   人工浏览不受影响。
+- 精简模式隐藏的「首页」入口是**按位置**选的（导航首项）。站点若调整导航顺序，
+  这条规则要跟着改；`verify:declutter` 会在真实站点上断言首项文字仍是「首页」/`Home`，
+  顺序一变就红。
+- 精简模式只处理社区页（`#page-bbs-community`）的右侧栏，其它页面的侧栏不受影响，
+  也没有接「隐藏搜索框 / 隐藏页脚」之类的额外项。
 
 ## 开发
 
@@ -96,7 +133,8 @@ npm run verify:all   # 构建 + 全部验收（推荐）
 | `npm run verify` | 真实首页 / 详情页：浅色表面、低对比文本、泥泞中间调、整屏底色层、开关还原 | 出图 + 指标 |
 | `npm run verify:canvas` | 离线：整屏底色层「首轮构建 == 强制重建」（含阴性对照） | 4 判据 |
 | `npm run verify:flash` | 离线：换路由白闪（JS 写内联白底的加载幕、新 CSS 分片，各含阴性对照） | 8 判据 |
-| `npm run verify:ui` | 切换按钮全部行为：Shadow DOM 隔离、初始态、记忆、图标/aria 同步、双色焦点环、冷淡扁平材质、reduced-motion | 55 |
+| `npm run verify:ui` | 两个按钮的全部行为：Shadow DOM 隔离、初始态、记忆、图标/aria 同步、双色焦点环、冷淡扁平材质、reduced-motion | 61 |
+| `npm run verify:declutter` | 精简模式：首页入口隐藏与恢复、右侧栏隐藏与列表铺满、开关/记忆/图标同步、与深色互不干扰（离线 43 + 真实站点 9） | 52 |
 | `npm run verify:lifecycle` | `<head>` 启动竞态、内联写循环、跟踪集约束、`url()` 保护、回前台对账与引擎状态出口 | 23 |
 | `npm run verify:preview` | 预览壳双向切换与自身样式隔离 | 9 |
 | `npm run verify:idempotent` | 反复重建 6 轮的渲染指纹、例外层字节、伪元素底色层「首轮 == 重建」 | 6 轮 |
@@ -106,24 +144,34 @@ npm run verify:all   # 构建 + 全部验收（推荐）
 `<head>` 竞态、内联写循环、`url()` 里的颜色词、hover 层叠顺序、
 拿站点样式反推结论时必须先还原自己写过的值（画布色集合就栽在这里）、
 换路由的首帧（新分片要即时重建、内联样式要同步改写，否则会白闪）。
-按钮的焦点环另有一条门将：`verify:ui` 会断言它是「浅内圈 + 深外圈」两色，
+按钮的焦点环另有一条门将：`verify:ui` 会断言**两个**开关的焦点环都是「浅内圈 + 深外圈」两色，
 防止被改回单色 `outline`（单色环会在某些宿主底色上融掉）。材质同理：
 断言静息态只有「1px 描边 + 一层接触影」，防止顶面内高光那类渐变被加回来。
+精简层的门将则是「关掉之后页面必须回到站点原样」：`verify:declutter` 的每条隐藏判据
+都配了阴性对照（首页入口必须重新可见、列表必须回到 660px），
+否则「一直隐藏着」也能让断言通过。
 
 ### 目录
 
 ```
 src/
-  dark-engine.ts   引擎：角色判定 + 就地改写 + 例外层 + 生命周期
-  dark-mode.ts     开关状态、偏好存储、基础层注入、订阅
-  dark-base.css    基础层：画布底色、color-scheme、滚动条、placeholder、选区
-  ui.ts / ui.css   切换按钮（原生 DOM，挂在 Shadow DOM 里；配色与动效令牌在 ui.css 顶部）
-  main.ts          入口
-scripts/           验收脚本（见上表）
-research/          证据与复现：FINDINGS.md 是完整结论，其余是可重跑的取证脚本
-fixtures/          真实页面 DOM 快照（预览壳与部分脚本依赖）
-dist/              构建产物（入库，供 raw 链接安装）
+  dark-engine.ts     引擎：角色判定 + 就地改写 + 例外层 + 生命周期
+  dark-mode.ts       深色开关状态、偏好存储、基础层注入、订阅
+  dark-base.css      基础层：画布底色、color-scheme、滚动条、placeholder、选区
+  declutter.ts       精简开关状态、偏好存储、样式注入、订阅
+  declutter.css      精简层：隐藏首页入口与社区页右侧栏（含列表加宽）
+  ui.ts / ui.css     右下角两个开关（原生 DOM，挂在同一个 Shadow DOM 里；配色与动效令牌在 ui.css 顶部）
+  main.ts            入口
+scripts/             验收脚本（见上表）
+research/            证据与复现：FINDINGS.md 是完整结论，其余是可重跑的取证脚本
+fixtures/            真实页面 DOM 快照（预览壳与部分脚本依赖）
+dist/                构建产物（入库，供 raw 链接安装）
 ```
+
+`research/probe-hide-targets.mjs` 是精简模式两个目标的取证脚本：
+从 `fixtures/home.html` 里把「含首页文本的节点」与
+`#page-bbs-community > div.content` 的元素子节点列出来，
+上面那两条选择器就是从它的输出里确定的。
 
 ### 想自己调配色
 

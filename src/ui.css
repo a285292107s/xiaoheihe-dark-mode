@@ -1,11 +1,11 @@
 /*
- * 深色模式开关按钮的样式，注入在 Shadow DOM 内部。
+ * 右下角两个开关的样式，注入在 Shadow DOM 内部。
  *
  * 设计口径：冷淡扁平 —— 一块实心面 + 1px 描边 + 一层接触影，没有别的东西。
  * 它要压在任何宿主页面上（纯白列表、深色详情页、游戏封面图）都读得出来，
  * 又不能抢内容。
  *
- * 四条硬约定：
+ * 六个硬约定：
  *   1) 视觉值全部走 :host 上的 --hbd-* 令牌，调配色只改这一块。
  *   2) 不用内高光 / 渐变 / 多层投影。上一版在顶面压过一条
  *      `inset 0 1px 0 rgba(255,255,255,.06)`，本意是「顶面受光」，
@@ -16,6 +16,11 @@
  *      outline 在彩色封面图上融掉。
  *   4) 动效只碰 background-color / box-shadow / transform，时长走令牌，
  *      prefers-reduced-motion 下全部归零。
+ *   5) 两个开关是同一件东西的两个入口，共用一个 .hbd-btn 材质类，
+ *      只有纵向位置不同（一列，间距走 --hbd-gap）；所以这里不写死任何一个按钮的
+ *      完整外观，加第三个开关只需要再补一条 bottom。
+ *   6) 每个圆点各自 position: fixed 定位，没有包一层 flex 容器 ——
+ *      老按钮的 bottom 因此一个字节都没动，加开关不会挪走已经验收过的那个圆点。
  */
 :host {
   /* all: initial 砍断站点继承下来的字号 / 字族 / 颜色。
@@ -33,6 +38,9 @@
   --hbd-ring-dark: #0b0f13; /* 焦点环外圈（浅底上可见） */
   --hbd-contact: 0 1px 2px rgba(0, 0, 0, 0.28); /* 唯一一层投影，只把按钮从内容上贴开 */
   --hbd-size: 44px; /* 触控目标，不要再调小 */
+  --hbd-gap: 12px; /* 两个圆点之间的缝：够看出是两个目标，又不至于读成两簇 */
+  --hbd-inset: 16px; /* 距视口右边 */
+  --hbd-bottom: 24px; /* 最下面那个圆点距视口底边 */
   --hbd-icon-size: 20px;
   --hbd-icon-stroke: 1.75; /* 20px 下等效约 1.46px，1x 屏不糊、2x 屏够精细 */
   --hbd-ease: cubic-bezier(0.2, 0, 0, 1);
@@ -41,10 +49,9 @@
   --hbd-t-icon: 160ms;
 }
 
-#heybox-dark-toggle {
+.hbd-btn {
   position: fixed;
-  right: 16px;
-  bottom: 24px;
+  right: var(--hbd-inset);
   z-index: 2147483646;
 
   box-sizing: border-box;
@@ -72,23 +79,31 @@
     transform var(--hbd-t-press) var(--hbd-ease);
 }
 
+/* 深色开关在下、精简开关在上：一列向上生长，新开关往上传不会动到老开关的位置 */
+#heybox-dark-toggle {
+  bottom: var(--hbd-bottom);
+}
+#heybox-declutter-toggle {
+  bottom: calc(var(--hbd-bottom) + var(--hbd-size) + var(--hbd-gap));
+}
+
 /* hover 只做两件小事：面抬一档、描边提亮。不放大、不加投影 ——
    缩放会让按钮在密集列表上方抖，投影外扩会让它显得在「呼吸」。
    面抬一档在浅色页面上是唯一的反馈来源（那时描边是看不见的）。 */
-#heybox-dark-toggle:hover {
+.hbd-btn:hover {
   background: var(--hbd-face-hover);
   box-shadow: 0 0 0 1px var(--hbd-edge-hover), var(--hbd-contact);
 }
 
 /* 按压像按实体键：整体下沉 1px。90ms 内出反馈。 */
-#heybox-dark-toggle:active {
+.hbd-btn:active {
   transform: translateY(1px);
   box-shadow: 0 0 0 1px var(--hbd-edge), var(--hbd-contact);
 }
 
 /* 双色焦点环：outline 只能是一色，做不到「任何底色上都可见」，所以用两圈
    box-shadow。先画的在上层，读作「浅圈 0~2px、深圈 2~4px」。 */
-#heybox-dark-toggle:focus-visible {
+.hbd-btn:focus-visible {
   outline: none;
   box-shadow:
     0 0 0 2px var(--hbd-ring-light),
@@ -96,7 +111,7 @@
     var(--hbd-contact);
 }
 
-#heybox-dark-toggle .hbd-icon {
+.hbd-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -104,7 +119,7 @@
 
 /* 图标几何由 ui.ts 提供（path 数据），视觉规格留在这里：
    改线宽 / 尺寸 / 圆角端点不用碰 TS。 */
-#heybox-dark-toggle svg {
+.hbd-btn svg {
   display: block;
   width: var(--hbd-icon-size);
   height: var(--hbd-icon-size);
@@ -129,10 +144,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #heybox-dark-toggle {
+  .hbd-btn {
     transition: none;
   }
-  #heybox-dark-toggle svg {
+  .hbd-btn svg {
     animation: none;
   }
 }
@@ -140,13 +155,13 @@
 /* 强制配色下 box-shadow 会被系统丢掉，按钮会连形状一起消失。
    这里换成系统色与真实边框，焦点环交给 Highlight。 */
 @media (forced-colors: active) {
-  #heybox-dark-toggle {
+  .hbd-btn {
     background: ButtonFace;
     color: ButtonText;
     border: 1px solid ButtonText;
     box-shadow: none;
   }
-  #heybox-dark-toggle:focus-visible {
+  .hbd-btn:focus-visible {
     outline: 2px solid Highlight;
     outline-offset: 2px;
   }

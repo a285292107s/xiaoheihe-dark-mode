@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         小黑盒深色模式
 // @namespace    xiaoheihe-dark-mode
-// @version      0.3.7
+// @version      0.4.0
 // @author       油猴脚本-小黑盒页面优化
-// @description  为小黑盒网页版（xiaoheihe.cn）提供深色模式：按角色重映射站点 CSS 规则，覆盖伪元素与交互态，可一键切换并记住偏好。
+// @description  为小黑盒网页版（xiaoheihe.cn）提供深色模式与页面精简：按角色重映射站点 CSS 规则（含伪元素与交互态），并可隐藏顶部「首页」入口与社区页右侧栏；两项各自记忆偏好、可随时切换。
 // @license      MIT
 // @icon         https://cdn.max-c.com/heybox/logo/app_251.png
 // @homepageURL  https://github.com/a285292107s/xiaoheihe-dark-mode
@@ -24,7 +24,7 @@
 	function clearEngineReady() {
 		delete document.documentElement.dataset[ENGINE_STATE_ATTR];
 	}
-	var STYLE_ID = "hb-dark-overrides";
+	var STYLE_ID$1 = "hb-dark-overrides";
 	var NAMED = {
 		white: [
 			255,
@@ -595,7 +595,7 @@
 		for (let i = 0; i < sheets.length; i++) {
 			const sheet = sheets[i];
 			const owner = sheet.ownerNode;
-			if (owner && (owner.id === STYLE_ID || owner.hasAttribute("data-hb-own"))) continue;
+			if (owner && (owner.id === STYLE_ID$1 || owner.hasAttribute("data-hb-own"))) continue;
 			let rules = null;
 			try {
 				rules = sheet.cssRules;
@@ -726,14 +726,14 @@ html.${ROOT_CLASS} {
 `;
 	var styleEl = null;
 	var headObserver = null;
-	var headProbe = null;
+	var headProbe$1 = null;
 	var retimer = null;
 	var enabled = false;
 	function build() {
 		collect();
 		if (!styleEl) {
 			styleEl = document.createElement("style");
-			styleEl.id = STYLE_ID;
+			styleEl.id = STYLE_ID$1;
 			styleEl.setAttribute("data-hb-own", "");
 		}
 		if (styleEl.textContent !== EXCEPTIONS_CSS) styleEl.textContent = EXCEPTIONS_CSS;
@@ -806,14 +806,14 @@ html.${ROOT_CLASS} {
 		if (headObserver) return;
 		const head = document.head;
 		if (!head) {
-			if (headProbe) return;
-			headProbe = new MutationObserver(() => {
+			if (headProbe$1) return;
+			headProbe$1 = new MutationObserver(() => {
 				if (!document.head) return;
-				headProbe?.disconnect();
-				headProbe = null;
+				headProbe$1?.disconnect();
+				headProbe$1 = null;
 				if (enabled) startSheetObserver();
 			});
-			headProbe.observe(document, {
+			headProbe$1.observe(document, {
 				childList: true,
 				subtree: true
 			});
@@ -882,9 +882,9 @@ html.${ROOT_CLASS} {
 			headObserver.disconnect();
 			headObserver = null;
 		}
-		if (headProbe) {
-			headProbe.disconnect();
-			headProbe = null;
+		if (headProbe$1) {
+			headProbe$1.disconnect();
+			headProbe$1 = null;
 		}
 		if (retimer !== null) {
 			window.clearTimeout(retimer);
@@ -921,18 +921,18 @@ html.${ROOT_CLASS} {
 		};
 	}
 	var dark_base_default = "html.hb-dark{--lightningcss-light: ;--lightningcss-dark:initial;color-scheme:dark;background-color:#0e1116!important}html.hb-dark body{background-color:#0e1116}html.hb-dark ::-webkit-scrollbar{width:8px;height:8px}html.hb-dark ::-webkit-scrollbar-track{background:#0e1116}html.hb-dark ::-webkit-scrollbar-thumb{background:#333b45;border-radius:4px}html.hb-dark ::-webkit-scrollbar-thumb:hover{background:#4a5360}html.hb-dark input::placeholder,html.hb-dark textarea::placeholder{color:#6f7782}html.hb-dark ::selection{background:#5eb0ff52}";
-	var STORAGE_KEY = "heybox-dark-mode";
+	var STORAGE_KEY$1 = "heybox-dark-mode";
 	var BASE_STYLE_ID = "hb-dark-base";
-	var listeners = new Set();
+	var listeners$1 = new Set();
 	function onDarkChange(fn) {
-		listeners.add(fn);
+		listeners$1.add(fn);
 		return () => {
-			listeners.delete(fn);
+			listeners$1.delete(fn);
 		};
 	}
 	function isDarkEnabled() {
 		try {
-			const saved = localStorage.getItem(STORAGE_KEY);
+			const saved = localStorage.getItem(STORAGE_KEY$1);
 			if (saved === "1") return true;
 			if (saved === "0") return false;
 		} catch {}
@@ -972,9 +972,9 @@ html.${ROOT_CLASS} {
 			document.getElementById(BASE_STYLE_ID)?.remove();
 		}
 		try {
-			localStorage.setItem(STORAGE_KEY, enabled ? "1" : "0");
+			localStorage.setItem(STORAGE_KEY$1, enabled ? "1" : "0");
 		} catch {}
-		for (const fn of [...listeners]) try {
+		for (const fn of [...listeners$1]) try {
 			fn(enabled);
 		} catch (err) {
 			console.error("[hb-dark] listener failed", err);
@@ -1009,45 +1009,140 @@ html.${ROOT_CLASS} {
 		w.__hbRebuild = () => rebuildDarkEngine();
 		w.__hbIsDark = () => isDarkEnabled();
 	}
-	var ui_default = ":host{all:initial;--hbd-face:#14191e;--hbd-face-hover:#1a1f25;--hbd-ink:#dce3ea;--hbd-edge:#ffffff21;--hbd-edge-hover:#ffffff38;--hbd-ring-light:#f4f7fa;--hbd-ring-dark:#0b0f13;--hbd-contact:0 1px 2px #00000047;--hbd-size:44px;--hbd-icon-size:20px;--hbd-icon-stroke:1.75;--hbd-ease:cubic-bezier(.2, 0, 0, 1);--hbd-t-hover:.16s;--hbd-t-press:90ms;--hbd-t-icon:.16s}#heybox-dark-toggle{z-index:2147483646;box-sizing:border-box;width:var(--hbd-size);height:var(--hbd-size);background:var(--hbd-face);color:var(--hbd-ink);cursor:pointer;pointer-events:auto;-webkit-tap-highlight-color:transparent;box-shadow:0 0 0 1px var(--hbd-edge), var(--hbd-contact);transition:background-color var(--hbd-t-hover) var(--hbd-ease), box-shadow var(--hbd-t-hover) var(--hbd-ease), transform var(--hbd-t-press) var(--hbd-ease);border:0;border-radius:50%;justify-content:center;align-items:center;padding:0;display:flex;position:fixed;bottom:24px;right:16px}#heybox-dark-toggle:hover{background:var(--hbd-face-hover);box-shadow:0 0 0 1px var(--hbd-edge-hover), var(--hbd-contact)}#heybox-dark-toggle:active{box-shadow:0 0 0 1px var(--hbd-edge), var(--hbd-contact);transform:translateY(1px)}#heybox-dark-toggle:focus-visible{box-shadow:0 0 0 2px var(--hbd-ring-light), 0 0 0 4px var(--hbd-ring-dark), var(--hbd-contact);outline:none}#heybox-dark-toggle .hbd-icon{justify-content:center;align-items:center;display:flex}#heybox-dark-toggle svg{width:var(--hbd-icon-size);height:var(--hbd-icon-size);fill:none;stroke:currentColor;stroke-width:var(--hbd-icon-stroke);stroke-linecap:round;stroke-linejoin:round;animation:hbd-icon-in var(--hbd-t-icon) var(--hbd-ease) both;display:block}@keyframes hbd-icon-in{0%{opacity:0}to{opacity:1}}@media (prefers-reduced-motion:reduce){#heybox-dark-toggle{transition:none}#heybox-dark-toggle svg{animation:none}}@media (forced-colors:active){#heybox-dark-toggle{color:buttontext;box-shadow:none;background:buttonface;border:1px solid buttontext}#heybox-dark-toggle:focus-visible{outline-offset:2px;outline:2px solid highlight}}";
+	var declutter_default = "html.hb-declutter .nav .nav-content .nav-links>.nav-link:first-child,html.hb-declutter #page-bbs-community>.content>.right{display:none}html.hb-declutter #page-bbs-community>.content{justify-content:center}html.hb-declutter #page-bbs-community>.content>.list{max-width:none}";
+	var STORAGE_KEY = "heybox-declutter";
+	var STYLE_ID = "hb-declutter";
+	var DECLUTTER_CLASS = "hb-declutter";
+	var listeners = new Set();
+	var headProbe = null;
+	function onDeclutterChange(fn) {
+		listeners.add(fn);
+		return () => {
+			listeners.delete(fn);
+		};
+	}
+	function isDeclutterEnabled() {
+		try {
+			return localStorage.getItem(STORAGE_KEY) !== "0";
+		} catch {
+			return true;
+		}
+	}
+	function ensureStyle() {
+		if (document.getElementById(STYLE_ID)) return;
+		const head = document.head;
+		if (!head) {
+			if (headProbe) return;
+			headProbe = new MutationObserver(() => {
+				if (!document.head) return;
+				stopHeadProbe();
+				ensureStyle();
+			});
+			headProbe.observe(document, {
+				childList: true,
+				subtree: true
+			});
+			return;
+		}
+		const el = document.createElement("style");
+		el.id = STYLE_ID;
+		el.setAttribute("data-hb-own", "");
+		el.textContent = declutter_default;
+		head.appendChild(el);
+	}
+	function stopHeadProbe() {
+		headProbe?.disconnect();
+		headProbe = null;
+	}
+	function applyDeclutter(enabled) {
+		const root = document.documentElement;
+		if (!root) return;
+		if (enabled) {
+			root.classList.add(DECLUTTER_CLASS);
+			ensureStyle();
+		} else {
+			root.classList.remove(DECLUTTER_CLASS);
+			stopHeadProbe();
+			document.getElementById(STYLE_ID)?.remove();
+		}
+		try {
+			localStorage.setItem(STORAGE_KEY, enabled ? "1" : "0");
+		} catch {}
+		for (const fn of [...listeners]) try {
+			fn(enabled);
+		} catch (err) {
+			console.error("[hb-declutter] listener failed", err);
+		}
+	}
+	function initDeclutter() {
+		const enabled = isDeclutterEnabled();
+		applyDeclutter(enabled);
+		return enabled;
+	}
+	function exposeDeclutterHooks() {
+		const w = window;
+		w.__hbSetDeclutter = (on) => applyDeclutter(on);
+		w.__hbIsDeclutter = () => isDeclutterEnabled();
+	}
+	var ui_default = ":host{all:initial;--hbd-face:#14191e;--hbd-face-hover:#1a1f25;--hbd-ink:#dce3ea;--hbd-edge:#ffffff21;--hbd-edge-hover:#ffffff38;--hbd-ring-light:#f4f7fa;--hbd-ring-dark:#0b0f13;--hbd-contact:0 1px 2px #00000047;--hbd-size:44px;--hbd-gap:12px;--hbd-inset:16px;--hbd-bottom:24px;--hbd-icon-size:20px;--hbd-icon-stroke:1.75;--hbd-ease:cubic-bezier(.2, 0, 0, 1);--hbd-t-hover:.16s;--hbd-t-press:90ms;--hbd-t-icon:.16s}.hbd-btn{right:var(--hbd-inset);z-index:2147483646;box-sizing:border-box;width:var(--hbd-size);height:var(--hbd-size);background:var(--hbd-face);color:var(--hbd-ink);cursor:pointer;pointer-events:auto;-webkit-tap-highlight-color:transparent;box-shadow:0 0 0 1px var(--hbd-edge), var(--hbd-contact);transition:background-color var(--hbd-t-hover) var(--hbd-ease), box-shadow var(--hbd-t-hover) var(--hbd-ease), transform var(--hbd-t-press) var(--hbd-ease);border:0;border-radius:50%;justify-content:center;align-items:center;padding:0;display:flex;position:fixed}#heybox-dark-toggle{bottom:var(--hbd-bottom)}#heybox-declutter-toggle{bottom:calc(var(--hbd-bottom) + var(--hbd-size) + var(--hbd-gap))}.hbd-btn:hover{background:var(--hbd-face-hover);box-shadow:0 0 0 1px var(--hbd-edge-hover), var(--hbd-contact)}.hbd-btn:active{box-shadow:0 0 0 1px var(--hbd-edge), var(--hbd-contact);transform:translateY(1px)}.hbd-btn:focus-visible{box-shadow:0 0 0 2px var(--hbd-ring-light), 0 0 0 4px var(--hbd-ring-dark), var(--hbd-contact);outline:none}.hbd-icon{justify-content:center;align-items:center;display:flex}.hbd-btn svg{width:var(--hbd-icon-size);height:var(--hbd-icon-size);fill:none;stroke:currentColor;stroke-width:var(--hbd-icon-stroke);stroke-linecap:round;stroke-linejoin:round;animation:hbd-icon-in var(--hbd-t-icon) var(--hbd-ease) both;display:block}@keyframes hbd-icon-in{0%{opacity:0}to{opacity:1}}@media (prefers-reduced-motion:reduce){.hbd-btn{transition:none}.hbd-btn svg{animation:none}}@media (forced-colors:active){.hbd-btn{color:buttontext;box-shadow:none;background:buttonface;border:1px solid buttontext}.hbd-btn:focus-visible{outline-offset:2px;outline:2px solid highlight}}";
 	var HOST_ID = "heybox-dark-mode-root";
-	var BUTTON_ID = "heybox-dark-toggle";
+	var DARK_BUTTON_ID = "heybox-dark-toggle";
+	var DECLUTTER_BUTTON_ID = "heybox-declutter-toggle";
 	var SVG_NS = "http://www.w3.org/2000/svg";
 	var ICON_MOON = ["M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z"];
 	var ICON_SUN = ["M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"];
-	function buildIcon(dark) {
+	var ICON_PANEL_WITH_RAIL = ["M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z", "M15 5v14"];
+	var ICON_PANEL_FULL = [
+		"M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z",
+		"M6 9.5h12",
+		"M6 14h8"
+	];
+	function buildIcon(paths, withCircle = false) {
 		const svg = document.createElementNS(SVG_NS, "svg");
 		svg.setAttribute("viewBox", "0 0 24 24");
 		svg.setAttribute("aria-hidden", "true");
 		svg.setAttribute("focusable", "false");
-		if (dark) {
+		if (withCircle) {
 			const circle = document.createElementNS(SVG_NS, "circle");
 			circle.setAttribute("cx", "12");
 			circle.setAttribute("cy", "12");
 			circle.setAttribute("r", "4");
 			svg.appendChild(circle);
-			for (const d of ICON_SUN) {
-				const path = document.createElementNS(SVG_NS, "path");
-				path.setAttribute("d", d);
-				svg.appendChild(path);
-			}
-			return svg;
 		}
-		for (const d of ICON_MOON) {
+		for (const d of paths) {
 			const path = document.createElementNS(SVG_NS, "path");
 			path.setAttribute("d", d);
 			svg.appendChild(path);
 		}
 		return svg;
 	}
-	function paint(iconSlot, button, dark) {
-		const label = dark ? "切换到浅色模式" : "切换到深色模式";
-		button.title = label;
-		button.setAttribute("aria-label", label);
-		button.setAttribute("aria-pressed", dark ? "true" : "false");
-		iconSlot.replaceChildren(buildIcon(dark));
+	function createControl(shadow, id) {
+		const button = document.createElement("button");
+		button.id = id;
+		button.className = "hbd-btn";
+		button.type = "button";
+		const iconSlot = document.createElement("span");
+		iconSlot.className = "hbd-icon";
+		button.appendChild(iconSlot);
+		shadow.appendChild(button);
+		return {
+			button,
+			iconSlot
+		};
 	}
-	function mountToggle() {
+	function paint(control, paths, withCircle, label, pressed) {
+		control.button.title = label;
+		control.button.setAttribute("aria-label", label);
+		control.button.setAttribute("aria-pressed", pressed ? "true" : "false");
+		control.iconSlot.replaceChildren(buildIcon(paths, withCircle));
+	}
+	function paintDark(control, dark) {
+		paint(control, dark ? ICON_SUN : ICON_MOON, dark, dark ? "切换到浅色模式" : "切换到深色模式", dark);
+	}
+	function paintDeclutter(control, on) {
+		paint(control, on ? ICON_PANEL_FULL : ICON_PANEL_WITH_RAIL, false, on ? "关闭精简模式（恢复首页入口与右侧栏）" : "开启精简模式（隐藏首页入口与右侧栏）", on);
+	}
+	function mountControls() {
 		if (document.getElementById(HOST_ID)) return;
 		const host = document.createElement("div");
 		host.id = HOST_ID;
@@ -1056,23 +1151,21 @@ html.${ROOT_CLASS} {
 		const style = document.createElement("style");
 		style.textContent = ui_default;
 		shadow.appendChild(style);
-		const button = document.createElement("button");
-		button.id = BUTTON_ID;
-		button.type = "button";
-		const iconSlot = document.createElement("span");
-		iconSlot.className = "hbd-icon";
-		button.addEventListener("click", () => {
-			applyDark(!isDarkEnabled());
-		});
-		onDarkChange((dark) => paint(iconSlot, button, dark));
-		paint(iconSlot, button, isDarkEnabled());
-		button.appendChild(iconSlot);
-		shadow.appendChild(button);
+		const darkControl = createControl(shadow, DARK_BUTTON_ID);
+		const declutterControl = createControl(shadow, DECLUTTER_BUTTON_ID);
+		darkControl.button.addEventListener("click", () => applyDark(!isDarkEnabled()));
+		declutterControl.button.addEventListener("click", () => applyDeclutter(!isDeclutterEnabled()));
+		onDarkChange((dark) => paintDark(darkControl, dark));
+		onDeclutterChange((on) => paintDeclutter(declutterControl, on));
+		paintDark(darkControl, isDarkEnabled());
+		paintDeclutter(declutterControl, isDeclutterEnabled());
 		document.documentElement.appendChild(host);
 	}
 	whenDocumentElementReady(() => {
 		initDarkMode();
+		initDeclutter();
 		exposeEngineHooks();
-		mountToggle();
+		exposeDeclutterHooks();
+		mountControls();
 	});
 })();

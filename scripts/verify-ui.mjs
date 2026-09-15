@@ -66,8 +66,10 @@ const PROBE = () => {
   const host = document.getElementById('heybox-dark-mode-root');
   const root = host && host.shadowRoot;
   const btn = root ? root.getElementById('heybox-dark-toggle') : null;
+  const dec = root ? root.getElementById('heybox-declutter-toggle') : null;
   const svg = btn ? btn.querySelector('svg') : null;
   const cs = btn ? getComputedStyle(btn) : null;
+  const decCs = dec ? getComputedStyle(dec) : null;
   const card = document.querySelector('.card');
   const cardBefore = card ? getComputedStyle(card, '::before') : null;
   const parse = (s) => {
@@ -89,6 +91,13 @@ const PROBE = () => {
     btnText: cs ? cs.color : null,
     btnShadow: cs ? cs.boxShadow : null,
     btnSize: btn ? [Math.round(btn.getBoundingClientRect().width), Math.round(btn.getBoundingClientRect().height)] : null,
+    // 第二个开关（页面精简）只在本套件里核对「共用材质」：它的行为由 verify:declutter 覆盖
+    decExists: !!dec,
+    decShadow: decCs ? decCs.boxShadow : null,
+    decBg: decCs ? decCs.backgroundColor : null,
+    decSize: dec ? [Math.round(dec.getBoundingClientRect().width), Math.round(dec.getBoundingClientRect().height)] : null,
+    decBottom: dec ? Math.round(dec.getBoundingClientRect().bottom) : null,
+    darkBottom: btn ? Math.round(btn.getBoundingClientRect().bottom) : null,
     darkClass: document.documentElement.classList.contains('hb-dark'),
     baseStyle: !!document.getElementById('hb-dark-base'),
     stored: (() => { try { return localStorage.getItem('heybox-dark-mode'); } catch { return 'ERR'; } })(),
@@ -144,6 +153,13 @@ console.log('\n===== 场景一：首次访问（系统浅色，无记忆） ====
     const layers = a.btnShadow.match(/rgba?\([^)]+\)/g) || [];
     return layers.length === 2;
   })(), a.btnShadow);
+  // 精简开关与深色开关是同一件东西的两个入口：材质必须逐条相同，位置必须分开
+  check('精简开关共用同一套材质（尺寸 / 描边 + 一层接触影）', (() => {
+    if (!a.decExists || !a.decSize || a.decSize[0] !== 44 || a.decSize[1] !== 44) return false;
+    if (!a.decShadow || a.decShadow.includes('inset')) return false;
+    return (a.decShadow.match(/rgba?\([^)]+\)/g) || []).length === 2;
+  })(), JSON.stringify({ size: a.decSize, shadow: a.decShadow }));
+  check('两个开关竖向分开、不相交', a.decBottom !== null && a.darkBottom !== null && a.decBottom <= a.darkBottom - 44, `declutter.bottom=${a.decBottom} dark.bottom=${a.darkBottom}`);
   check('Shadow 隔离：按钮底色未被站点/引擎改动', a.btnBg === 'rgb(20, 25, 30)', `btnBg=${a.btnBg}`);
   check('浅色下卡片是白的', a.cardLum > 240, `cardLum=${a.cardLum}`);
   check('无 JS 报错', errors.length === 0, errors.join(' | '));
@@ -295,6 +311,33 @@ console.log('\n===== 场景九：focus-visible 双色焦点环 =====');
   check('焦点环含深外圈 rgb(11, 15, 19)', r.shadow.includes('rgb(11, 15, 19)'), r.shadow);
   check('不再使用单色 outline', r.outline === 'none', `outline=${r.outline}`);
   check('聚焦时尺寸仍是 44x44（焦点环不吃布局）', r.size[0] === 44 && r.size[1] === 44, JSON.stringify(r.size));
+
+  // 门将必须罩住两个开关：只给深色按钮写双色环、另一个退回单色 outline，
+  // 正是这条断言要拦下的形状
+  await page.evaluate(() => {
+    document
+      .getElementById('heybox-dark-mode-root')
+      .shadowRoot.getElementById('heybox-declutter-toggle')
+      .focus({ focusVisible: true });
+  });
+  await page.waitForTimeout(260);
+  const r2 = await page.evaluate(() => {
+    const btn = document
+      .getElementById('heybox-dark-mode-root')
+      .shadowRoot.getElementById('heybox-declutter-toggle');
+    const cs = getComputedStyle(btn);
+    const rect = btn.getBoundingClientRect();
+    return {
+      focused: btn.matches(':focus-visible'),
+      shadow: cs.boxShadow,
+      outline: cs.outlineStyle,
+      size: [Math.round(rect.width), Math.round(rect.height)],
+    };
+  });
+  check('精简开关同样命中 :focus-visible', r2.focused);
+  check('精简开关焦点环同为浅内圈 + 深外圈', r2.shadow.includes('rgb(244, 247, 250)') && r2.shadow.includes('rgb(11, 15, 19)'), r2.shadow);
+  check('精简开关不使用单色 outline', r2.outline === 'none', `outline=${r2.outline}`);
+  check('精简开关聚焦时尺寸仍是 44x44', r2.size[0] === 44 && r2.size[1] === 44, JSON.stringify(r2.size));
   check('无 JS 报错', errors.length === 0, errors.join(' | '));
   await context.close();
 }
