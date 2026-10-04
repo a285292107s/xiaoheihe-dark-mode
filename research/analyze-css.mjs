@@ -1,7 +1,3 @@
-/**
- * 分析站点 CSS：设计令牌（自定义属性）、暗色相关选择器、媒体查询、硬编码颜色占比。
- * node research/analyze-css.mjs
- */
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -13,8 +9,7 @@ const blob = all.map((x) => x.text).join('\n');
 
 const uniq = (arr) => [...new Set(arr)];
 
-// ---------- 1) 自定义属性定义 ----------
-const defined = new Map(); // name -> Set(files)
+const defined = new Map();
 const definedInRootish = new Map();
 for (const { f, text } of all) {
   for (const m of text.matchAll(/(--[\w-]+)\s*:\s*([^;{}]+)[;}]/g)) {
@@ -34,7 +29,6 @@ for (const name of defined.keys()) {
 }
 console.log('前缀分布:', [...groups].sort((a, b) => b[1] - a[1]).slice(0, 20).map(([k, v]) => `${k}:${v}`).join(' '));
 
-// ---------- 2) 暗色相关 ----------
 console.log('\n=== 暗色相关信号 ===');
 for (const [label, re] of [
   ['prefers-color-scheme', /prefers-color-scheme[^)]*\)/g],
@@ -51,7 +45,6 @@ for (const [label, re] of [
   console.log(`${label.padEnd(24)} ${(blob.match(re) || []).length} 次 | 形态: ${hits.slice(0, 8).join(' | ') || '—'}`);
 }
 
-// ---------- 3) 媒体查询类型 ----------
 const mq = new Map();
 for (const m of blob.matchAll(/@media([^{]+)\{/g)) {
   const q = m[1].replace(/\s+/g, ' ').trim().slice(0, 60);
@@ -60,7 +53,6 @@ for (const m of blob.matchAll(/@media([^{]+)\{/g)) {
 console.log('\n=== @media 条件 TOP ===');
 for (const [k, v] of [...mq].sort((a, b) => b[1] - a[1]).slice(0, 12)) console.log(`  ${String(v).padStart(4)}  ${k}`);
 
-// ---------- 4) 硬编码颜色 vs 令牌 ----------
 const hexAll = blob.match(/#[0-9a-fA-F]{3,8}\b/g) || [];
 const rgbAll = blob.match(/rgba?\([^)]*\)/g) || [];
 const varUse = blob.match(/var\(\s*--[\w-]+/g) || [];
@@ -77,7 +69,6 @@ const white = hexAll.filter((h) => /^#(fff|ffffff)$/i.test(h)).length;
 const nearWhite = hexAll.filter((h) => /^#(f[0-9a-f]|e[0-9a-f]|f7f8f9|fafbfc)/i.test(h)).length;
 console.log(`  纯白 #fff/#ffffff: ${white} | 近白: ${nearWhite}`);
 
-// ---------- 5) :root 令牌块 ----------
 console.log('\n=== :root / html 令牌块（前 3 个）===');
 let shown = 0;
 for (const { f, text } of all) {
@@ -89,7 +80,6 @@ for (const { f, text } of all) {
   if (shown >= 3) break;
 }
 
-// ---------- 6) 最大的文件里，选择器形态 ----------
 const main = all.find((x) => x.f.includes('Cv4ia_mR'));
 if (main) {
   const sels = main.text.match(/[^{}]+\{/g) || [];

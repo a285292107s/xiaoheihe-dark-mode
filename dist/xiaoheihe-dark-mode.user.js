@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         小黑盒深色模式
 // @namespace    xiaoheihe-dark-mode
-// @version      0.4.0
+// @version      0.7.0
 // @author       油猴脚本-小黑盒页面优化
-// @description  为小黑盒网页版（xiaoheihe.cn）提供深色模式与页面精简：按角色重映射站点 CSS 规则（含伪元素与交互态），并可隐藏顶部「首页」入口与社区页右侧栏；两项各自记忆偏好、可随时切换。
+// @description  为小黑盒网页版（xiaoheihe.cn）提供深色模式、页面精简、复制解锁、一级评论免打扰与楼中楼卡片化：按角色重映射站点 CSS 规则（含伪元素与交互态），可隐藏顶部「首页」入口与社区页右侧栏，可在站点回复编辑器夺焦毁掉选区、剪贴板数据被清空时把选中内容救回剪贴板，可把一级评论「回复此楼」的触发从「点整行」改成行内一个「回复」按钮 —— 点正文只选中、不弹框；楼中楼每条回复则排成卡片（第一行头像/用户名/回复对象/时间，第二行起正文），回复入口是卡片末尾的纸飞机图标，点它即展开站点回复框并引用这一条。深色、精简、免打扰、卡片化四项各自记忆偏好、可随时切换；复制解锁常驻开启，没有开关按钮。
 // @license      MIT
 // @icon         https://cdn.max-c.com/heybox/logo/app_251.png
 // @homepageURL  https://github.com/a285292107s/xiaoheihe-dark-mode
@@ -16,7 +16,7 @@
 
 (function() {
 	"use strict";
-	var ROOT_CLASS = "hb-dark";
+	var ROOT_CLASS$1 = "hb-dark";
 	var ENGINE_STATE_ATTR = "hbEngine";
 	function markEngineReady() {
 		document.documentElement.dataset[ENGINE_STATE_ATTR] = "ready";
@@ -24,7 +24,7 @@
 	function clearEngineReady() {
 		delete document.documentElement.dataset[ENGINE_STATE_ATTR];
 	}
-	var STYLE_ID$1 = "hb-dark-overrides";
+	var STYLE_ID$4 = "hb-dark-overrides";
 	var NAMED = {
 		white: [
 			255,
@@ -595,7 +595,7 @@
 		for (let i = 0; i < sheets.length; i++) {
 			const sheet = sheets[i];
 			const owner = sheet.ownerNode;
-			if (owner && (owner.id === STYLE_ID$1 || owner.hasAttribute("data-hb-own"))) continue;
+			if (owner && (owner.id === STYLE_ID$4 || owner.hasAttribute("data-hb-own"))) continue;
 			let rules = null;
 			try {
 				rules = sheet.cssRules;
@@ -690,15 +690,28 @@
 		}
 	}
 	var EXCEPTIONS_CSS = `
-/* 导航主 CTA：浅色下为「深底浅字」，深色下反转为「浅底深字」 */
-html.${ROOT_CLASS} .nav {
-  --publish-bg: linear-gradient(46deg, #f2f4f7 -.9%, #dfe3e8 100.9%);
+html.${ROOT_CLASS$1} .nav {
+  --publish-bg: #f2f4f7;
   --publish-color: #14191e;
   --publish-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
 }
 
-/* Element Plus 未内置暗色主题，这里补齐弹层/表单所需令牌 */
-html.${ROOT_CLASS} {
+html.${ROOT_CLASS$1} .hot-topic__look,
+html.${ROOT_CLASS$1} .link-section-user .link-user__follow-btn:not(.followed),
+html.${ROOT_CLASS$1} #page-bbs-link .page-header__user-info .page-header__follow-btn:not(.followed) {
+  background-image: none;
+  background-color: #464b50;
+}
+
+@media (prefers-color-scheme: dark) {
+  html.${ROOT_CLASS$1} .article-vote .vote-wrapper .vote-submit.active p {
+    background-image: none;
+    background-color: #a1a7b2;
+    color: #101112;
+  }
+}
+
+html.${ROOT_CLASS$1} {
   --el-color-white: #1b1f24;
   --el-color-black: #e6e8eb;
   --el-bg-color: #1b1f24;
@@ -726,14 +739,14 @@ html.${ROOT_CLASS} {
 `;
 	var styleEl = null;
 	var headObserver = null;
-	var headProbe$1 = null;
+	var headProbe$4 = null;
 	var retimer = null;
 	var enabled = false;
 	function build() {
 		collect();
 		if (!styleEl) {
 			styleEl = document.createElement("style");
-			styleEl.id = STYLE_ID$1;
+			styleEl.id = STYLE_ID$4;
 			styleEl.setAttribute("data-hb-own", "");
 		}
 		if (styleEl.textContent !== EXCEPTIONS_CSS) styleEl.textContent = EXCEPTIONS_CSS;
@@ -806,14 +819,14 @@ html.${ROOT_CLASS} {
 		if (headObserver) return;
 		const head = document.head;
 		if (!head) {
-			if (headProbe$1) return;
-			headProbe$1 = new MutationObserver(() => {
+			if (headProbe$4) return;
+			headProbe$4 = new MutationObserver(() => {
 				if (!document.head) return;
-				headProbe$1?.disconnect();
-				headProbe$1 = null;
+				headProbe$4?.disconnect();
+				headProbe$4 = null;
 				if (enabled) startSheetObserver();
 			});
-			headProbe$1.observe(document, {
+			headProbe$4.observe(document, {
 				childList: true,
 				subtree: true
 			});
@@ -863,7 +876,7 @@ html.${ROOT_CLASS} {
 	function enableDarkEngine() {
 		if (enabled) return;
 		enabled = true;
-		document.documentElement.classList.add(ROOT_CLASS);
+		document.documentElement.classList.add(ROOT_CLASS$1);
 		document.documentElement.classList.add("dark");
 		document.documentElement.style.colorScheme = "dark";
 		scheduleMilestones();
@@ -873,7 +886,7 @@ html.${ROOT_CLASS} {
 	}
 	function disableDarkEngine() {
 		enabled = false;
-		document.documentElement.classList.remove(ROOT_CLASS);
+		document.documentElement.classList.remove(ROOT_CLASS$1);
 		document.documentElement.classList.remove("dark");
 		document.documentElement.style.colorScheme = "";
 		clearEngineReady();
@@ -882,9 +895,9 @@ html.${ROOT_CLASS} {
 			headObserver.disconnect();
 			headObserver = null;
 		}
-		if (headProbe$1) {
-			headProbe$1.disconnect();
-			headProbe$1 = null;
+		if (headProbe$4) {
+			headProbe$4.disconnect();
+			headProbe$4 = null;
 		}
 		if (retimer !== null) {
 			window.clearTimeout(retimer);
@@ -921,18 +934,18 @@ html.${ROOT_CLASS} {
 		};
 	}
 	var dark_base_default = "html.hb-dark{--lightningcss-light: ;--lightningcss-dark:initial;color-scheme:dark;background-color:#0e1116!important}html.hb-dark body{background-color:#0e1116}html.hb-dark ::-webkit-scrollbar{width:8px;height:8px}html.hb-dark ::-webkit-scrollbar-track{background:#0e1116}html.hb-dark ::-webkit-scrollbar-thumb{background:#333b45;border-radius:4px}html.hb-dark ::-webkit-scrollbar-thumb:hover{background:#4a5360}html.hb-dark input::placeholder,html.hb-dark textarea::placeholder{color:#6f7782}html.hb-dark ::selection{background:#5eb0ff52}";
-	var STORAGE_KEY$1 = "heybox-dark-mode";
+	var STORAGE_KEY$4 = "heybox-dark-mode";
 	var BASE_STYLE_ID = "hb-dark-base";
-	var listeners$1 = new Set();
+	var listeners$3 = new Set();
 	function onDarkChange(fn) {
-		listeners$1.add(fn);
+		listeners$3.add(fn);
 		return () => {
-			listeners$1.delete(fn);
+			listeners$3.delete(fn);
 		};
 	}
 	function isDarkEnabled() {
 		try {
-			const saved = localStorage.getItem(STORAGE_KEY$1);
+			const saved = localStorage.getItem(STORAGE_KEY$4);
 			if (saved === "1") return true;
 			if (saved === "0") return false;
 		} catch {}
@@ -963,18 +976,18 @@ html.${ROOT_CLASS} {
 		const root = document.documentElement;
 		if (!root) return;
 		if (enabled) {
-			root.classList.add(ROOT_CLASS);
+			root.classList.add(ROOT_CLASS$1);
 			ensureBaseStyle();
 			enableDarkEngine();
 		} else {
 			disableDarkEngine();
-			root.classList.remove(ROOT_CLASS);
+			root.classList.remove(ROOT_CLASS$1);
 			document.getElementById(BASE_STYLE_ID)?.remove();
 		}
 		try {
-			localStorage.setItem(STORAGE_KEY$1, enabled ? "1" : "0");
+			localStorage.setItem(STORAGE_KEY$4, enabled ? "1" : "0");
 		} catch {}
-		for (const fn of [...listeners$1]) try {
+		for (const fn of [...listeners$3]) try {
 			fn(enabled);
 		} catch (err) {
 			console.error("[hb-dark] listener failed", err);
@@ -1010,65 +1023,65 @@ html.${ROOT_CLASS} {
 		w.__hbIsDark = () => isDarkEnabled();
 	}
 	var declutter_default = "html.hb-declutter .nav .nav-content .nav-links>.nav-link:first-child,html.hb-declutter #page-bbs-community>.content>.right{display:none}html.hb-declutter #page-bbs-community>.content{justify-content:center}html.hb-declutter #page-bbs-community>.content>.list{max-width:none}";
-	var STORAGE_KEY = "heybox-declutter";
-	var STYLE_ID = "hb-declutter";
+	var STORAGE_KEY$3 = "heybox-declutter";
+	var STYLE_ID$3 = "hb-declutter";
 	var DECLUTTER_CLASS = "hb-declutter";
-	var listeners = new Set();
-	var headProbe = null;
+	var listeners$2 = new Set();
+	var headProbe$3 = null;
 	function onDeclutterChange(fn) {
-		listeners.add(fn);
+		listeners$2.add(fn);
 		return () => {
-			listeners.delete(fn);
+			listeners$2.delete(fn);
 		};
 	}
 	function isDeclutterEnabled() {
 		try {
-			return localStorage.getItem(STORAGE_KEY) !== "0";
+			return localStorage.getItem(STORAGE_KEY$3) !== "0";
 		} catch {
 			return true;
 		}
 	}
-	function ensureStyle() {
-		if (document.getElementById(STYLE_ID)) return;
+	function ensureStyle$3() {
+		if (document.getElementById(STYLE_ID$3)) return;
 		const head = document.head;
 		if (!head) {
-			if (headProbe) return;
-			headProbe = new MutationObserver(() => {
+			if (headProbe$3) return;
+			headProbe$3 = new MutationObserver(() => {
 				if (!document.head) return;
-				stopHeadProbe();
-				ensureStyle();
+				stopHeadProbe$3();
+				ensureStyle$3();
 			});
-			headProbe.observe(document, {
+			headProbe$3.observe(document, {
 				childList: true,
 				subtree: true
 			});
 			return;
 		}
 		const el = document.createElement("style");
-		el.id = STYLE_ID;
+		el.id = STYLE_ID$3;
 		el.setAttribute("data-hb-own", "");
 		el.textContent = declutter_default;
 		head.appendChild(el);
 	}
-	function stopHeadProbe() {
-		headProbe?.disconnect();
-		headProbe = null;
+	function stopHeadProbe$3() {
+		headProbe$3?.disconnect();
+		headProbe$3 = null;
 	}
 	function applyDeclutter(enabled) {
 		const root = document.documentElement;
 		if (!root) return;
 		if (enabled) {
 			root.classList.add(DECLUTTER_CLASS);
-			ensureStyle();
+			ensureStyle$3();
 		} else {
 			root.classList.remove(DECLUTTER_CLASS);
-			stopHeadProbe();
-			document.getElementById(STYLE_ID)?.remove();
+			stopHeadProbe$3();
+			document.getElementById(STYLE_ID$3)?.remove();
 		}
 		try {
-			localStorage.setItem(STORAGE_KEY, enabled ? "1" : "0");
+			localStorage.setItem(STORAGE_KEY$3, enabled ? "1" : "0");
 		} catch {}
-		for (const fn of [...listeners]) try {
+		for (const fn of [...listeners$2]) try {
 			fn(enabled);
 		} catch (err) {
 			console.error("[hb-declutter] listener failed", err);
@@ -1084,10 +1097,1113 @@ html.${ROOT_CLASS} {
 		w.__hbSetDeclutter = (on) => applyDeclutter(on);
 		w.__hbIsDeclutter = () => isDeclutterEnabled();
 	}
-	var ui_default = ":host{all:initial;--hbd-face:#14191e;--hbd-face-hover:#1a1f25;--hbd-ink:#dce3ea;--hbd-edge:#ffffff21;--hbd-edge-hover:#ffffff38;--hbd-ring-light:#f4f7fa;--hbd-ring-dark:#0b0f13;--hbd-contact:0 1px 2px #00000047;--hbd-size:44px;--hbd-gap:12px;--hbd-inset:16px;--hbd-bottom:24px;--hbd-icon-size:20px;--hbd-icon-stroke:1.75;--hbd-ease:cubic-bezier(.2, 0, 0, 1);--hbd-t-hover:.16s;--hbd-t-press:90ms;--hbd-t-icon:.16s}.hbd-btn{right:var(--hbd-inset);z-index:2147483646;box-sizing:border-box;width:var(--hbd-size);height:var(--hbd-size);background:var(--hbd-face);color:var(--hbd-ink);cursor:pointer;pointer-events:auto;-webkit-tap-highlight-color:transparent;box-shadow:0 0 0 1px var(--hbd-edge), var(--hbd-contact);transition:background-color var(--hbd-t-hover) var(--hbd-ease), box-shadow var(--hbd-t-hover) var(--hbd-ease), transform var(--hbd-t-press) var(--hbd-ease);border:0;border-radius:50%;justify-content:center;align-items:center;padding:0;display:flex;position:fixed}#heybox-dark-toggle{bottom:var(--hbd-bottom)}#heybox-declutter-toggle{bottom:calc(var(--hbd-bottom) + var(--hbd-size) + var(--hbd-gap))}.hbd-btn:hover{background:var(--hbd-face-hover);box-shadow:0 0 0 1px var(--hbd-edge-hover), var(--hbd-contact)}.hbd-btn:active{box-shadow:0 0 0 1px var(--hbd-edge), var(--hbd-contact);transform:translateY(1px)}.hbd-btn:focus-visible{box-shadow:0 0 0 2px var(--hbd-ring-light), 0 0 0 4px var(--hbd-ring-dark), var(--hbd-contact);outline:none}.hbd-icon{justify-content:center;align-items:center;display:flex}.hbd-btn svg{width:var(--hbd-icon-size);height:var(--hbd-icon-size);fill:none;stroke:currentColor;stroke-width:var(--hbd-icon-stroke);stroke-linecap:round;stroke-linejoin:round;animation:hbd-icon-in var(--hbd-t-icon) var(--hbd-ease) both;display:block}@keyframes hbd-icon-in{0%{opacity:0}to{opacity:1}}@media (prefers-reduced-motion:reduce){.hbd-btn{transition:none}.hbd-btn svg{animation:none}}@media (forced-colors:active){.hbd-btn{color:buttontext;box-shadow:none;background:buttonface;border:1px solid buttontext}.hbd-btn:focus-visible{outline-offset:2px;outline:2px solid highlight}}";
+	var copy_default = "html.hb-copy,html.hb-copy body{-webkit-user-select:text;user-select:text}";
+	var STORAGE_KEY$2 = "heybox-copy";
+	var STYLE_ID$2 = "hb-copy";
+	var COPY_CLASS = "hb-copy";
+	var SNAPSHOT_TTL = 3e3;
+	var FOCUS_GRAB_WINDOW = 500;
+	var headProbe$2 = null;
+	var rescueAttached = false;
+	var snapshot = null;
+	var focusGrabAt = 0;
+	var lastMouseDownAt = 0;
+	var lastMouseDownInEditable = false;
+	function nodeToElement$1(node) {
+		if (!node) return null;
+		const n = node;
+		if (n.nodeType === 1) return n;
+		return n.parentElement;
+	}
+	function selectionInEditable(sel) {
+		for (const node of [sel.anchorNode, sel.focusNode]) {
+			const el = nodeToElement$1(node);
+			if (el && el.isContentEditable) return true;
+		}
+		return false;
+	}
+	function onSelectionChange() {
+		const sel = window.getSelection();
+		if (!sel) return;
+		if (sel.rangeCount > 0 && !sel.isCollapsed) {
+			const text = sel.toString();
+			if (text && !selectionInEditable(sel)) snapshot = {
+				text,
+				revokedAt: 0
+			};
+			return;
+		}
+		if (snapshot && snapshot.revokedAt === 0) {
+			if (focusGrabAt !== 0 && Date.now() - focusGrabAt <= FOCUS_GRAB_WINDOW) snapshot.revokedAt = Date.now();
+			else snapshot = null;
+		}
+	}
+	function onMouseDown(event) {
+		lastMouseDownAt = Date.now();
+		const el = nodeToElement$1(event.target);
+		lastMouseDownInEditable = !!(el && (el.isContentEditable || el.closest("input, textarea")));
+	}
+	function onFocusIn(event) {
+		const el = nodeToElement$1(event.target);
+		if (!el || !el.isContentEditable) return;
+		if (Date.now() - lastMouseDownAt <= FOCUS_GRAB_WINDOW && lastMouseDownInEditable) {
+			snapshot = null;
+			focusGrabAt = 0;
+			return;
+		}
+		focusGrabAt = Date.now();
+	}
+	function onCopy(event) {
+		const sel = window.getSelection();
+		const cd = event.clipboardData;
+		if (!cd) return;
+		let text = "";
+		if (sel && sel.rangeCount > 0 && !sel.isCollapsed && !selectionInEditable(sel)) text = sel.toString();
+		if (!text && snapshot && snapshot.revokedAt !== 0 && Date.now() - snapshot.revokedAt <= SNAPSHOT_TTL) text = snapshot.text;
+		if (!text) return;
+		if (cd.getData("text/plain") !== "") return;
+		cd.setData("text/plain", text);
+		event.preventDefault();
+	}
+	function attach$2() {
+		if (rescueAttached) return;
+		rescueAttached = true;
+		document.addEventListener("selectionchange", onSelectionChange);
+		window.addEventListener("mousedown", onMouseDown, true);
+		document.addEventListener("focusin", onFocusIn, true);
+		window.addEventListener("copy", onCopy, false);
+	}
+	function detach$2() {
+		if (!rescueAttached) return;
+		rescueAttached = false;
+		document.removeEventListener("selectionchange", onSelectionChange);
+		window.removeEventListener("mousedown", onMouseDown, true);
+		document.removeEventListener("focusin", onFocusIn, true);
+		window.removeEventListener("copy", onCopy, false);
+		snapshot = null;
+		focusGrabAt = 0;
+	}
+	function isCopyEnabled() {
+		try {
+			return localStorage.getItem(STORAGE_KEY$2) !== "0";
+		} catch {
+			return true;
+		}
+	}
+	function ensureStyle$2() {
+		if (document.getElementById(STYLE_ID$2)) return;
+		const head = document.head;
+		if (!head) {
+			if (headProbe$2) return;
+			headProbe$2 = new MutationObserver(() => {
+				if (!document.head) return;
+				stopHeadProbe$2();
+				ensureStyle$2();
+			});
+			headProbe$2.observe(document, {
+				childList: true,
+				subtree: true
+			});
+			return;
+		}
+		const el = document.createElement("style");
+		el.id = STYLE_ID$2;
+		el.setAttribute("data-hb-own", "");
+		el.textContent = copy_default;
+		head.appendChild(el);
+	}
+	function stopHeadProbe$2() {
+		headProbe$2?.disconnect();
+		headProbe$2 = null;
+	}
+	function applyCopy(enabled) {
+		const root = document.documentElement;
+		if (!root) return;
+		if (enabled) {
+			root.classList.add(COPY_CLASS);
+			ensureStyle$2();
+			attach$2();
+		} else {
+			detach$2();
+			root.classList.remove(COPY_CLASS);
+			stopHeadProbe$2();
+			document.getElementById(STYLE_ID$2)?.remove();
+		}
+		try {
+			localStorage.setItem(STORAGE_KEY$2, enabled ? "1" : "0");
+		} catch {}
+	}
+	function initCopy() {
+		const enabled = isCopyEnabled();
+		applyCopy(enabled);
+		return enabled;
+	}
+	function exposeCopyHooks() {
+		const w = window;
+		w.__hbSetCopy = (on) => applyCopy(on);
+		w.__hbIsCopy = () => isCopyEnabled();
+	}
+	var reply_btn_default = "html.hb-reply-btn .hb-reply{height:var(--hb-ui-size-control);border:1px solid var(--hb-ui-edge-control);border-radius:var(--hb-ui-radius-pill);color:var(--hb-ui-ink-soft);font-size:var(--hb-ui-font-label);white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;vertical-align:middle;background:0 0;justify-content:center;align-items:center;margin-left:8px;padding:0 8px;line-height:1;transition:color .12s,border-color .12s,background-color .12s,transform 90ms;display:inline-flex}html.hb-reply-btn .hb-reply:hover{color:var(--hb-ui-accent-strong);border-color:var(--hb-ui-edge-control-hover);background-color:var(--hb-ui-accent-wash)}html.hb-reply-btn .hb-reply:active{transform:translateY(1px)}html.hb-reply-btn .hb-reply:focus-visible{box-shadow:0 0 0 2px var(--hb-ui-ring-light), 0 0 0 3px var(--hb-ui-ring-dark);outline:none}@media (prefers-reduced-motion:reduce){html.hb-reply-btn .hb-reply{transition:none}html.hb-reply-btn .hb-reply:active{transform:none}}@media (forced-colors:active){html.hb-reply-btn .hb-reply{color:buttontext;border-color:buttontext}html.hb-reply-btn .hb-reply:hover{color:highlight;border-color:highlight}html.hb-reply-btn .hb-reply:focus-visible{outline-offset:2px;box-shadow:none;outline:2px solid highlight}}";
+	var tokens_default = "html.hb-comment-cards [data-hb-tc],html.hb-comment-cards .hb-tc__fold,html.hb-reply-btn .hb-reply{--hb-ui-hue:210;--hb-ui-font-meta:10px;--hb-ui-font-label:13px;--hb-ui-font-title:14px;--hb-ui-size-control:24px;--hb-ui-radius-card:5px;--hb-ui-radius-control:5px;--hb-ui-radius-pill:999px;--hb-ui-pad-x:12px;--hb-ui-pad-y:10px;--hb-ui-avatar-size:34px;--hb-ui-avatar-gap:10px;--hb-ui-line-1:20px;--hb-ui-line-2:14px;--hb-ui-gap-line:1px;--hb-ui-gap-block:10px;--hb-ui-surface:#fff;--hb-ui-ink:#14191e;--hb-ui-ink-muted:#4b5359;--hb-ui-ink-soft:#697077;--hb-ui-accent:#3ea3e3;--hb-ui-accent-strong:#1a6da6;--hb-ui-accent-wash:#3ea3e31a;--hb-ui-edge-control:#14191e47;--hb-ui-edge-control-hover:#1a6da68c;--hb-ui-avatar-tile:hsl(var(--hb-ui-hue) 34% 90%);--hb-ui-avatar-ink:hsl(var(--hb-ui-hue) 45% 26%);--hb-ui-ring-light:#f4f7fa;--hb-ui-ring-dark:#0b0f13}html.hb-dark.hb-comment-cards [data-hb-tc],html.hb-dark.hb-comment-cards .hb-tc__fold,html.hb-dark.hb-reply-btn .hb-reply{--hb-ui-surface:#2e353d;--hb-ui-ink:#dce3ea;--hb-ui-ink-muted:#b6bec7;--hb-ui-ink-soft:#9aa3ac;--hb-ui-accent:#62a3e3;--hb-ui-accent-strong:#8ec7f2;--hb-ui-accent-wash:#62a3e329;--hb-ui-edge-control:#ffffff47;--hb-ui-edge-control-hover:#8ec7f299;--hb-ui-avatar-tile:hsl(var(--hb-ui-hue) 26% 30%);--hb-ui-avatar-ink:hsl(var(--hb-ui-hue) 30% 88%)}";
+	var STORAGE_KEY$1 = "heybox-reply-btn";
+	var STYLE_ID$1 = "hb-reply-btn";
+	var REPLY_CLASS = "hb-reply-btn";
+	var MAIN_ROW_SELECTOR$1 = ".link-comment__comment-item";
+	var CHILD_ROW_SELECTOR$1 = ".comment-children-item";
+	var ROW_SELECTOR = MAIN_ROW_SELECTOR$1;
+	var MAIN_ANCHOR_SELECTOR = ".comment-item-header__operation-box";
+	var BTN_CLASS = "hb-reply";
+	var ROW_BTN_SELECTOR = `.${BTN_CLASS}, .hb-card-reply`;
+	var HB_CARD_ATTR = "data-hb-tc";
+	var listeners$1 = new Set();
+	var headProbe$1 = null;
+	var observer$1 = null;
+	var guardAttached = false;
+	var passThrough = 0;
+	var syntheticTarget = null;
+	function setSyntheticTarget(el) {
+		syntheticTarget = el;
+	}
+	function isRowClickSynthesized(el) {
+		if (passThrough <= 0) return false;
+		if (!el) return true;
+		const target = el;
+		return syntheticTarget === target || target.contains(syntheticTarget);
+	}
+	function nodeToElement(node) {
+		if (!node) return null;
+		const n = node;
+		if (n.nodeType === 1) return n;
+		return n.parentElement;
+	}
+	function isSiteInteractive(el) {
+		if (!el) return false;
+		return !!el.closest("a, button, input, textarea, [contenteditable], [role=\"button\"]");
+	}
+	function isImageZone(el) {
+		if (!el) return false;
+		return !!el.closest(".comment-item__image-box, .comment-item__image-wrapper, img");
+	}
+	function shouldBlock(el) {
+		if (!el) return false;
+		if (isSiteInteractive(el) || isImageZone(el)) return false;
+		if (el.closest(`[${HB_CARD_ATTR}]`) || el.closest(CHILD_ROW_SELECTOR$1)) return true;
+		if (!el.closest(MAIN_ROW_SELECTOR$1)) return false;
+		if (el.closest(".link-comment__comment-children")) return false;
+		return true;
+	}
+	function onClickCapture(event) {
+		const el = nodeToElement(event.target);
+		const btn = el ? el.closest(ROW_BTN_SELECTOR) : null;
+		if (btn) {
+			const host = btn.closest(CHILD_ROW_SELECTOR$1) || btn.closest(MAIN_ROW_SELECTOR$1);
+			if (host) {
+				passThrough += 1;
+				try {
+					setSyntheticTarget(el);
+					host.click();
+				} finally {
+					setSyntheticTarget(null);
+					passThrough -= 1;
+				}
+			}
+			event.stopPropagation();
+			event.preventDefault();
+			return;
+		}
+		if (passThrough > 0) return;
+		if (!shouldBlock(el)) return;
+		event.stopPropagation();
+	}
+	function ensureStyle$1() {
+		if (document.getElementById(STYLE_ID$1)) return;
+		const head = document.head;
+		if (!head) {
+			if (headProbe$1) return;
+			headProbe$1 = new MutationObserver(() => {
+				if (!document.head) return;
+				stopHeadProbe$1();
+				ensureStyle$1();
+			});
+			headProbe$1.observe(document, {
+				childList: true,
+				subtree: true
+			});
+			return;
+		}
+		const el = document.createElement("style");
+		el.id = STYLE_ID$1;
+		el.setAttribute("data-hb-own", "");
+		el.textContent = `${tokens_default}\n${reply_btn_default}`;
+		head.appendChild(el);
+	}
+	function stopHeadProbe$1() {
+		headProbe$1?.disconnect();
+		headProbe$1 = null;
+	}
+	function createButton() {
+		const btn = document.createElement("button");
+		btn.type = "button";
+		btn.className = BTN_CLASS;
+		btn.setAttribute("data-hb-own", "");
+		btn.textContent = "回复";
+		btn.title = "回复这条评论";
+		btn.setAttribute("aria-label", "回复这条评论");
+		btn.addEventListener("mousedown", (e) => e.stopPropagation());
+		return btn;
+	}
+	function decorateRow$1(row) {
+		if (row.matches(CHILD_ROW_SELECTOR$1)) return;
+		if (row.querySelector(`.${BTN_CLASS}`)) return;
+		const anchor = row.querySelector(MAIN_ANCHOR_SELECTOR);
+		if (!anchor || !anchor.parentElement) return;
+		anchor.appendChild(createButton());
+	}
+	function decorateAll$1() {
+		for (const row of document.querySelectorAll(ROW_SELECTOR)) decorateRow$1(row);
+	}
+	function ensureObserver$1() {
+		if (observer$1) return;
+		observer$1 = new MutationObserver((records) => {
+			for (const r of records) for (const node of r.addedNodes) {
+				if (node.nodeType !== 1) continue;
+				const el = node;
+				if (el.matches(ROW_SELECTOR)) decorateRow$1(el);
+				for (const row of el.querySelectorAll(ROW_SELECTOR)) decorateRow$1(row);
+			}
+		});
+		observer$1.observe(document.documentElement, {
+			childList: true,
+			subtree: true
+		});
+	}
+	function attach$1() {
+		if (guardAttached) return;
+		guardAttached = true;
+		document.addEventListener("click", onClickCapture, true);
+		decorateAll$1();
+		ensureObserver$1();
+	}
+	function detach$1() {
+		if (!guardAttached) return;
+		guardAttached = false;
+		document.removeEventListener("click", onClickCapture, true);
+		observer$1?.disconnect();
+		observer$1 = null;
+		for (const b of document.querySelectorAll(`.${BTN_CLASS}`)) b.remove();
+	}
+	function onReplyBtnChange(fn) {
+		listeners$1.add(fn);
+		return () => {
+			listeners$1.delete(fn);
+		};
+	}
+	function isReplyBtnEnabled() {
+		try {
+			return localStorage.getItem(STORAGE_KEY$1) !== "0";
+		} catch {
+			return true;
+		}
+	}
+	function applyReplyBtn(enabled) {
+		const root = document.documentElement;
+		if (!root) return;
+		if (enabled) {
+			root.classList.add(REPLY_CLASS);
+			ensureStyle$1();
+			attach$1();
+		} else {
+			detach$1();
+			root.classList.remove(REPLY_CLASS);
+			stopHeadProbe$1();
+			document.getElementById(STYLE_ID$1)?.remove();
+		}
+		try {
+			localStorage.setItem(STORAGE_KEY$1, enabled ? "1" : "0");
+		} catch {}
+		for (const fn of [...listeners$1]) try {
+			fn(enabled);
+		} catch (err) {
+			console.error("[hb-reply-btn] listener failed", err);
+		}
+	}
+	function initReplyBtn() {
+		const enabled = isReplyBtnEnabled();
+		applyReplyBtn(enabled);
+		return enabled;
+	}
+	function exposeReplyBtnHooks() {
+		const w = window;
+		w.__hbSetReplyBtn = (on) => applyReplyBtn(on);
+		w.__hbIsReplyBtn = () => isReplyBtnEnabled();
+	}
+	var cache = new Map();
+	var API_URL_PATTERN = /\/bbs\/app\/(?:link\/tree|comment)(?:[/?#]|$)/;
+	var MAX_DEPTH = 24;
+	function isPlainObject(value) {
+		return !!value && typeof value === "object" && !Array.isArray(value);
+	}
+	function toIdString(value) {
+		if (typeof value === "number") return Number.isFinite(value) ? String(value) : void 0;
+		if (typeof value === "string") {
+			const trimmed = value.trim();
+			return trimmed === "" ? void 0 : trimmed;
+		}
+	}
+	function nonEmptyString(value) {
+		if (typeof value !== "string") return void 0;
+		return value.length > 0 && value.trim() !== "" ? value : void 0;
+	}
+	function metaFromBody(body) {
+		const meta = {};
+		const author = isPlainObject(body.user) ? body.user : null;
+		if (author) {
+			const avatar = nonEmptyString(author.avatar) ?? nonEmptyString(author.avartar);
+			if (avatar) meta.authorAvatar = avatar;
+			const name = nonEmptyString(author.username);
+			if (name) meta.authorName = name;
+		}
+		const replyId = toIdString(body.replyid);
+		if (replyId) meta.replyId = replyId;
+		const replyUser = isPlainObject(body.replyuser) ? body.replyuser : null;
+		if (replyUser) {
+			const name = nonEmptyString(replyUser.username);
+			if (name) meta.replyToName = name;
+			const id = toIdString(body.replyuserid) ?? toIdString(replyUser.userid);
+			if (id) meta.replyToUserId = id;
+		}
+		return Object.keys(meta).length > 0 ? meta : null;
+	}
+	function collectBodies(value, out, depth = 0) {
+		if (depth > MAX_DEPTH || !value || typeof value !== "object") return;
+		if (Array.isArray(value)) {
+			for (const item of value) collectBodies(item, out, depth + 1);
+			return;
+		}
+		const obj = value;
+		if (Array.isArray(obj.comments)) collectBodies(obj.comments, out, depth + 1);
+		if (Array.isArray(obj.comment)) collectBodies(obj.comment, out, depth + 1);
+		if (obj.commentid !== void 0 && obj.commentid !== null) {
+			out.push(obj);
+			return;
+		}
+		if (obj.result && typeof obj.result === "object") collectBodies(obj.result, out, depth + 1);
+	}
+	function mergeMeta(id, incoming) {
+		const prev = cache.get(id);
+		cache.set(id, prev ? {
+			...prev,
+			...incoming
+		} : incoming);
+	}
+	function ingest(payload) {
+		const bodies = [];
+		collectBodies(payload, bodies);
+		let stored = 0;
+		for (const body of bodies) {
+			const id = toIdString(body.commentid);
+			if (!id) continue;
+			const meta = metaFromBody(body);
+			if (!meta) continue;
+			mergeMeta(id, meta);
+			stored += 1;
+		}
+		return stored;
+	}
+	function __ingestTreeResponse(payload) {
+		try {
+			if (typeof payload === "string") {
+				const text = payload.trim();
+				if (text === "") return 0;
+				return ingest(JSON.parse(text));
+			}
+			return ingest(payload);
+		} catch {
+			return 0;
+		}
+	}
+	function lookupMeta(commentId) {
+		try {
+			const id = toIdString(commentId);
+			if (!id) return null;
+			const hit = cache.get(id);
+			return hit ? { ...hit } : null;
+		} catch {
+			return null;
+		}
+	}
+	function cacheSize() {
+		return cache.size;
+	}
+	var xhrUrls = new WeakMap();
+	var xhrListening = new WeakSet();
+	var attached = false;
+	var origXhrOpen = null;
+	var origFetch = null;
+	function matchesApiUrl(url) {
+		try {
+			return url !== "" && API_URL_PATTERN.test(url);
+		} catch {
+			return false;
+		}
+	}
+	function urlFromOpenArgs(args) {
+		const raw = args[1];
+		if (typeof raw === "string") return raw;
+		if (raw instanceof URL) return raw.href;
+		return "";
+	}
+	function urlFromFetchInput(input) {
+		try {
+			if (typeof input === "string") return input;
+			if (input instanceof URL) return input.href;
+			const req = input;
+			return typeof req?.url === "string" ? req.url : "";
+		} catch {
+			return "";
+		}
+	}
+	function readXhrPayload(xhr) {
+		try {
+			const text = xhr.responseText;
+			if (typeof text === "string" && text.trim() !== "") return JSON.parse(text);
+		} catch {}
+		try {
+			const data = xhr.response;
+			if (isPlainObject(data) || Array.isArray(data)) return data;
+		} catch {}
+		return null;
+	}
+	function patchXhr() {
+		if (origXhrOpen) return;
+		const proto = globalThis.XMLHttpRequest?.prototype;
+		if (!proto) return;
+		const openFn = proto.open;
+		const sendFn = proto.send;
+		const nextOpen = function(...args) {
+			try {
+				const url = urlFromOpenArgs(args);
+				if (url) xhrUrls.set(this, url);
+			} catch {}
+			return openFn.apply(this, args);
+		};
+		const nextSend = function(...args) {
+			try {
+				const xhr = this;
+				if (!xhrListening.has(xhr)) {
+					xhrListening.add(xhr);
+					xhr.addEventListener("load", () => {
+						try {
+							if (!matchesApiUrl(xhrUrls.get(xhr) ?? "")) return;
+							__ingestTreeResponse(readXhrPayload(xhr));
+						} catch {}
+					});
+				}
+			} catch {}
+			return sendFn.apply(this, args);
+		};
+		proto.open = nextOpen;
+		proto.send = nextSend;
+		origXhrOpen = openFn;
+	}
+	function patchFetch() {
+		if (origFetch) return;
+		const g = globalThis;
+		const fn = g.fetch;
+		if (typeof fn !== "function") return;
+		const nextFetch = function(input, init) {
+			const url = urlFromFetchInput(input);
+			const result = fn.call(globalThis, input, init);
+			try {
+				if (matchesApiUrl(url)) result.then((res) => {
+					try {
+						res.clone().json().then((data) => {
+							__ingestTreeResponse(data);
+						}, () => {});
+					} catch {}
+				}, () => {});
+			} catch {}
+			return result;
+		};
+		g.fetch = nextFetch;
+		origFetch = fn;
+	}
+	function attachApiCache() {
+		if (attached) return;
+		attached = true;
+		try {
+			patchXhr();
+		} catch {}
+		try {
+			patchFetch();
+		} catch {}
+	}
+	function exposeApiCacheHooks() {
+		const w = window;
+		w.__hbApiCacheSize = () => cacheSize();
+		w.__hbApiCacheAttached = () => attached;
+		w.__hbLookupCommentMeta = (commentId) => lookupMeta(commentId);
+		w.__hbIngestCommentTree = (payload) => __ingestTreeResponse(payload);
+	}
+	var comment_cards_default = "html.hb-comment-cards [data-hb-tc].hb-tc{padding:var(--hb-ui-pad-y) var(--hb-ui-pad-x) var(--hb-ui-pad-y) calc(var(--hb-ui-pad-x) + var(--hb-ui-avatar-size) + var(--hb-ui-avatar-gap));border-radius:var(--hb-ui-radius-card);background-color:var(--hb-ui-surface);color:var(--hb-ui-ink);outline-offset:2px;outline:2px solid #0000;flex-wrap:wrap;align-items:flex-start;gap:0 8px;transition:outline-color .16s cubic-bezier(.2,0,0,1),background-color .16s cubic-bezier(.2,0,0,1);display:flex;position:relative}html.hb-comment-cards [data-hb-tc].hb-tc--flash{outline-color:var(--hb-ui-accent-strong)}html.hb-comment-cards [data-hb-tc].hb-tc>*{order:3}html.hb-comment-cards [data-hb-tc]>.children-item__writer-tag{height:var(--hb-ui-line-1);flex:none;order:2;margin-left:5px}html.hb-comment-cards .link-comment__comment-children .comment-children-item.hb-tc:hover:after{display:none}html.hb-comment-cards [data-hb-tc].hb-tc:hover{background-color:var(--hb-ui-accent-wash)}html.hb-comment-cards [data-hb-tc]>.hb-tc__avatar{top:var(--hb-ui-pad-y);left:var(--hb-ui-pad-x);width:var(--hb-ui-avatar-size);height:var(--hb-ui-avatar-size);position:absolute}html.hb-comment-cards [data-hb-tc]>.children-item__comment-creator{white-space:nowrap;font-size:var(--hb-ui-font-title);font-weight:700;line-height:var(--hb-ui-line-1);flex:none;order:1;text-decoration:none}html.hb-comment-cards [data-hb-tc]>.hb-tc__replyto{white-space:nowrap;color:var(--hb-ui-ink-muted);font-size:var(--hb-ui-font-label);flex:none;order:2;margin-right:-8px}html.hb-comment-cards [data-hb-tc]>.children-item__reply-to{white-space:nowrap;flex:none;order:3;margin-left:0;display:inline}html.hb-comment-cards [data-hb-tc][data-hb-reply-kind=root]>.children-item__reply-to{color:var(--hb-ui-ink-muted)}html.hb-comment-cards [data-hb-tc]>.hb-tc__replyto>.hb-tc__link{font:inherit;color:var(--hb-ui-accent-strong);cursor:pointer;text-underline-offset:2px;-webkit-user-select:none;user-select:none;background:0 0;border:0;margin:0;padding:0;text-decoration:underline;text-decoration-thickness:1px;display:inline}html.hb-comment-cards [data-hb-tc]>.hb-tc__replyto>.hb-tc__link:hover{text-decoration-thickness:2px}html.hb-comment-cards [data-hb-tc]>.hb-tc__replyto>.hb-tc__link:focus-visible{box-shadow:0 0 0 2px var(--hb-ui-ring-light), 0 0 0 3px var(--hb-ui-ring-dark);border-radius:2px;outline:none}html.hb-comment-cards [data-hb-tc]>.children-item__other-info{margin-left:0;margin-top:var(--hb-ui-gap-line);min-width:0;font-size:var(--hb-ui-font-meta);line-height:var(--hb-ui-line-2);white-space:nowrap;flex:0 0 100%;order:5;align-items:center;display:flex}html.hb-comment-cards [data-hb-tc]>.children-item__other-info>span+span{margin-left:2px}html.hb-comment-cards [data-hb-tc]>.hb-tc__floor{color:var(--hb-ui-ink-soft);font-size:var(--hb-ui-font-meta);font-weight:500;line-height:var(--hb-ui-line-1);font-variant-numeric:tabular-nums;white-space:nowrap;pointer-events:none;-webkit-user-select:none;user-select:none;flex:none;order:4;margin-left:auto;padding-left:6px}html.hb-comment-cards [data-hb-tc]>p.children-item__comment-content,html.hb-comment-cards [data-hb-tc]>.children-item__comment-content{margin-left:0;margin-top:var(--hb-ui-gap-block);white-space:pre-wrap;overflow-wrap:anywhere;flex:100%;order:9;min-width:0;margin-bottom:0;padding-left:0;display:block}html.hb-comment-cards [data-hb-tc]>.children-item__comment-content.cy{padding-left:0}html.hb-comment-cards [data-hb-tc]>.children-item__comment-content.cy:before{width:14px;height:14px;top:0;left:0}html.hb-comment-cards [data-hb-tc]>.hb-card-reply{-webkit-user-select:none;user-select:none;vertical-align:middle;width:var(--hb-ui-size-control);height:var(--hb-ui-size-control);border-radius:var(--hb-ui-radius-control);color:var(--hb-ui-ink-muted);cursor:pointer;-webkit-tap-highlight-color:transparent;background:0 0;border:1px solid #0000;flex:none;order:11;justify-content:center;align-items:center;margin-left:auto;padding:0;transition:color .12s,border-color .12s,background-color .12s,transform 90ms;display:inline-flex}html.hb-comment-cards [data-hb-tc]>.hb-card-reply svg{fill:none;stroke:currentColor;stroke-width:1.6px;stroke-linecap:round;stroke-linejoin:round;width:16px;height:16px;display:block}html.hb-comment-cards [data-hb-tc]>.hb-card-reply:hover{color:var(--hb-ui-accent-strong);border-color:var(--hb-ui-edge-control-hover);background-color:var(--hb-ui-accent-wash)}html.hb-comment-cards [data-hb-tc]>.hb-card-reply:active{transform:translateY(1px)}html.hb-comment-cards [data-hb-tc]>.hb-card-reply:focus-visible{box-shadow:0 0 0 2px var(--hb-ui-ring-light), 0 0 0 3px var(--hb-ui-ring-dark);outline:none}html.hb-comment-cards [data-hb-tc]>.hb-tc__avatar{box-sizing:border-box;pointer-events:none;background-color:#0000;border-radius:50%;justify-content:center;align-items:center;text-decoration:none;display:flex;overflow:hidden}html.hb-comment-cards [data-hb-tc]>.hb-tc__avatar img{object-fit:cover;border-radius:50%;width:100%;height:100%}html.hb-comment-cards [data-hb-tc]>.hb-tc__avatar.hb-tc__avatar--fallback{background-color:var(--hb-ui-avatar-tile);color:var(--hb-ui-avatar-ink);-webkit-user-select:none;user-select:none;font-size:14px;font-weight:600;line-height:1}html.hb-comment-cards .hb-tc__fold{height:var(--hb-ui-size-control);border-radius:var(--hb-ui-radius-pill);color:var(--hb-ui-ink-soft);font-size:var(--hb-ui-font-label);white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;vertical-align:middle;background:0 0;border:1px solid #0000;align-items:center;gap:3px;margin-left:4px;padding:0 6px;line-height:1;transition:color .12s,background-color .12s;display:inline-flex}html.hb-comment-cards .hb-tc__fold svg{fill:none;stroke:currentColor;stroke-width:2px;stroke-linecap:round;stroke-linejoin:round;width:12px;height:12px;transition:transform .16s cubic-bezier(.2,0,0,1);display:block}html.hb-comment-cards .hb-tc__fold[data-expanded=false] svg{transform:rotate(180deg)}html.hb-comment-cards .hb-tc__fold:hover{color:var(--hb-ui-accent-strong);background-color:var(--hb-ui-accent-wash)}html.hb-comment-cards .hb-tc__fold:focus-visible{box-shadow:0 0 0 2px var(--hb-ui-ring-light), 0 0 0 3px var(--hb-ui-ring-dark);outline:none}html.hb-comment-cards .link-comment__comment-children.hb-tc--folded>.comment-children-item{display:none}@media (prefers-reduced-motion:reduce){html.hb-comment-cards [data-hb-tc].hb-tc,html.hb-comment-cards [data-hb-tc]>.hb-card-reply,html.hb-comment-cards .hb-tc__fold,html.hb-comment-cards .hb-tc__fold svg{transition:none}html.hb-comment-cards [data-hb-tc]>.hb-card-reply:active{transform:none}}@media (forced-colors:active){html.hb-comment-cards [data-hb-tc]>.hb-card-reply{color:buttontext;border-color:buttontext}html.hb-comment-cards [data-hb-tc]>.hb-card-reply:hover{color:highlight;border-color:highlight}html.hb-comment-cards .hb-tc__fold{color:buttontext;border-color:buttontext}html.hb-comment-cards .hb-tc__fold:hover{color:highlight;border-color:highlight}html.hb-comment-cards [data-hb-tc]>.hb-tc__replyto>.hb-tc__link{color:linktext}html.hb-comment-cards [data-hb-tc].hb-tc--flash{outline-color:highlight}html.hb-comment-cards [data-hb-tc]>.hb-tc__avatar.hb-tc__avatar--fallback{color:buttontext;background-color:buttonface}}";
+	var STORAGE_KEY = "heybox-comment-cards";
+	var ROOT_CLASS = "hb-comment-cards";
+	var STYLE_ID = "hb-comment-cards";
+	var CARD_CLASS = "hb-tc";
+	var AVATAR_CLASS = "hb-tc__avatar";
+	var AVATAR_FALLBACK_CLASS = "hb-tc__avatar--fallback";
+	var REPLYTO_CLASS = "hb-tc__replyto";
+	var CARD_REPLY_CLASS = "hb-card-reply";
+	var CARD_FLOOR_CLASS = "hb-tc__floor";
+	var CARD_FOLD_CLASS = "hb-tc__fold";
+	var CARD_LINK_CLASS = "hb-tc__link";
+	var FLASH_CLASS = "hb-tc--flash";
+	var FLASH_MS = 1200;
+	var FOLDED_CLASS = "hb-tc--folded";
+	var OWN_ATTR = "data-hb-own";
+	var DONE_ATTR = "data-hb-tc";
+	var CHILD_ROW_SELECTOR = ".comment-children-item";
+	var MAIN_ROW_SELECTOR = ".link-comment__comment-item";
+	var THREAD_SELECTOR = ".link-comment__comment-children";
+	var OPERATION_BOX_SELECTOR = ".comment-item-header__operation-box";
+	var CONTENT_SELECTOR = ".children-item__comment-content";
+	var CREATOR_SELECTOR = ".children-item__comment-creator";
+	var REPLYTO_SITE_SELECTOR = ".children-item__reply-to";
+	var OTHER_INFO_SELECTOR = ".children-item__other-info";
+	var SVG_NS$1 = "http://www.w3.org/2000/svg";
+	var RETRY_DELAYS = [
+		500,
+		1500,
+		4e3
+	];
+	var PLANE_PATHS = ["M21.3 3.2 2.9 10.4 12.6 20.4Z", "M9.1 12.7 21.3 3.2"];
+	var listeners = new Set();
+	var applied = false;
+	var styleAttached = false;
+	var headProbe = null;
+	var observer = null;
+	var retryTimer = null;
+	var pendingMeta = new Set();
+	function normalizeText(value) {
+		return (value ?? "").replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim();
+	}
+	function useridFromProfileHref(href) {
+		if (!href) return "";
+		const m = /\/profile\/(\w+)/.exec(href);
+		return m ? m[1] : "";
+	}
+	function mainRowOf(row) {
+		return row.closest(MAIN_ROW_SELECTOR);
+	}
+	function rootUserIdOf(row) {
+		const main = mainRowOf(row);
+		if (!main) return "";
+		const links = [main.querySelector(".comment-item-header__avatar")?.closest("a") ?? null, main.querySelector(".info-box__username")];
+		for (const link of links) {
+			if (!link) continue;
+			const id = useridFromProfileHref(link.getAttribute("href"));
+			if (id) return id;
+		}
+		return "";
+	}
+	function creatorNameOf(row) {
+		return normalizeText(row.querySelector(CREATOR_SELECTOR)?.textContent);
+	}
+	function creatorUserIdOf(row) {
+		return useridFromProfileHref(row.querySelector(CREATOR_SELECTOR)?.getAttribute("href") ?? null);
+	}
+	function threadOf(row) {
+		return row.closest(THREAD_SELECTOR);
+	}
+	function ordinalOf(row) {
+		const thread = threadOf(row);
+		if (!thread) return 0;
+		const rows = thread.querySelectorAll(CHILD_ROW_SELECTOR);
+		for (let i = 0; i < rows.length; i += 1) if (rows[i] === row) return i + 1;
+		return 0;
+	}
+	function rowByCommentId(thread, commentId) {
+		if (!commentId) return null;
+		for (const row of thread.querySelectorAll(CHILD_ROW_SELECTOR)) if (row.dataset.commentId === commentId) return row;
+		return null;
+	}
+	function replyKindOf(row, meta) {
+		const replyToId = normalizeText(meta?.replyToUserId);
+		if (!replyToId) return "";
+		const rootId = rootUserIdOf(row);
+		if (!rootId) return "";
+		return replyToId === rootId ? "root" : "other";
+	}
+	function hueOf(seed) {
+		let h = 0;
+		for (let i = 0; i < seed.length; i += 1) h = (h * 31 + seed.charCodeAt(i)) % 360;
+		return h;
+	}
+	function softHue(seed) {
+		return (hueOf(seed) * 3 + 205) % 360;
+	}
+	function getThreadMeta(commentId) {
+		if (!commentId) return null;
+		const meta = lookupMeta(commentId);
+		if (!meta || typeof meta !== "object") return null;
+		return meta;
+	}
+	function applyFallbackHue(box, row) {
+		box.style.setProperty("--hb-ui-hue", String(softHue(creatorUserIdOf(row) || creatorNameOf(row) || "hb")));
+	}
+	function buildAvatar(row) {
+		const meta = getThreadMeta(row.dataset.commentId ?? "");
+		const box = document.createElement("span");
+		box.className = AVATAR_CLASS;
+		box.setAttribute(OWN_ATTR, "");
+		box.setAttribute("aria-hidden", "true");
+		const avatarUrl = typeof meta?.authorAvatar === "string" ? meta.authorAvatar.trim() : "";
+		if (avatarUrl) {
+			const img = document.createElement("img");
+			img.className = "hb-tc__avatar-img";
+			img.alt = "";
+			img.loading = "lazy";
+			img.decoding = "async";
+			img.referrerPolicy = "no-referrer";
+			img.src = avatarUrl;
+			img.addEventListener("error", () => {
+				img.remove();
+				applyFallbackHue(box, row);
+				box.classList.add(AVATAR_FALLBACK_CLASS);
+				box.textContent = avatarLetter(row);
+			});
+			box.appendChild(img);
+			return box;
+		}
+		box.classList.add(AVATAR_FALLBACK_CLASS);
+		applyFallbackHue(box, row);
+		box.textContent = avatarLetter(row);
+		return box;
+	}
+	function avatarLetter(row) {
+		const name = creatorNameOf(row);
+		return name ? Array.from(name)[0] : "匿";
+	}
+	function buildReplyTo(row) {
+		const site = row.querySelector(REPLYTO_SITE_SELECTOR);
+		if (!site) return null;
+		if (normalizeText(site.textContent) !== ":") return null;
+		const meta = getThreadMeta(row.dataset.commentId ?? "");
+		if (!meta) return null;
+		const thread = threadOf(row);
+		const targetId = normalizeText(meta.replyId);
+		const target = thread ? rowByCommentId(thread, targetId) : null;
+		let kind;
+		let label = "";
+		let jump = 0;
+		if (target && target !== row) {
+			kind = "other";
+			const index = ordinalOf(target);
+			const name = normalizeText(meta.replyToName) || creatorNameOf(target);
+			if (!name) return null;
+			if (index > 0) {
+				jump = index;
+				label = `回复 #${index} ${name}`;
+			} else label = `回复 @${name}`;
+		} else {
+			kind = replyKindOf(row, meta);
+			if (kind === "root") label = "回复楼主";
+			else if (kind === "other") {
+				const name = normalizeText(meta.replyToName);
+				if (!name) return null;
+				label = `回复 @${name}`;
+			} else return null;
+		}
+		const span = document.createElement("span");
+		span.className = REPLYTO_CLASS;
+		span.setAttribute(OWN_ATTR, "");
+		if (jump > 0) {
+			span.appendChild(document.createTextNode("回复 "));
+			span.appendChild(buildJumpLink(jump));
+			span.appendChild(document.createTextNode(` ${label.slice(`回复 #${jump} `.length)}`));
+		} else span.textContent = label;
+		row.dataset.hbReplyKind = kind;
+		return span;
+	}
+	function buildJumpLink(index) {
+		const btn = document.createElement("button");
+		btn.type = "button";
+		btn.className = CARD_LINK_CLASS;
+		btn.setAttribute(OWN_ATTR, "");
+		btn.textContent = `#${index}`;
+		const label = `跳到本楼第 ${index} 条回复`;
+		btn.title = label;
+		btn.setAttribute("aria-label", label);
+		btn.addEventListener("mousedown", (e) => e.stopPropagation());
+		btn.addEventListener("click", (event) => {
+			event.preventDefault();
+			event.stopPropagation();
+			jumpToFloor(btn, index);
+		});
+		return btn;
+	}
+	var flashTimer = null;
+	function jumpToFloor(from, index) {
+		const row = from.closest(CHILD_ROW_SELECTOR);
+		const thread = row ? threadOf(row) : null;
+		if (!thread) return;
+		const target = thread.querySelectorAll(CHILD_ROW_SELECTOR)[index - 1];
+		if (!target) return;
+		const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+		target.scrollIntoView({
+			behavior: reduced ? "auto" : "smooth",
+			block: "center"
+		});
+		if (flashTimer !== null) window.clearTimeout(flashTimer);
+		for (const el of document.querySelectorAll(`.${FLASH_CLASS}`)) el.classList.remove(FLASH_CLASS);
+		target.classList.add(FLASH_CLASS);
+		flashTimer = window.setTimeout(() => {
+			flashTimer = null;
+			target.classList.remove(FLASH_CLASS);
+		}, FLASH_MS);
+	}
+	function buildFloor(index) {
+		const el = document.createElement("span");
+		el.className = CARD_FLOOR_CLASS;
+		el.setAttribute(OWN_ATTR, "");
+		el.textContent = `${index}#`;
+		return el;
+	}
+	function buildReplyButton() {
+		const btn = document.createElement("button");
+		btn.type = "button";
+		btn.className = CARD_REPLY_CLASS;
+		btn.setAttribute(OWN_ATTR, "");
+		btn.setAttribute("aria-label", "回复这条评论");
+		btn.title = "回复这条评论";
+		const svg = document.createElementNS(SVG_NS$1, "svg");
+		svg.setAttribute("viewBox", "0 0 24 24");
+		svg.setAttribute("aria-hidden", "true");
+		svg.setAttribute("focusable", "false");
+		for (const d of PLANE_PATHS) {
+			const path = document.createElementNS(SVG_NS$1, "path");
+			path.setAttribute("d", d);
+			svg.appendChild(path);
+		}
+		btn.appendChild(svg);
+		btn.addEventListener("mousedown", (e) => e.stopPropagation());
+		return btn;
+	}
+	function attachReplyButton(row, btn) {
+		btn.addEventListener("click", (event) => {
+			event.preventDefault();
+			event.stopPropagation();
+			if (!row.isConnected) return;
+			if (isRowClickSynthesized(btn)) return;
+			row.click();
+		});
+	}
+	function rowStamped(row) {
+		return row.getAttribute(DONE_ATTR) === "1" && row.classList.contains(CARD_CLASS);
+	}
+	function decorateRow(row) {
+		if (!row.isConnected) return false;
+		const hadStamp = rowStamped(row);
+		let touched = false;
+		if (!row.querySelector(CONTENT_SELECTOR) || !row.querySelector(OTHER_INFO_SELECTOR)) return false;
+		let avatar = row.querySelector(`:scope > .${AVATAR_CLASS}`);
+		if (!avatar) {
+			avatar = buildAvatar(row);
+			const siteFirst = row.firstElementChild;
+			if (siteFirst) row.insertBefore(avatar, siteFirst);
+			else row.appendChild(avatar);
+			touched = true;
+		}
+		row.classList.toggle("hb-tc-no-avatar", !avatar);
+		if (row.classList.contains(CARD_CLASS) === false) {
+			row.classList.add(CARD_CLASS);
+			touched = true;
+		}
+		const index = ordinalOf(row);
+		let floor = row.querySelector(`:scope > .${CARD_FLOOR_CLASS}`);
+		if (!floor && index > 0) {
+			floor = buildFloor(index);
+			row.appendChild(floor);
+			touched = true;
+		} else if (floor && index > 0 && normalizeText(floor.textContent) !== `${index}#`) {
+			floor.textContent = `${index}#`;
+			touched = true;
+		}
+		if (!row.querySelector(`:scope > .${REPLYTO_CLASS}`)) {
+			const candidate = buildReplyTo(row);
+			if (candidate) {
+				const site = row.querySelector(REPLYTO_SITE_SELECTOR);
+				if (site && site.parentElement === row) row.insertBefore(candidate, site);
+				else row.appendChild(candidate);
+				touched = true;
+			}
+		}
+		let btn = row.querySelector(`:scope > .${CARD_REPLY_CLASS}`);
+		if (!btn) {
+			btn = buildReplyButton();
+			row.appendChild(btn);
+			attachReplyButton(row, btn);
+			touched = true;
+		}
+		if (avatar && avatar !== row.firstElementChild) {
+			const first = row.firstElementChild;
+			if (first) row.insertBefore(avatar, first);
+			touched = true;
+		}
+		row.setAttribute(DONE_ATTR, "1");
+		if (!hadStamp || touched) {
+			const fallbackAvatar = !avatar || avatar.classList.contains(AVATAR_FALLBACK_CLASS);
+			const noReplyTo = row.querySelector(`:scope > .${REPLYTO_CLASS}`) === null;
+			if (fallbackAvatar || noReplyTo) pendingMeta.add(row);
+			else pendingMeta.delete(row);
+		}
+		return touched || !hadStamp;
+	}
+	function decorateAll() {
+		for (const row of document.querySelectorAll(CHILD_ROW_SELECTOR)) decorateRow(row);
+		decorateThreads();
+		if (pendingMeta.size > 0) scheduleRetry();
+	}
+	var foldedRoots = new Set();
+	function mainRowKey(mainRow) {
+		return normalizeText(mainRow.dataset.commentId);
+	}
+	var CHEVRON_UP_PATH = "M6 15 12 9 18 15";
+	var FOLD_LABEL_CLASS = "hb-tc__fold-label";
+	function createFoldButton(mainRow) {
+		const btn = document.createElement("button");
+		btn.type = "button";
+		btn.className = CARD_FOLD_CLASS;
+		btn.setAttribute(OWN_ATTR, "");
+		btn.dataset.expanded = "true";
+		const svg = document.createElementNS(SVG_NS$1, "svg");
+		svg.setAttribute("viewBox", "0 0 24 24");
+		svg.setAttribute("aria-hidden", "true");
+		svg.setAttribute("focusable", "false");
+		const path = document.createElementNS(SVG_NS$1, "path");
+		path.setAttribute("d", CHEVRON_UP_PATH);
+		svg.appendChild(path);
+		const label = document.createElement("span");
+		label.className = FOLD_LABEL_CLASS;
+		btn.append(svg, label);
+		btn.addEventListener("mousedown", (e) => e.stopPropagation());
+		btn.addEventListener("click", (event) => {
+			event.preventDefault();
+			event.stopPropagation();
+			const key = mainRowKey(mainRow);
+			if (!key) return;
+			if (foldedRoots.has(key)) foldedRoots.delete(key);
+			else foldedRoots.add(key);
+			decorateFold(mainRow);
+		});
+		return btn;
+	}
+	function syncFoldButton(btn, count, folded) {
+		const label = folded ? `展开 ${count} 条` : "折叠";
+		const span = btn.querySelector(`:scope > .${FOLD_LABEL_CLASS}`);
+		if (span && normalizeText(span.textContent) !== label) span.textContent = label;
+		const expanded = folded ? "false" : "true";
+		if (btn.getAttribute("aria-expanded") !== expanded) btn.setAttribute("aria-expanded", expanded);
+		if (btn.dataset.expanded !== expanded) btn.dataset.expanded = expanded;
+		const aria = folded ? `展开这条评论下的 ${count} 条回复` : "折叠这条评论下的楼中楼";
+		if (btn.getAttribute("aria-label") !== aria) btn.setAttribute("aria-label", aria);
+		if (btn.title !== aria) btn.title = aria;
+		const countAttr = String(count);
+		if (btn.dataset.hbFoldCount !== countAttr) btn.dataset.hbFoldCount = countAttr;
+	}
+	function decorateFold(mainRow) {
+		if (!mainRow.isConnected) return;
+		const key = mainRowKey(mainRow);
+		const thread = mainRow.querySelector(THREAD_SELECTOR);
+		const count = thread ? thread.querySelectorAll(CHILD_ROW_SELECTOR).length : 0;
+		const box = mainRow.querySelector(OPERATION_BOX_SELECTOR);
+		const existing = box ? box.querySelector(`:scope > .${CARD_FOLD_CLASS}`) : null;
+		const folded = count > 0 && key !== "" && foldedRoots.has(key);
+		if (thread) thread.classList.toggle(FOLDED_CLASS, folded);
+		if (!box || count === 0 || key === "") {
+			existing?.remove();
+			return;
+		}
+		const btn = existing ?? createFoldButton(mainRow);
+		if (!existing) box.appendChild(btn);
+		syncFoldButton(btn, count, folded);
+	}
+	function decorateThreads() {
+		for (const mainRow of document.querySelectorAll(MAIN_ROW_SELECTOR)) decorateFold(mainRow);
+	}
+	var retryRound = 0;
+	function scheduleRetry() {
+		if (retryTimer !== null) return;
+		if (retryRound >= RETRY_DELAYS.length) {
+			pendingMeta.clear();
+			return;
+		}
+		const delay = RETRY_DELAYS[retryRound];
+		retryRound += 1;
+		retryTimer = window.setTimeout(() => {
+			retryTimer = null;
+			if (!applied) return;
+			const rows = [...pendingMeta];
+			if (rows.length === 0) return;
+			for (const row of rows) {
+				if (!row.isConnected) {
+					pendingMeta.delete(row);
+					continue;
+				}
+				if (getThreadMeta(row.dataset.commentId ?? "")) {
+					pendingMeta.delete(row);
+					decorateRow(row);
+				}
+			}
+			if (pendingMeta.size > 0) scheduleRetry();
+		}, delay);
+	}
+	function stopHeadProbe() {
+		headProbe?.disconnect();
+		headProbe = null;
+	}
+	function ensureStyle() {
+		if (styleAttached && document.getElementById(STYLE_ID)) return;
+		const head = document.head;
+		if (!head) {
+			if (headProbe) return;
+			headProbe = new MutationObserver(() => {
+				if (!document.head) return;
+				stopHeadProbe();
+				ensureStyle();
+			});
+			headProbe.observe(document, {
+				childList: true,
+				subtree: true
+			});
+			return;
+		}
+		if (document.getElementById(STYLE_ID)) {
+			styleAttached = true;
+			return;
+		}
+		const el = document.createElement("style");
+		el.id = STYLE_ID;
+		el.setAttribute(OWN_ATTR, "");
+		el.textContent = `${tokens_default}\n${comment_cards_default}`;
+		head.appendChild(el);
+		styleAttached = true;
+	}
+	function removeStyle() {
+		document.getElementById(STYLE_ID)?.remove();
+		styleAttached = false;
+		stopHeadProbe();
+	}
+	function ensureObserver() {
+		if (observer) return;
+		observer = new MutationObserver((records) => {
+			const touchedThreads = new Set();
+			for (const record of records) for (const node of record.addedNodes) {
+				if (node.nodeType !== 1) continue;
+				const el = node;
+				if (el.matches(CHILD_ROW_SELECTOR)) {
+					decorateRow(el);
+					const main = mainRowOf(el);
+					if (main) touchedThreads.add(main);
+				}
+				for (const row of el.querySelectorAll(CHILD_ROW_SELECTOR)) {
+					decorateRow(row);
+					const main = mainRowOf(row);
+					if (main) touchedThreads.add(main);
+				}
+				if (el.matches(MAIN_ROW_SELECTOR)) touchedThreads.add(el);
+				for (const main of el.querySelectorAll(MAIN_ROW_SELECTOR)) touchedThreads.add(main);
+			}
+			for (const main of touchedThreads) decorateFold(main);
+			if (pendingMeta.size > 0) scheduleRetry();
+		});
+		observer.observe(document.documentElement, {
+			childList: true,
+			subtree: true
+		});
+	}
+	function attach() {
+		if (applied) return;
+		applied = true;
+		decorateAll();
+		ensureObserver();
+	}
+	function detach() {
+		if (!applied) return;
+		applied = false;
+		observer?.disconnect();
+		observer = null;
+		if (retryTimer !== null) {
+			window.clearTimeout(retryTimer);
+			retryTimer = null;
+		}
+		if (flashTimer !== null) {
+			window.clearTimeout(flashTimer);
+			flashTimer = null;
+		}
+		retryRound = 0;
+		pendingMeta.clear();
+		for (const node of document.querySelectorAll(`.${AVATAR_CLASS}, .${REPLYTO_CLASS}, .${CARD_REPLY_CLASS}, .${CARD_FLOOR_CLASS}, .${CARD_FOLD_CLASS}`)) node.remove();
+		for (const row of document.querySelectorAll(`[${DONE_ATTR}]`)) {
+			row.removeAttribute(DONE_ATTR);
+			row.removeAttribute("data-hb-reply-kind");
+			row.classList.remove(CARD_CLASS);
+			row.classList.remove(FLASH_CLASS);
+			row.classList.remove("hb-tc-no-avatar");
+		}
+		for (const thread of document.querySelectorAll(`.${FOLDED_CLASS}`)) thread.classList.remove(FOLDED_CLASS);
+		foldedRoots.clear();
+	}
+	function onCommentCardsChange(fn) {
+		listeners.add(fn);
+		return () => {
+			listeners.delete(fn);
+		};
+	}
+	function isCommentCardsEnabled() {
+		try {
+			return localStorage.getItem(STORAGE_KEY) !== "0";
+		} catch {
+			return true;
+		}
+	}
+	function applyCommentCards(enabled) {
+		const root = document.documentElement;
+		if (!root) return;
+		if (enabled) {
+			root.classList.add(ROOT_CLASS);
+			ensureStyle();
+			attach();
+		} else {
+			root.classList.remove(ROOT_CLASS);
+			detach();
+			removeStyle();
+		}
+		try {
+			localStorage.setItem(STORAGE_KEY, enabled ? "1" : "0");
+		} catch {}
+		for (const fn of [...listeners]) try {
+			fn(enabled);
+		} catch (err) {
+			console.error("[hb-comment-cards] listener failed", err);
+		}
+	}
+	function initCommentCards() {
+		const enabled = isCommentCardsEnabled();
+		applyCommentCards(enabled);
+		return enabled;
+	}
+	function exposeCommentCardsHooks() {
+		const w = window;
+		w.__hbSetCommentCards = (on) => applyCommentCards(on);
+		w.__hbIsCommentCards = () => isCommentCardsEnabled();
+	}
+	var ui_default = ":host{all:initial;--hbd-face:#14191e;--hbd-face-hover:#1a1f25;--hbd-ink:#dce3ea;--hbd-edge:#ffffff21;--hbd-edge-hover:#ffffff38;--hbd-ring-light:#f4f7fa;--hbd-ring-dark:#0b0f13;--hbd-contact:0 1px 2px #00000047;--hbd-size:44px;--hbd-gap:12px;--hbd-inset:16px;--hbd-bottom:24px;--hbd-icon-size:20px;--hbd-icon-stroke:1.75;--hbd-ease:cubic-bezier(.2, 0, 0, 1);--hbd-t-hover:.16s;--hbd-t-press:90ms;--hbd-t-icon:.16s}.hbd-btn{right:var(--hbd-inset);z-index:2147483646;box-sizing:border-box;width:var(--hbd-size);height:var(--hbd-size);background:var(--hbd-face);color:var(--hbd-ink);cursor:pointer;pointer-events:auto;-webkit-tap-highlight-color:transparent;box-shadow:0 0 0 1px var(--hbd-edge), var(--hbd-contact);transition:background-color var(--hbd-t-hover) var(--hbd-ease), box-shadow var(--hbd-t-hover) var(--hbd-ease), transform var(--hbd-t-press) var(--hbd-ease);border:0;border-radius:50%;justify-content:center;align-items:center;padding:0;display:flex;position:fixed}#heybox-dark-toggle{bottom:var(--hbd-bottom)}#heybox-declutter-toggle{bottom:calc(var(--hbd-bottom) + var(--hbd-size) + var(--hbd-gap))}#heybox-reply-toggle{bottom:calc(var(--hbd-bottom) + 2 * (var(--hbd-size) + var(--hbd-gap)))}#heybox-cards-toggle{bottom:calc(var(--hbd-bottom) + 3 * (var(--hbd-size) + var(--hbd-gap)))}.hbd-btn:hover{background:var(--hbd-face-hover);box-shadow:0 0 0 1px var(--hbd-edge-hover), var(--hbd-contact)}.hbd-btn:active{box-shadow:0 0 0 1px var(--hbd-edge), var(--hbd-contact);transform:translateY(1px)}.hbd-btn:focus-visible{box-shadow:0 0 0 2px var(--hbd-ring-light), 0 0 0 4px var(--hbd-ring-dark), var(--hbd-contact);outline:none}.hbd-icon{justify-content:center;align-items:center;display:flex}.hbd-btn svg{width:var(--hbd-icon-size);height:var(--hbd-icon-size);fill:none;stroke:currentColor;stroke-width:var(--hbd-icon-stroke);stroke-linecap:round;stroke-linejoin:round;animation:hbd-icon-in var(--hbd-t-icon) var(--hbd-ease) both;display:block}@keyframes hbd-icon-in{0%{opacity:0}to{opacity:1}}@media (prefers-reduced-motion:reduce){.hbd-btn{transition:none}.hbd-btn svg{animation:none}}@media (forced-colors:active){.hbd-btn{color:buttontext;box-shadow:none;background:buttonface;border:1px solid buttontext}.hbd-btn:focus-visible{outline-offset:2px;outline:2px solid highlight}}";
 	var HOST_ID = "heybox-dark-mode-root";
 	var DARK_BUTTON_ID = "heybox-dark-toggle";
 	var DECLUTTER_BUTTON_ID = "heybox-declutter-toggle";
+	var REPLY_BUTTON_ID = "heybox-reply-toggle";
+	var CARDS_BUTTON_ID = "heybox-cards-toggle";
 	var SVG_NS = "http://www.w3.org/2000/svg";
 	var ICON_MOON = ["M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z"];
 	var ICON_SUN = ["M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"];
@@ -1097,17 +2213,30 @@ html.${ROOT_CLASS} {
 		"M6 9.5h12",
 		"M6 14h8"
 	];
-	function buildIcon(paths, withCircle = false) {
+	var ICON_REPLY = ["M4 5.5h16a1.5 1.5 0 0 1 1.5 1.5v8A1.5 1.5 0 0 1 20 16.5H12l-4.2 3.2a.5.5 0 0 1-.8-.4V16.5H4A1.5 1.5 0 0 1 2.5 15V7A1.5 1.5 0 0 1 4 5.5Z"];
+	var ICON_REPLY_OFF = ["M4 5.5h16a1.5 1.5 0 0 1 1.5 1.5v8A1.5 1.5 0 0 1 20 16.5H12l-4.2 3.2a.5.5 0 0 1-.8-.4V16.5H4A1.5 1.5 0 0 1 2.5 15V7A1.5 1.5 0 0 1 4 5.5Z", "M3.8 20.2 20.2 3.8"];
+	var ICON_CARDS = [
+		"M3.25 5.25h17.5a1 1 0 0 1 1 1v11.5a1 1 0 0 1-1 1H3.25a1 1 0 0 1-1-1V6.25a1 1 0 0 1 1-1Z",
+		"M7.7 10.5h11.4",
+		"M7.7 13.7h7.4"
+	];
+	var ICON_CARDS_OFF = [...ICON_CARDS, "M3.8 20.2 20.2 3.8"];
+	var CARDS_AVATAR_DOT = {
+		cx: 6.4,
+		cy: 10.6,
+		r: 1.7
+	};
+	function buildIcon(paths, circle) {
 		const svg = document.createElementNS(SVG_NS, "svg");
 		svg.setAttribute("viewBox", "0 0 24 24");
 		svg.setAttribute("aria-hidden", "true");
 		svg.setAttribute("focusable", "false");
-		if (withCircle) {
-			const circle = document.createElementNS(SVG_NS, "circle");
-			circle.setAttribute("cx", "12");
-			circle.setAttribute("cy", "12");
-			circle.setAttribute("r", "4");
-			svg.appendChild(circle);
+		if (circle) {
+			const dot = document.createElementNS(SVG_NS, "circle");
+			dot.setAttribute("cx", String(circle.cx));
+			dot.setAttribute("cy", String(circle.cy));
+			dot.setAttribute("r", String(circle.r));
+			svg.appendChild(dot);
 		}
 		for (const d of paths) {
 			const path = document.createElementNS(SVG_NS, "path");
@@ -1130,17 +2259,28 @@ html.${ROOT_CLASS} {
 			iconSlot
 		};
 	}
-	function paint(control, paths, withCircle, label, pressed) {
+	function paint(control, paths, circle, label, pressed) {
 		control.button.title = label;
 		control.button.setAttribute("aria-label", label);
 		control.button.setAttribute("aria-pressed", pressed ? "true" : "false");
-		control.iconSlot.replaceChildren(buildIcon(paths, withCircle));
+		control.iconSlot.replaceChildren(buildIcon(paths, circle));
 	}
+	var SUN_CORE = {
+		cx: 12,
+		cy: 12,
+		r: 4
+	};
 	function paintDark(control, dark) {
-		paint(control, dark ? ICON_SUN : ICON_MOON, dark, dark ? "切换到浅色模式" : "切换到深色模式", dark);
+		paint(control, dark ? ICON_SUN : ICON_MOON, dark ? SUN_CORE : void 0, dark ? "切换到浅色模式" : "切换到深色模式", dark);
 	}
 	function paintDeclutter(control, on) {
-		paint(control, on ? ICON_PANEL_FULL : ICON_PANEL_WITH_RAIL, false, on ? "关闭精简模式（恢复首页入口与右侧栏）" : "开启精简模式（隐藏首页入口与右侧栏）", on);
+		paint(control, on ? ICON_PANEL_FULL : ICON_PANEL_WITH_RAIL, void 0, on ? "关闭精简模式（恢复首页入口与右侧栏）" : "开启精简模式（隐藏首页入口与右侧栏）", on);
+	}
+	function paintReplyBtn(control, on) {
+		paint(control, on ? ICON_REPLY : ICON_REPLY_OFF, void 0, on ? "关闭评论免打扰（恢复点整行弹回复框）" : "点正文不再弹回复框（改用行内「回复」按钮）", on);
+	}
+	function paintCards(control, on) {
+		paint(control, on ? ICON_CARDS : ICON_CARDS_OFF, on ? CARDS_AVATAR_DOT : void 0, on ? "恢复楼中楼原本的一行式显示" : "把楼中楼每条回复显示成卡片", on);
 	}
 	function mountControls() {
 		if (document.getElementById(HOST_ID)) return;
@@ -1153,19 +2293,35 @@ html.${ROOT_CLASS} {
 		shadow.appendChild(style);
 		const darkControl = createControl(shadow, DARK_BUTTON_ID);
 		const declutterControl = createControl(shadow, DECLUTTER_BUTTON_ID);
+		const replyControl = createControl(shadow, REPLY_BUTTON_ID);
+		const cardsControl = createControl(shadow, CARDS_BUTTON_ID);
 		darkControl.button.addEventListener("click", () => applyDark(!isDarkEnabled()));
 		declutterControl.button.addEventListener("click", () => applyDeclutter(!isDeclutterEnabled()));
+		replyControl.button.addEventListener("click", () => applyReplyBtn(!isReplyBtnEnabled()));
+		cardsControl.button.addEventListener("click", () => applyCommentCards(!isCommentCardsEnabled()));
 		onDarkChange((dark) => paintDark(darkControl, dark));
 		onDeclutterChange((on) => paintDeclutter(declutterControl, on));
+		onReplyBtnChange((on) => paintReplyBtn(replyControl, on));
+		onCommentCardsChange((on) => paintCards(cardsControl, on));
 		paintDark(darkControl, isDarkEnabled());
 		paintDeclutter(declutterControl, isDeclutterEnabled());
+		paintReplyBtn(replyControl, isReplyBtnEnabled());
+		paintCards(cardsControl, isCommentCardsEnabled());
 		document.documentElement.appendChild(host);
 	}
+	attachApiCache();
 	whenDocumentElementReady(() => {
 		initDarkMode();
 		initDeclutter();
+		initCopy();
+		initReplyBtn();
+		initCommentCards();
 		exposeEngineHooks();
 		exposeDeclutterHooks();
+		exposeCopyHooks();
+		exposeReplyBtnHooks();
+		exposeCommentCardsHooks();
+		exposeApiCacheHooks();
 		mountControls();
 	});
 })();

@@ -1,7 +1,3 @@
-/**
- * 打印 JS 分片中关键词的上下文（用于逆向站点行为）。
- *   node research/js-context.mjs <文件名或路径> <关键词> [窗口=600] [最多命中=5]
- */
 import fs from 'node:fs';
 import path from 'node:path';
 

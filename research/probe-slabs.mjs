@@ -1,23 +1,13 @@
-/**
- * 定位大块「可疑底色」。
- *
- * 不猜坐标：先取关键容器（信息流卡片、右栏）的真实盒模型，
- * 算出租隙中点，再在该点取样；同时枚举全页所有「面积大且不透明」的背景，
- * 按颜色分组，找出不属于「画布 / 卡片」两个预期色调的大色块。
- *
- *   node research/probe-slabs.mjs
- */
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import fs from 'node:fs';
+import { resolveChromePath } from '../scripts/lib/chromium.mjs';
 
 const require = createRequire(import.meta.url);
 const cliRoot = path.join(process.env.APPDATA || '', 'npm/node_modules/@playwright/cli');
 const { chromium } = require(path.join(cliRoot, 'node_modules/playwright'));
 
-const exe =
-  process.env.CHROME_PATH ||
-  path.join(process.env.LOCALAPPDATA || '', 'ms-playwright/chromium-1234/chrome-win64/chrome.exe');
+const exe = resolveChromePath();
 
 const userscript = fs.readFileSync(path.resolve('dist/xiaoheihe-dark-mode.user.js'), 'utf8');
 const code = userscript.replace(/^\/\/ ==UserScript==[\s\S]*?\/\/ ==\/UserScript==\s*/, '');
@@ -58,7 +48,6 @@ const SURVEY = () => {
     ? { x: gapPoint, y: Math.max(200, Math.min(400, window.innerHeight - 200)), chain: chain(document.elementFromPoint(gapPoint, 300)) }
     : null;
 
-  // 全页大块不透明背景
   const slabs = new Map();
   for (const el of document.querySelectorAll('body *')) {
     const cs = getComputedStyle(el);
@@ -87,7 +76,6 @@ const SURVEY = () => {
   };
 };
 
-/** 搜索区专项：列出搜索栏及其祖先/兄弟的背景与盒模型 */
 const SEARCH_SURVEY = () => {
   const desc = (el) => {
     if (!el || el.nodeType !== 1) return 'none';
@@ -109,7 +97,6 @@ const SEARCH_SURVEY = () => {
   const input = document.querySelector('.el-input__wrapper') || document.querySelector('input');
   const out = { input: info(input) };
   if (input) {
-    // 祖先链（搜索区容器往往在这里）
     const anc = [];
     let n = input.parentElement;
     let i = 0;
@@ -118,7 +105,6 @@ const SEARCH_SURVEY = () => {
       n = n.parentElement;
     }
     out.ancestors = anc;
-    // 输入框左右两侧的兄弟/邻域取样（“搜索栏外部”的那块）
     const r = input.getBoundingClientRect();
     const y = Math.round(r.top + r.height / 2);
     const probes = [
@@ -156,7 +142,6 @@ for (const width of WIDTHS) {
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(1500);
 
-  // 先看浅色下的搜索区（作为对照）
   await page.evaluate(() => window.__hbSetDark(false));
   await page.waitForTimeout(1200);
   const searchLight = await page.evaluate(SEARCH_SURVEY);
@@ -184,7 +169,6 @@ for (const width of WIDTHS) {
   (searchDark.neighbours || []).forEach((nb) => console.log(`    nbr:   ${nb.label} @${nb.at} -> ${nb.hit} bg=${nb.bg}`));
 
   await page.screenshot({ path: path.resolve(`output/probe/slab-${width}-dark.png`) });
-  // 搜索区局部放大图，便于肉眼确认
   const box = searchDark.input;
   if (box) {
     const m = box.box.match(/(\d+)x(\d+) @(-?\d+),(-?\d+)/);

@@ -1,30 +1,21 @@
-/**
- * 定位「奇怪灰色色块」：在指定坐标上取元素链，对比浅色/深色两态的背景色，
- * 找出被映射成中间调的大块表面，以及二维码区域的背景构成。
- *
- *   node research/probe-blocks.mjs
- */
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import fs from 'node:fs';
+import { resolveChromePath } from '../scripts/lib/chromium.mjs';
 
 const require = createRequire(import.meta.url);
 const cliRoot = path.join(process.env.APPDATA || '', 'npm/node_modules/@playwright/cli');
 const { chromium } = require(path.join(cliRoot, 'node_modules/playwright'));
 
-const exe =
-  process.env.CHROME_PATH ||
-  path.join(process.env.LOCALAPPDATA || '', 'ms-playwright/chromium-1234/chrome-win64/chrome.exe');
+const exe = resolveChromePath();
 
 const userscript = fs.readFileSync(path.resolve('dist/xiaoheihe-dark-mode.user.js'), 'utf8');
 const code = userscript.replace(/^\/\/ ==UserScript==[\s\S]*?\/\/ ==\/UserScript==\s*/, '');
 
-// 用户截图 3060x1369 @dpr2 -> CSS 约 1530x685；再补一个更宽的
 const WIDTHS = [1530, 1920];
 
 const browser = await chromium.launch({ headless: true, executablePath: exe });
 
-/** 在页面上按坐标取链条 */
 const PROBE = (points) => {
   const desc = (el) => {
     if (!el || el.nodeType !== 1) return null;
@@ -76,15 +67,14 @@ for (const width of WIDTHS) {
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(1500);
 
-  // 采样点按宽度等比缩放（原截图基于 1530 宽）
   const sx = width / 1530;
   const points = [
-    [110 * sx, 300],   // 左侧留白
-    [500 * sx, 300],   // 内容列
-    [900 * sx, 300],   // ← 用户截图里的灰色带
-    [1180 * sx, 300],  // 侧栏卡片
-    [1480 * sx, 460],  // 右侧留白
-    [860 * sx, 520],   // 二维码
+    [110 * sx, 300],
+    [500 * sx, 300],
+    [900 * sx, 300],
+    [1180 * sx, 300],
+    [1480 * sx, 460],
+    [860 * sx, 520],
   ];
 
   const light = await page.evaluate(PROBE, points);
@@ -102,7 +92,6 @@ for (const width of WIDTHS) {
     console.log('  深色:', JSON.stringify(dark[i].chain.slice(0, 4)));
   }
 
-  // 二维码专项
   const qr = await page.evaluate(() => {
     const out = [];
     for (const sel of ['.qr-section', '.qr-section img', '.app-link-item', 'canvas']) {

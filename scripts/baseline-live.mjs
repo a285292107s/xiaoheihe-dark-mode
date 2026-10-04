@@ -1,7 +1,3 @@
-/**
- * 基线：不注入任何脚本，量站点自身的长任务，用于对比脚本开销。
- * node scripts/baseline-live.mjs
- */
 import { createRequire } from 'node:module';
 import path from 'node:path';
 

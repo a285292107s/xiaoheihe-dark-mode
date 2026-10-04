@@ -6,12 +6,6 @@
   <meta name="theme-color" content="#fafbfc" id="meta-theme" />
   <title>小黑盒深色模式 · 效果预览</title>
   <style data-hb-own>
-    /* 预览壳自身样式：data-hb-own 让引擎在遍历 document.styleSheets 时整块跳过它，
-       否则预览条的深色配色会被当成站点内容再映射一遍。
-
-       视觉口径与 src/ui.css 的开关按钮一致：单色、1px 描边分层、不靠大投影。
-       条上的控件用 6px 圆角（贴合站点自己的 5px/8px 语言），
-       而浮在内容之上的那个开关是唯一的圆形 —— 形状差异本身就在表达「层级不同」。 */
     html, body { margin: 0; padding: 0; }
     #hb-bar {
       position: fixed;
@@ -28,7 +22,6 @@
       background: rgba(20, 24, 29, 0.94);
       color: #f0f2f5;
       backdrop-filter: blur(14px) saturate(140%);
-      /* 深色页面下条与本底几乎同色，靠这条 hairline 分界；浅色页面靠条自身的明度差 */
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
     #hb-bar .brand {
@@ -54,7 +47,6 @@
       border-color: transparent;
       font-weight: 600;
     }
-    /* 选中态是浅底，按压要压暗而不是再叠一层白 */
     #hb-bar button.on:hover { background: #ffffff; }
     #hb-bar button.on:active { background: #dde2e9; }
     #hb-bar button:focus-visible { outline: 2px solid rgba(244, 247, 250, 0.9); outline-offset: 2px; }
@@ -119,11 +111,8 @@
       const doc = new DOMParser().parseFromString(html, 'text/html');
       adoptStyles(doc);
       stage.innerHTML = doc.body.innerHTML;
-      // 换页只换 DOM，不换站点 CSS：引擎改的是规则而不是元素，
-      // 新增节点里的内联颜色由内联观察器处理，这里不需要做任何事。
     }
 
-    // 深色状态由脚本持有；脚本没加载时退回预览壳自己的类名与存储
     const ROOT_CLASS = 'hb-dark';
     const hasEngine = () => typeof window.__hbSetDark === 'function';
     const isDarkNow = () =>
@@ -143,10 +132,7 @@
       }
       const on = isDarkNow();
       stage.classList.toggle('is-dark', on);
-      // 文案本身就是动作名（点了会变成什么），所以不再叠 aria-pressed：
-      // 「名字在变 + 又说自己 pressed」会读成「浅色, 已按下」，语义打架。
       themeBtn.textContent = on ? '浅色' : '深色';
-      // 与引擎画布同色（src/dark-engine.ts 的 CANVAS），标签页配色要跟着一致
       metaTheme.setAttribute('content', on ? '#0e1116' : '#fafbfc');
     }
 
@@ -158,7 +144,6 @@
         current = btn.dataset.page;
         document.querySelectorAll('#hb-bar [data-page]').forEach((b) => {
           const on = b === btn;
-          // 选中态不只靠底色：同时给出 aria-pressed，读屏与键盘用户拿得到同一个信息
           b.classList.toggle('on', on);
           b.setAttribute('aria-pressed', on ? 'true' : 'false');
         });
@@ -166,7 +151,6 @@
       });
     }
 
-    // 深色已经由脚本在 document-start 应用过了，这里只把预览条同步到当前状态
     let startDark = false;
     try {
       startDark = typeof window.__hbIsDark === 'function'
@@ -181,7 +165,6 @@
     setTheme(startDark);
   </script>
 
-  <!-- 油猴脚本本体（与装到浏览器里的是同一个产物） -->
   <script src="dist/xiaoheihe-dark-mode.user.js"></script>
 </body>
 </html>

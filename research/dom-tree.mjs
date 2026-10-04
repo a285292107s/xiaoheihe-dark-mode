@@ -1,7 +1,3 @@
-/**
- * 从 fixture 中还原 DOM 骨架：输出带 class / 关键属性的树，用于理解页面结构。
- * node research/dom-tree.mjs [fixtures/home.html] [maxDepth] [maxChildrenPerNode]
- */
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -11,7 +7,6 @@ const maxKids = Number(process.argv[4] || 12);
 
 const html = fs.readFileSync(path.resolve(file), 'utf8');
 
-// 极简解析器：只关心标签 / class / id / data-v / 文本长度，跳过 script 内容
 const VOID = new Set([
   'area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr',
 ]);
@@ -48,7 +43,6 @@ function parse(src) {
     const parent = stack[stack.length - 1];
     parent.children.push(node);
     node.parent = parent;
-    // 记录文本长度（粗略）
     if (tag === 'script' || tag === 'style') {
       const close = src.toLowerCase().indexOf(`</${tag}`, gt);
       i = close < 0 ? src.length : src.indexOf('>', close) + 1;
@@ -93,7 +87,6 @@ walk(tree, 0);
 console.log(lines.join('\n'));
 console.log(`\n--- shown nodes: ${nodes} | maxDepth=${maxDepth} ---`);
 
-// 统计
 const tagCount = new Map();
 const classCount = new Map();
 (function count(n) {

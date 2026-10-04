@@ -1,8 +1,3 @@
-/**
- * 令牌角色审计：统计每个令牌被引用多少次、被哪些「角色属性」使用。
- * 这决定深色模式下能否安全反转该令牌。
- * node research/token-usage.mjs
- */
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -13,14 +8,12 @@ const blob = fs
   .map((f) => fs.readFileSync(path.join(dir, f), 'utf8'))
   .join('\n');
 
-// 把 blob 切成 { selector, body } 规则
 const rules = [];
 for (const m of blob.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
   rules.push({ sel: m[1].trim(), body: m[2] });
 }
 console.log(`规则数: ${rules.length}`);
 
-// 属性名归一：background-color / background / color / border-color / box-shadow ...
 const ROLE = (prop) => {
   const p = prop.toLowerCase();
   if (p === 'color' || p.endsWith('-color') && !p.startsWith('background')) {
@@ -38,7 +31,7 @@ const ROLE = (prop) => {
   return 'OTHER:' + p;
 };
 
-const stats = new Map(); // token -> { total, roles: Map, sels: [] }
+const stats = new Map();
 function bump(token, role, sel) {
   if (!stats.has(token)) stats.set(token, { total: 0, roles: new Map(), sels: [] });
   const s = stats.get(token);
@@ -93,7 +86,6 @@ for (const k of KEY) {
   for (const sel of s.sels) console.log(`   ${sel}`);
 }
 
-// 原子层 vs 语义层的总引用量
 let atom = 0, sem = 0, other = 0;
 for (const [k, s] of stats) {
   if (/^--hb-general-/.test(k)) sem += s.total;
@@ -102,7 +94,6 @@ for (const [k, s] of stats) {
 }
 console.log(`\n=== 引用总量 ===\n  语义层 --hb-general-*: ${sem}\n  原子层 --hb-*: ${atom}\n  其他(el-*/nav-*等): ${other}`);
 
-// 输出完整 json 便于后续生成覆盖层
 fs.writeFileSync(
   path.resolve('research/token-usage.json'),
   JSON.stringify(

@@ -1,21 +1,13 @@
-/**
- * 策略验证探测：
- *  1) Element Plus 令牌层是否活跃（override --el-* 为红色，看是否有元素变红）
- *  2) 导航 logo / 图标的构成（img？svg use？currentColor？）—— 决定需不需要 invert 兜底
- *  3) 伪元素与渐变的使用规模 —— 决定 CSS 文本变换必须覆盖哪些语法
- * node research/probe-strategy.mjs
- */
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import fs from 'node:fs';
+import { resolveChromePath } from '../scripts/lib/chromium.mjs';
 
 const require = createRequire(import.meta.url);
 const cliRoot = path.join(process.env.APPDATA || '', 'npm/node_modules/@playwright/cli');
 const { chromium } = require(path.join(cliRoot, 'node_modules/playwright'));
 
-const exe =
-  process.env.CHROME_PATH ||
-  path.join(process.env.LOCALAPPDATA || '', 'ms-playwright/chromium-1234/chrome-win64/chrome.exe');
+const exe = resolveChromePath();
 
 const browser = await chromium.launch({ headless: true, executablePath: exe });
 
@@ -101,7 +93,6 @@ console.log('\n########## 结论 ##########');
 console.log(`红色元素: 基线 ${base.red} -> 注入 ${inj.red}`);
 console.log('判定:', inj.red > base.red + 5 ? 'Element Plus 令牌层活跃 ✅' : 'Element Plus 令牌层基本不活跃 ❌');
 
-// ---- 静态：导航 logo 与图标构成 / 伪元素 / 渐变 规模 ----
 const page2 = await (await browser.newContext({
   viewport: { width: 1440, height: 900 }, locale: 'zh-CN',
   userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
@@ -123,7 +114,6 @@ const anatomy = await page2.evaluate(() => {
     };
   }) : null;
 
-  // 伪元素/渐变规模（从 CSSOM 统计）
   let pseudoRules = 0, gradientRules = 0, urlBgRules = 0, shadowRules = 0, totalRules = 0;
   const visit = (rules) => {
     for (const r of rules) {

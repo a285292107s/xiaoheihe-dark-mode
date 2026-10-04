@@ -1,20 +1,13 @@
-/**
- * 精确诊断：暗色模式下哪些元素出现「配对反转失效」。
- *  - 文本亮、但最近不透明祖先背景也亮  -> 文字看不清（必须修）
- *  - 表面很深、却位于更深的页面上      -> 反转填充（CTA）失效（可选修）
- * node research/probe-cta.mjs
- */
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import fs from 'node:fs';
+import { resolveChromePath } from '../scripts/lib/chromium.mjs';
 
 const require = createRequire(import.meta.url);
 const cliRoot = path.join(process.env.APPDATA || '', 'npm/node_modules/@playwright/cli');
 const { chromium } = require(path.join(cliRoot, 'node_modules/playwright'));
 
-const exe =
-  process.env.CHROME_PATH ||
-  path.join(process.env.LOCALAPPDATA || '', 'ms-playwright/chromium-1234/chrome-win64/chrome.exe');
+const exe = resolveChromePath();
 
 const engine = fs.readFileSync(path.resolve('research/hb-dark-engine.js'), 'utf8');
 
@@ -52,7 +45,6 @@ const report = await page.evaluate(() => {
     }
     return out.join(' > ');
   };
-  // 找最近的不透明背景
   const bgBehind = (el) => {
     let n = el.parentElement;
     while (n && n !== document.documentElement) {
@@ -64,15 +56,14 @@ const report = await page.evaluate(() => {
     return b && b.a > 0.5 ? { c: b, el: document.body } : { c: { r: 14, g: 17, b: 22, a: 1 }, el: document.body };
   };
 
-  const badText = [];     // 文字与背景对比不足
-  const invertedFill = []; // 深色实心块（CTA）
+  const badText = [];
+  const invertedFill = [];
   let scanned = 0;
 
   for (const el of document.querySelectorAll('body *')) {
     const r = el.getBoundingClientRect();
     if (r.width < 24 || r.height < 12) continue;
     const cs = getComputedStyle(el);
-    // 只看自身直接有文本的叶子
     const hasOwnText = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim().length > 0);
     const own = parse(cs.backgroundColor);
     const ownOpaque = own && own.a > 0.5;
@@ -86,7 +77,6 @@ const report = await page.evaluate(() => {
     const fg = parse(cs.color);
     if (!fg || fg.a < 0.3) continue;
     const behindRaw = ownOpaque ? own : bgBehind(el).c;
-    // 半透明自身背景：与背后做近似混合
     let behind = behindRaw;
     if (own && own.a > 0.05 && own.a <= 0.5) {
       behind = {
@@ -107,7 +97,6 @@ const report = await page.evaluate(() => {
     }
   }
 
-  // CTA 专项
   const cta = [];
   for (const sel of ['.login-btn', '.publish-btn', '.view-btn', '.hb-level-tag__inner']) {
     for (const el of document.querySelectorAll(sel)) {

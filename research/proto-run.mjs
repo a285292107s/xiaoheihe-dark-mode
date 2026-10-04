@@ -1,18 +1,13 @@
-/**
- * 原型验证：把 hb-dark-engine.js 注入真实页面，量化并出图。
- * node research/proto-run.mjs
- */
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import fs from 'node:fs';
+import { resolveChromePath } from '../scripts/lib/chromium.mjs';
 
 const require = createRequire(import.meta.url);
 const cliRoot = path.join(process.env.APPDATA || '', 'npm/node_modules/@playwright/cli');
 const { chromium } = require(path.join(cliRoot, 'node_modules/playwright'));
 
-const exe =
-  process.env.CHROME_PATH ||
-  path.join(process.env.LOCALAPPDATA || '', 'ms-playwright/chromium-1234/chrome-win64/chrome.exe');
+const exe = resolveChromePath();
 
 const engine = fs.readFileSync(path.resolve('research/hb-dark-engine.js'), 'utf8');
 const outDir = path.resolve('output/proto');

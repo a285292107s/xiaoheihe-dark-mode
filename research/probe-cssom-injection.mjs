@@ -1,24 +1,12 @@
-/**
- * 探针：站点是否在运行时用 CSSOM API 改规则（`insertRule` / `deleteRule` /
- * `replaceSync` / `replace`）。
- *
- *   node research/probe-cssom-injection.mjs
- *
- * 这类注入不产生 `<style>` / `<link>` 节点变更，引擎的 head 观察器与内联观察器
- * 原理上都看不见 —— 它只能靠里程碑、防抖兜底或回前台对账补上。
- * 实测结论（2026-09）：首页与换路由到详情页后**都是 0 次**，
- * 所以这是边界而非现状；回前台对账不是为它加的，但顺手能兜住（见 FINDINGS 第十四节）。
- */
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import fs from 'node:fs';
+import { resolveChromePath } from '../scripts/lib/chromium.mjs';
 
 const require = createRequire(import.meta.url);
 const cliRoot = path.join(process.env.APPDATA || '', 'npm/node_modules/@playwright/cli');
 const { chromium } = require(path.join(cliRoot, 'node_modules/playwright'));
-const exe =
-  process.env.CHROME_PATH ||
-  path.join(process.env.LOCALAPPDATA || '', 'ms-playwright/chromium-1234/chrome-win64/chrome.exe');
+const exe = resolveChromePath();
 
 const userscript = fs.readFileSync(path.resolve('dist/xiaoheihe-dark-mode.user.js'), 'utf8');
 const code = userscript.replace(/^\/\/ ==UserScript==[\s\S]*?\/\/ ==\/UserScript==\s*/, '');

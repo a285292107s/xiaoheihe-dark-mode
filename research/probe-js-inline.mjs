@@ -1,21 +1,13 @@
-/**
- * 验证：JS 是否消费 CSS 令牌？
- * 做法：在 document-start 把令牌改成刺眼的红色，看渲染后的内联样式/计算样式是否变红。
- *   - 若变红 => 令牌层可用，且 JS 在运行时读取 CSS 变量
- *   - 若不变 => 令牌在 JS 里是硬编码的，覆盖 CSS 变量无效（必须走 CSS 文本变换）
- * node research/probe-js-inline.mjs
- */
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import fs from 'node:fs';
+import { resolveChromePath } from '../scripts/lib/chromium.mjs';
 
 const require = createRequire(import.meta.url);
 const cliRoot = path.join(process.env.APPDATA || '', 'npm/node_modules/@playwright/cli');
 const { chromium } = require(path.join(cliRoot, 'node_modules/playwright'));
 
-const exe =
-  process.env.CHROME_PATH ||
-  path.join(process.env.LOCALAPPDATA || '', 'ms-playwright/chromium-1234/chrome-win64/chrome.exe');
+const exe = resolveChromePath();
 
 const browser = await chromium.launch({ headless: true, executablePath: exe });
 
@@ -54,7 +46,6 @@ async function run(label, injectTokens) {
     timeout: 90000,
   });
   await page.waitForTimeout(7000);
-  // 滚动以触发更多列表项渲染
   await page.evaluate(async () => {
     for (let i = 0; i < 5; i++) { window.scrollBy(0, 700); await new Promise((r) => setTimeout(r, 400)); }
     window.scrollTo(0, 0);
@@ -78,7 +69,6 @@ async function run(label, injectTokens) {
         richNodeColors.add(getComputedStyle(el).color);
       }
     }
-    // 计算样式里有多少元素真的变成红色
     let computedRed = 0;
     for (const el of document.querySelectorAll('body *')) {
       const cs = getComputedStyle(el);

@@ -1,0 +1,53 @@
+
+html.hb-comment-cards [data-hb-tc],
+html.hb-comment-cards .hb-tc__fold,
+html.hb-reply-btn .hb-reply {
+  --hb-ui-hue: 210;
+
+  --hb-ui-font-meta: 10px;
+  --hb-ui-font-label: 13px;
+  --hb-ui-font-title: 14px;
+  --hb-ui-size-control: 24px;
+  --hb-ui-radius-card: 5px;
+  --hb-ui-radius-control: 5px;
+  --hb-ui-radius-pill: 999px;
+
+  --hb-ui-pad-x: 12px;
+  --hb-ui-pad-y: 10px;
+  --hb-ui-avatar-size: 34px;
+  --hb-ui-avatar-gap: 10px;
+  --hb-ui-line-1: 20px;
+  --hb-ui-line-2: 14px;
+  --hb-ui-gap-line: 1px;
+  --hb-ui-gap-block: 10px;
+
+  --hb-ui-surface: #ffffff;
+  --hb-ui-ink: #14191e;
+  --hb-ui-ink-muted: #4b5359;
+  --hb-ui-ink-soft: #697077;
+  --hb-ui-accent: #3ea3e3;
+  --hb-ui-accent-strong: #1a6da6;
+  --hb-ui-accent-wash: rgba(62, 163, 227, 0.1);
+  --hb-ui-edge-control: rgba(20, 25, 30, 0.28);
+  --hb-ui-edge-control-hover: rgba(26, 109, 166, 0.55);
+  --hb-ui-avatar-tile: hsl(var(--hb-ui-hue) 34% 90%);
+  --hb-ui-avatar-ink: hsl(var(--hb-ui-hue) 45% 26%);
+  --hb-ui-ring-light: #f4f7fa;
+  --hb-ui-ring-dark: #0b0f13;
+}
+
+html.hb-dark.hb-comment-cards [data-hb-tc],
+html.hb-dark.hb-comment-cards .hb-tc__fold,
+html.hb-dark.hb-reply-btn .hb-reply {
+  --hb-ui-surface: #2e353d;
+  --hb-ui-ink: #dce3ea;
+  --hb-ui-ink-muted: #b6bec7;
+  --hb-ui-ink-soft: #9aa3ac;
+  --hb-ui-accent: #62a3e3;
+  --hb-ui-accent-strong: #8ec7f2;
+  --hb-ui-accent-wash: rgba(98, 163, 227, 0.16);
+  --hb-ui-edge-control: rgba(255, 255, 255, 0.28);
+  --hb-ui-edge-control-hover: rgba(142, 199, 242, 0.6);
+  --hb-ui-avatar-tile: hsl(var(--hb-ui-hue) 26% 30%);
+  --hb-ui-avatar-ink: hsl(var(--hb-ui-hue) 30% 88%);
+}

@@ -1,22 +1,13 @@
-/**
- * 用 fixtures/detail-full.html 的真实结构定位「那块 rgb(34,40,46) 的板」是哪个元素。
- *
- *   node research/probe-fixture-slab.mjs
- *
- * 思路：fixture 是旧引擎抓的（内联样式带 data-hb-dark-*），先把这些内联样式剥掉，
- * 让站点的浅色 CSS 重新生效，然后枚举评论区内的大块元素，看谁占住了整层楼。
- */
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import fs from 'node:fs';
+import { resolveChromePath } from '../scripts/lib/chromium.mjs';
 
 const require = createRequire(import.meta.url);
 const cliRoot = path.join(process.env.APPDATA || '', 'npm/node_modules/@playwright/cli');
 const { chromium } = require(path.join(cliRoot, 'node_modules/playwright'));
 
-const exe =
-  process.env.CHROME_PATH ||
-  path.join(process.env.LOCALAPPDATA || '', 'ms-playwright/chromium-1234/chrome-win64/chrome.exe');
+const exe = resolveChromePath();
 
 const html = fs.readFileSync(path.resolve('fixtures/detail-full.html'), 'utf8');
 
@@ -32,7 +23,6 @@ await page.setContent(html, { waitUntil: 'load', timeout: 90000 });
 await page.waitForTimeout(4000);
 
 const report = await page.evaluate(() => {
-  // 1) 剥掉旧引擎的痕迹，恢复站点原本的浅色样式
   document.documentElement.classList.remove('heybox-dark', 'dark');
   document.documentElement.removeAttribute('style');
   let stripped = 0;
@@ -49,7 +39,6 @@ const report = await page.evaluate(() => {
     return el.tagName.toLowerCase() + (cls ? '.' + cls : '');
   };
 
-  // 需要关注的「可能盖住整层楼」的候选选择器
   const CANDIDATES = [
     '.hb-cpt__image--default',
     '.hb-cpt__image',
@@ -65,14 +54,12 @@ const report = await page.evaluate(() => {
 
   const out = { stripped, commentItems: [], bigBlocks: [], candidateBoxes: {} };
 
-  // 评论项基本信息
   for (const el of document.querySelectorAll('.link-comment__comment-item')) {
     const r = el.getBoundingClientRect();
     out.commentItems.push({ cls: desc(el), box: `${Math.round(r.width)}x${Math.round(r.height)}` });
     if (out.commentItems.length >= 5) break;
   }
 
-  // 候选选择器实际命中情况（含尺寸与背景）
   for (const sel of CANDIDATES) {
     const list = [...document.querySelectorAll(sel)].slice(0, 6).map((el) => {
       const r = el.getBoundingClientRect();
@@ -86,7 +73,6 @@ const report = await page.evaluate(() => {
     if (list.length) out.candidateBoxes[sel] = list;
   }
 
-  // 评论区内所有「面积够大且背景不透明」的元素
   const root = document.querySelector('.link-comment') || document.body;
   for (const el of root.querySelectorAll('*')) {
     const r = el.getBoundingClientRect();

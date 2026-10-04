@@ -1,42 +1,19 @@
-/**
- * 回归：整屏底色层「第 1 轮构建正确、第 2 轮起翻车」。
- *
- *   node research/repro-canvas-flip.mjs
- *
- * 离线、不联网：用 research/css/ 里站点真实的两个 CSS 分片渲染
- * `#page-bbs-community` 的固定色带与信息流分隔条，注入 dist 产物，比较两种状态：
- *
- *   fresh    —— 关掉再打开（首轮构建：站点声明刚从还原状态读出来）
- *   rebuilt  —— 强制重建（第二轮构建）
- *
- * 四层都必须等于画布色 `rgb(14,17,22)`，且两种状态逐条相等。
- *
- * 根因（FINDINGS 第八节的回归）：`walk()` 登记「页面画布色」时读的是声明的
- * **当前值**，而 `:root{background-color:#f7f8f9}` 在上一轮刚被引擎自己改写成
- * 画布色 —— 画布色集合于是从 `#f7f8f9` 变成 `#0e1116`，此后凡是「等于页面底色」
- * 的整屏层都掉进通用中性表面分支，拿到卡片色 `rgb(38,44,51)`。
- *
- * 脚本同时跑**阴性对照**：把引擎换回「读当前值」的实现，要求判据必须能检出
- * 差异 —— 否则这套断言只是空跑。
- */
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import fs from 'node:fs';
+import { resolveChromePath } from '../scripts/lib/chromium.mjs';
 
 const require = createRequire(import.meta.url);
 const cliRoot = path.join(process.env.APPDATA || '', 'npm/node_modules/@playwright/cli');
 const { chromium } = require(path.join(cliRoot, 'node_modules/playwright'));
 
-const exe =
-  process.env.CHROME_PATH ||
-  path.join(process.env.LOCALAPPDATA || '', 'ms-playwright/chromium-1234/chrome-win64/chrome.exe');
+const exe = resolveChromePath();
 
 const CANVAS = 'rgb(14, 17, 22)';
 
 const userscript = fs.readFileSync(path.resolve('dist/xiaoheihe-dark-mode.user.js'), 'utf8');
 const code = userscript.replace(/^\/\/ ==UserScript==[\s\S]*?\/\/ ==\/UserScript==\s*/, '');
 
-/** 阴性对照：退回「读声明当前值」的旧实现 */
 const PREFIXED = code.replace(
   'plainColorOf(sourceValue(style, style[j]))',
   'plainColorOf(style.getPropertyValue(style[j]))',
@@ -70,7 +47,6 @@ const LAYERS = [
   ['.hb-bbs-home__feed-splitline', '::after'],
 ];
 
-/** 读取与构建放在同一次 evaluate 里，避免采样点落在线上的里程碑构建之后 */
 const LAYER_CYCLE = ({ pairs, action }) => {
   const read = () =>
     pairs.map(([sel, pseudo]) => {
@@ -79,7 +55,7 @@ const LAYER_CYCLE = ({ pairs, action }) => {
     });
   if (action === 'fresh') {
     window.__hbSetDark(false);
-    window.__hbSetDark(true); // 首轮构建在这次调用内同步完成
+    window.__hbSetDark(true);
   } else {
     window.__hbRebuild();
   }

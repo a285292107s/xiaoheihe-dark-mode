@@ -1,33 +1,18 @@
-/**
- * 针对用户给的那一层楼（纯文字评论）做精确复现与「谁盖住了它」定位。
- *
- *   node research/repro-floor.mjs
- *
- * 做法：
- *   1) 用用户提供的真实 outerHTML，套上站点真实的祖先结构；
- *   2) 加载本地全部站点 CSS（必须走 HTTP，file:// 下样式表跨域读不到）；
- *   3) 注入构建产物，浅色/深色各跑一遍；
- *   4) 在评论盒子内做网格 elementFromPoint 采样，统计「最上层元素」，
- *      —— 盖住内容的那一层会以绝对优势出现；
- *   5) 同时列出该子树里所有大块不透明背景（含伪元素）与正文计算色。
- */
 import { createRequire } from 'node:module';
 import http from 'node:http';
 import path from 'node:path';
 import fs from 'node:fs';
+import { resolveChromePath } from '../scripts/lib/chromium.mjs';
 
 const require = createRequire(import.meta.url);
 const cliRoot = path.join(process.env.APPDATA || '', 'npm/node_modules/@playwright/cli');
 const { chromium } = require(path.join(cliRoot, 'node_modules/playwright'));
 
-const exe =
-  process.env.CHROME_PATH ||
-  path.join(process.env.LOCALAPPDATA || '', 'ms-playwright/chromium-1234/chrome-win64/chrome.exe');
+const exe = resolveChromePath();
 
 const reproDir = path.resolve('research/repro');
 fs.mkdirSync(reproDir, { recursive: true });
 
-// ---- 用户提供的真实元素 ----
 const FLOOR_HTML = `<div class="link-comment__comment-item" data-comment-id="954488686"><div class="link-comment__comment-item-header"><a href="/app/user/profile/22634617" class=""><div class="hb-cpt-avatar comment-item-header__avatar" style="--hb-avatar-size: 34px; --hb-avatar-deraction-size: 48px;"><img class="hb-avatar__image" src="https://cdn.max-c.com/heybox/profile/avatar/heygirl_1.png?imageMogr2/thumbnail/100x100%3E" alt=""><!----></div></a><div class="comment-item-header__info-box"><div class="info-box__line-1"><a href="/app/user/profile/22634617" class="info-box__username">只是一梦成空</a><!----><!----><div class="hb-level-tag hb-level-14 info-box__level"><div class="hb-level-tag__inner"><div class="hb-level-tag__inner__text"> Lv.14</div><!----></div></div><!----><div class="comment-item-header__operation-box"><button class="like-box"><i class="hb-icon">
     <svg class="hb-iconfont" aria-hidden="true">
       <use xlink:href="#icon-bbs_thumbs-up_filled_24x24"></use>
@@ -53,7 +38,6 @@ const html = `<!DOCTYPE html>
 <html><head><meta charset="utf-8">${links}
 <style>
   body { margin: 0; background: #f7f8f9; font-family: -apple-system, "Microsoft YaHei", sans-serif; }
-  /* 复现详情页：白色卡片里放评论列表 */
   #page-bbs-link { max-width: 1256px; margin: 24px auto; }
   .card { background: #fff; border-radius: 8px; padding: 0 16px; }
 </style></head>
@@ -70,7 +54,6 @@ const html = `<!DOCTYPE html>
 </body></html>`;
 
 fs.writeFileSync(path.join(reproDir, 'floor.html'), html, 'utf8');
-// 单独存一份「那一层楼」的 HTML 片段，供其它测试复用
 fs.writeFileSync(path.join(reproDir, 'floor-snippet.html'), FLOOR_HTML, 'utf8');
 
 const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8' };
@@ -90,7 +73,6 @@ const origin = `http://127.0.0.1:${server.address().port}`;
 const userscript = fs.readFileSync(path.resolve('dist/xiaoheihe-dark-mode.user.js'), 'utf8');
 const code = userscript.replace(/^\/\/ ==UserScript==[\s\S]*?\/\/ ==\/UserScript==\s*/, '');
 
-/** 在评论盒子内网格采样 elementFromPoint，并对子树做大块背景普查 */
 const PROBE = () => {
   const desc = (el) => {
     if (!el || el.nodeType !== 1) return 'none';
@@ -101,7 +83,6 @@ const PROBE = () => {
   if (!item) return { error: 'comment item not found' };
   const box = item.getBoundingClientRect();
 
-  // 1) 网格采样：谁在最上层
   const hits = new Map();
   const gridN = 36;
   for (let iy = 1; iy <= 6; iy++) {
@@ -116,7 +97,6 @@ const PROBE = () => {
   }
   const topHits = [...hits].sort((a, b) => b[1] - a[1]).slice(0, 8).map(([k, v]) => `${k} x${v}`);
 
-  // 2) 子树大块不透明背景（含伪元素）
   const blocks = [];
   for (const el of item.querySelectorAll('*')) {
     const r = el.getBoundingClientRect();
@@ -134,7 +114,6 @@ const PROBE = () => {
     }
   }
 
-  // 3) 关键元素的计算色
   const key = {};
   for (const sel of ['.comment-item__content', '.info-box__username', '.link-comment__comment-children', '.children-item__comment-content']) {
     const el = item.querySelector(sel);
@@ -144,7 +123,6 @@ const PROBE = () => {
     key[sel] = { color: cs.color, bg: cs.backgroundColor, box: `${Math.round(r.width)}x${Math.round(r.height)}`, op: cs.opacity, vis: cs.visibility };
   }
 
-  // 4) 评论项自身
   const cs = getComputedStyle(item);
   const itemStyle = { bg: cs.backgroundColor, color: cs.color, op: cs.opacity, pos: cs.position, z: cs.zIndex };
 

@@ -1,0 +1,67 @@
+html.hb-reply-btn .hb-reply {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--hb-ui-size-control);
+  padding: 0 8px;
+  margin-left: 8px;
+  border: 1px solid var(--hb-ui-edge-control);
+  border-radius: var(--hb-ui-radius-pill);
+  background: transparent;
+  color: var(--hb-ui-ink-soft);
+  font-size: var(--hb-ui-font-label);
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  vertical-align: middle;
+  transition:
+    color 120ms ease,
+    border-color 120ms ease,
+    background-color 120ms ease,
+    transform 90ms ease;
+}
+
+html.hb-reply-btn .hb-reply:hover {
+  color: var(--hb-ui-accent-strong);
+  border-color: var(--hb-ui-edge-control-hover);
+  background-color: var(--hb-ui-accent-wash);
+}
+
+html.hb-reply-btn .hb-reply:active {
+  transform: translateY(1px);
+}
+
+html.hb-reply-btn .hb-reply:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--hb-ui-ring-light),
+    0 0 0 3px var(--hb-ui-ring-dark);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.hb-reply-btn .hb-reply {
+    transition: none;
+  }
+  html.hb-reply-btn .hb-reply:active {
+    transform: none;
+  }
+}
+
+@media (forced-colors: active) {
+  html.hb-reply-btn .hb-reply {
+    border-color: ButtonText;
+    color: ButtonText;
+  }
+  html.hb-reply-btn .hb-reply:hover {
+    border-color: Highlight;
+    color: Highlight;
+  }
+  html.hb-reply-btn .hb-reply:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+    box-shadow: none;
+  }
+}

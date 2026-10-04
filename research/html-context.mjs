@@ -1,7 +1,3 @@
-/**
- * 打印 fixture 中某一选择器附近的原始 HTML（用于看清真实结构与内联样式）。
- *   node research/html-context.mjs <文件> <关键词> [窗口=2500] [最多=2]
- */
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -18,7 +14,6 @@ let n = 0;
 while ((idx = text.indexOf(kw, idx)) >= 0 && n < max) {
   n++;
   console.log(`\n===== 命中 ${n} @${idx} =====`);
-  // 美化：按标签断行，便于阅读
   const chunk = text.slice(Math.max(0, idx - 400), Math.min(text.length, idx + win));
   console.log(chunk.replace(/></g, '>\n<'));
   idx += kw.length;

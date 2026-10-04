@@ -1,13 +1,3 @@
-/**
- * 复用本机 Chrome 的会话数据（只读复制到临时 profile），
- * 以便绕过整页风控验证码，然后用外部 Chrome 真实检查页面。
- *
- *   node research/chrome-session.mjs [url]
- *
- * 只复制：Local State（含 cookie 解密密钥）、Default/Network/Cookies(+WAL/SHM)、
- *         Default/Local Storage（SPA 登录态可能在这里）。
- * 源 profile 全程只读，不会被修改。
- */
 import { createRequire } from 'node:module';
 import os from 'node:os';
 import path from 'node:path';
@@ -44,7 +34,6 @@ for (const f of ['Cookies', 'Cookies-wal', 'Cookies-shm']) {
   n = copyIfExists(path.join(SRC, 'Default', 'Network', f), path.join(dst, 'Default', 'Network', f));
   if (n) copied.push(`Default/Network/${f}: ${(n / 1024).toFixed(0)}KB`);
 }
-// SPA 登录态常在 Local Storage
 const lsSrc = path.join(SRC, 'Default', 'Local Storage');
 if (fs.existsSync(lsSrc)) {
   try {
@@ -87,7 +76,6 @@ const page = context.pages()[0] || (await context.newPage());
 const errors = [];
 page.on('pageerror', (e) => errors.push(String(e).slice(0, 200)));
 
-// 第一趟：先用「浅色 + 不注入脚本」看能否通过风控
 await page.goto(URL_, { waitUntil: 'domcontentloaded', timeout: 120000 });
 
 let state = { count: 0, captcha: false };
@@ -113,7 +101,6 @@ if (state.count === 0) {
   process.exit(2);
 }
 
-// 第二趟：注入脚本开深色，做 hover 检查
 await page.addScriptTag({ content: code });
 await page.evaluate(() => window.__hbSetDark && window.__hbSetDark(true));
 await page.waitForTimeout(1500);

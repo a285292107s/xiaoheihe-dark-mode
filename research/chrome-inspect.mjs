@@ -1,13 +1,3 @@
-/**
- * 用外部 Google Chrome 打开真实页面，检查「hover 那一层楼时内容被覆盖」。
- *
- *   node research/chrome-inspect.mjs [url]
- *
- * - 用独立临时 profile，不影响你正在用的 Chrome
- * - 先等 45s 看能否渲染出评论（此前遇到过整页验证码）
- * - 拿到评论后：hover 该层楼，读 ::before 计算值 / 引擎生成的覆盖规则 / 元素栈
- * - 存 hover 前后同区域截图，供像素比对
- */
 import { createRequire } from 'node:module';
 import os from 'node:os';
 import path from 'node:path';
@@ -47,10 +37,8 @@ const context = await chromium.launchPersistentContext(userDataDir, {
   timezoneId: 'Asia/Shanghai',
 });
 
-// 抹掉自动化特征：风控常用 navigator.webdriver / chrome 对象 / 插件列表来判定
 await context.addInitScript(() => {
   Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
-  // eslint-disable-next-line no-undef
   window.chrome = window.chrome || { runtime: {} };
   Object.defineProperty(navigator, 'languages', { get: () => ['zh-CN', 'zh', 'en'] });
   Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4, 5] });
@@ -75,11 +63,9 @@ page.on('pageerror', (e) => errors.push(String(e).slice(0, 200)));
 
 await page.goto(URL_, { waitUntil: 'domcontentloaded', timeout: 120000 });
 
-// 最多等 45s，看评论能不能渲染出来
 let state = { count: 0, captcha: false, dark: false };
 for (let i = 0; i < 15; i++) {
   await page.waitForTimeout(3000);
-  // 滚动一下触发懒加载
   await page.evaluate(async () => {
     window.scrollBy(0, 700);
     await new Promise((r) => setTimeout(r, 300));
@@ -104,7 +90,6 @@ if (state.count === 0) {
   process.exit(2);
 }
 
-// 回到第一条评论
 await page.evaluate(() => {
   const el = document.querySelector('.link-comment__comment-item');
   if (el) el.scrollIntoView({ block: 'center' });
@@ -117,7 +102,6 @@ const info = await page.evaluate(() => {
   const r = item.getBoundingClientRect();
   const p = getComputedStyle(item, '::before');
   const cs = getComputedStyle(content);
-  // 引擎生成的 hover 覆盖规则
   const styleEl = document.getElementById('hb-dark-overrides');
   const text = styleEl ? styleEl.textContent : '';
   const gen = [];

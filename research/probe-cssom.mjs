@@ -1,21 +1,13 @@
-/**
- * 关键可行性探测：
- *  1) 站点样式表是否跨域可读（CSSOM / fetch）—— 决定能否用「CSS 文本变换」方案
- *  2) 页面是否存在 JS 写入的内联颜色（决定是否必须做元素级处理）
- *  3) 需要保护的非颜色资源规模（img / 背景图 / canvas / svg）
- * node research/probe-cssom.mjs
- */
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import fs from 'node:fs';
+import { resolveChromePath } from '../scripts/lib/chromium.mjs';
 
 const require = createRequire(import.meta.url);
 const cliRoot = path.join(process.env.APPDATA || '', 'npm/node_modules/@playwright/cli');
 const { chromium } = require(path.join(cliRoot, 'node_modules/playwright'));
 
-const exe =
-  process.env.CHROME_PATH ||
-  path.join(process.env.LOCALAPPDATA || '', 'ms-playwright/chromium-1234/chrome-win64/chrome.exe');
+const exe = resolveChromePath();
 
 const browser = await chromium.launch({ headless: true, executablePath: exe });
 const context = await browser.newContext({
@@ -34,12 +26,10 @@ await page.waitForTimeout(7000);
 const result = await page.evaluate(async () => {
   const out = { sheets: [], fetchTests: [], inline: {}, resources: {} };
 
-  // ---- 1) CSSOM 可读性 ----
   for (const sheet of document.styleSheets) {
     const rec = { href: sheet.href, owner: !!sheet.ownerNode, rules: null, error: null, cors: null };
     try {
       rec.rules = sheet.cssRules.length;
-      // 抽样统计含硬编码颜色的规则数
       let colored = 0;
       let scanned = 0;
       for (const r of sheet.cssRules) {
@@ -54,7 +44,6 @@ const result = await page.evaluate(async () => {
     out.sheets.push(rec);
   }
 
-  // ---- 2) fetch 跨域 CSS 可行性 ----
   const cssUrls = [...document.querySelectorAll('link[rel=stylesheet]')].map((l) => l.href);
   for (const url of cssUrls.slice(0, 3)) {
     try {
@@ -72,7 +61,6 @@ const result = await page.evaluate(async () => {
     }
   }
 
-  // ---- 3) 内联样式中的颜色（JS 写入）----
   let inlineColor = 0;
   let inlineBg = 0;
   let inlineBgImg = 0;
@@ -94,7 +82,6 @@ const result = await page.evaluate(async () => {
     samples,
   };
 
-  // ---- 4) 资源规模 ----
   const all = [...document.querySelectorAll('body *')];
   let bgImageRules = 0;
   for (const el of all) {
@@ -111,7 +98,6 @@ const result = await page.evaluate(async () => {
     elsWithBgUrl: bgImageRules,
   };
 
-  // ---- 5) 站点自身的元信息 ----
   out.meta = {
     htmlClass: document.documentElement.className,
     colorScheme: getComputedStyle(document.documentElement).colorScheme,
@@ -120,7 +106,6 @@ const result = await page.evaluate(async () => {
     sheetsCount: document.styleSheets.length,
   };
 
-  // ---- 6) Element Plus 版本 ----
   out.epVersion = (window.ElementPlus && window.ElementPlus.version) || null;
 
   return out;

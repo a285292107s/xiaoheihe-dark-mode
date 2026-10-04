@@ -1,23 +1,13 @@
 {
   "name": "xiaoheihe",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.7.0",
   "license": "MIT",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview",
-    "verify": "node scripts/verify-dark.mjs",
-    "verify:idempotent": "node scripts/verify-idempotent.mjs",
-    "verify:cascade": "node research/test-hover-cascade.mjs",
-    "verify:canvas": "node research/repro-canvas-flip.mjs",
-    "verify:flash": "node scripts/verify-flash.mjs",
-    "verify:ui": "node scripts/verify-ui.mjs",
-    "verify:declutter": "node scripts/verify-declutter.mjs",
-    "verify:lifecycle": "node scripts/verify-lifecycle.mjs",
-    "verify:preview": "node scripts/verify-preview.mjs",
-    "verify:all": "npm run build && npm run verify:canvas && npm run verify:flash && npm run verify:ui && npm run verify:declutter && npm run verify:lifecycle && npm run verify:preview && npm run verify && npm run verify:idempotent && npm run verify:cascade"
+    "preview": "vite preview"
   },
   "devDependencies": {
     "typescript": "^6.0.3",

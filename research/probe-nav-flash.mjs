@@ -1,30 +1,13 @@
-/**
- * 现场取证：换路由时的「白闪」面积与时长。
- *
- *   node research/probe-nav-flash.mjs
- *
- * 在真实站点上从首页点进帖子（连续两次，覆盖「首页 -> 详情 -> 返回 -> 另一个详情」），
- * 用页面内 rAF 密集网格逐帧统计「浅色面积占比」，并记录当时是谁在画那块浅色。
- *
- * 修复前（0.3.5）实测：
- *   帧数 218，浅色占比 >2% 的帧 16
- *   白闪区间: t=602ms -> t=1385ms（≈783ms）
- *   峰值: frac=0.412 maxL=255 culprit=div.hb-cpt-page-header hb-bbs-link__header
- *   同期 scanned 停在 4739（引擎还没重建），说明画的是站点新分片里的原始浅色
- *
- * 修复后（0.3.6）实测：浅色帧 0，峰值 frac=0 maxL=43（卡片色）。
- */
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import fs from 'node:fs';
+import { resolveChromePath } from '../scripts/lib/chromium.mjs';
 
 const require = createRequire(import.meta.url);
 const cliRoot = path.join(process.env.APPDATA || '', 'npm/node_modules/@playwright/cli');
 const { chromium } = require(path.join(cliRoot, 'node_modules/playwright'));
 
-const exe =
-  process.env.CHROME_PATH ||
-  path.join(process.env.LOCALAPPDATA || '', 'ms-playwright/chromium-1234/chrome-win64/chrome.exe');
+const exe = resolveChromePath();
 
 const userscript = fs.readFileSync(path.resolve('dist/xiaoheihe-dark-mode.user.js'), 'utf8');
 const code = userscript.replace(/^\/\/ ==UserScript==[\s\S]*?\/\/ ==\/UserScript==\s*/, '');
@@ -42,7 +25,6 @@ const page = await context.newPage();
 const errors = [];
 page.on('pageerror', (e) => errors.push(String(e).slice(0, 200)));
 
-/** 一次导航的采样器：网格逐帧统计最上层不透明背景的亮度 */
 const START_SAMPLER = () => {
   window.__f = [];
   const xs = [];
@@ -93,8 +75,6 @@ const START_SAMPLER = () => {
 
 const runs = [];
 async function navigate(label, nth) {
-  // 无头浏览器下详情页会撞腾讯验证码的整屏遮罩，它会挡住点击 —— 属自动化环境产物，
-  // 与主题无关，这里先摘掉它，避免把「点不动」误报成「白闪」。
   await page.evaluate(() => {
     document.querySelectorAll('#t_mask, .t-mask, #tcaptcha_iframe, .tcaptcha-transform').forEach((el) => el.remove());
   });

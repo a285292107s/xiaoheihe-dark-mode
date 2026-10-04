@@ -56,3 +56,7 @@ research/js/
 
 # 会话技能目录（工具生成，非项目内容）
 .agents/
+
+# Playwright CLI 的会话状态与持久化浏览器 profile（本机运行产物）
+.playwright-cli/
+.playwright-data/

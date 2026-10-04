@@ -1,9 +1,3 @@
-/**
- * 定位「隐藏首页 tab / 隐藏右侧栏」两个改动目标的真实 DOM：
- * 从 fixture 里找出含「首页」文本的候选节点、以及 #page-bbs-community > .content 的子节点。
- *
- *   node research/probe-hide-targets.mjs [fixtures/home.html]
- */
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -59,7 +53,6 @@ function parse(src) {
 
 const tree = parse(html);
 
-/** 收集节点自身的直接文本（不含后代文本） */
 function ownText(node) {
   return node.children.filter((c) => c.tag === '#text').map((c) => c.text).join('');
 }

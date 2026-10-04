@@ -1,11 +1,3 @@
-/**
- * 真实点击「某一层楼」后，对该元素子树做计算样式前后差分，
- * 精确定位「选中高亮」到底改了什么，以及深色引擎把它变成了什么。
- *
- *   node research/probe-select-floor.mjs [url]
- *
- * 用有头 Chrome + 去自动化特征，避免整页验证码（无头下会被拦截）。
- */
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import fs from 'node:fs';
@@ -23,7 +15,6 @@ const code = userscript.replace(/^\/\/ ==UserScript==[\s\S]*?\/\/ ==\/UserScript
 const outDir = path.resolve('output/select');
 fs.mkdirSync(outDir, { recursive: true });
 
-/** 对子树做「计算样式快照」，用于前后差分 */
 const SNAPSHOT = (rootSel) => {
   const root = document.querySelector(rootSel);
   if (!root) return null;
@@ -70,7 +61,6 @@ await page.goto(URL_, { waitUntil: 'domcontentloaded', timeout: 120000 });
 await page.waitForTimeout(10000);
 await page.evaluate(async () => {
   for (let i = 0; i < 8; i++) { window.scrollBy(0, 800); await new Promise((r) => setTimeout(r, 400)); }
-  // 回到第一条评论
   const first = document.querySelector('.link-comment__comment-item');
   if (first) first.scrollIntoView({ block: 'center' });
 });
@@ -97,7 +87,6 @@ if (pre.captcha || pre.count === 0) {
 await page.screenshot({ path: path.join(outDir, 'before.png') });
 const before = await page.evaluate(SNAPSHOT, '.link-comment__comment-item');
 
-// 记录属性变化
 await page.evaluate(() => {
   window.__log = [];
   const root = document.querySelector('.link-comment__list') || document.body;
@@ -118,7 +107,6 @@ await page.evaluate(() => {
   window.__obs.observe(root, { attributes: true, subtree: true, attributeOldValue: true });
 });
 
-// 点击第一层楼（触发「设为回复目标」＝选中）
 await page.evaluate(() => {
   const el = document.querySelector('.link-comment__comment-item');
   el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
@@ -129,7 +117,6 @@ const after = await page.evaluate(SNAPSHOT, '.link-comment__comment-item');
 const log = await page.evaluate(() => window.__log || []);
 await page.screenshot({ path: path.join(outDir, 'after-click.png') });
 
-// 差分
 const diffs = [];
 const n = Math.max(before.length, after.length);
 for (let i = 0; i < n; i++) {

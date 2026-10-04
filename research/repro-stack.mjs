@@ -1,21 +1,14 @@
-/**
- * 用 elementsFromPoint 打出「文字上方压着谁」的完整元素栈，
- * 并分别检查 静态 / hover 评论项 / hover 嵌套回复 三种状态。
- *
- *   node research/repro-stack.mjs
- */
 import { createRequire } from 'node:module';
 import http from 'node:http';
 import path from 'node:path';
 import fs from 'node:fs';
+import { resolveChromePath } from '../scripts/lib/chromium.mjs';
 
 const require = createRequire(import.meta.url);
 const cliRoot = path.join(process.env.APPDATA || '', 'npm/node_modules/@playwright/cli');
 const { chromium } = require(path.join(cliRoot, 'node_modules/playwright'));
 
-const exe =
-  process.env.CHROME_PATH ||
-  path.join(process.env.LOCALAPPDATA || '', 'ms-playwright/chromium-1234/chrome-win64/chrome.exe');
+const exe = resolveChromePath();
 
 const reproDir = path.resolve('research/repro');
 const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8' };
@@ -35,7 +28,6 @@ const origin = `http://127.0.0.1:${server.address().port}`;
 const userscript = fs.readFileSync(path.resolve('dist/xiaoheihe-dark-mode.user.js'), 'utf8');
 const code = userscript.replace(/^\/\/ ==UserScript==[\s\S]*?\/\/ ==\/UserScript==\s*/, '');
 
-/** 在「正文文字」与「嵌套回复文字」上打元素栈 */
 const STACK = () => {
   const desc = (el) => {
     if (!el || el.nodeType !== 1) return 'none';
@@ -58,7 +50,6 @@ const STACK = () => {
     const el = document.querySelector(sel);
     if (!el) return null;
     const r = el.getBoundingClientRect();
-    // 取文字行内一点（靠近左侧，避开 emoji）
     const x = r.left + Math.min(60, r.width / 2);
     const y = r.top + r.height / 2;
     const stack = document.elementsFromPoint(x, y).slice(0, 6).map(info);
@@ -97,7 +88,6 @@ console.log('\n===== 深色 · hover 整层楼 =====');
 console.log(JSON.stringify(await page.evaluate(STACK), null, 1));
 await page.screenshot({ path: path.join(reproDir, 'stack-hover-item.png') });
 
-// 顺带看看 hover 伪元素的实际取值
 const pseudo = await page.evaluate(() => {
   const item = document.querySelector('.link-comment__comment-item');
   const child = document.querySelector('.comment-children-item');

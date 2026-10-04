@@ -1,11 +1,7 @@
-/**
- * 探测：小黑盒是否原生支持 prefers-color-scheme 深色。
- * 不注入任何脚本，纯看站点自身行为。
- * node scripts/probe-native-dark.mjs
- */
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import fs from 'node:fs';
+import { resolveChromePath } from './lib/chromium.mjs';
 
 const require = createRequire(import.meta.url);
 const cliRoot = path.join(process.env.APPDATA || '', 'npm/node_modules/@playwright/cli');
@@ -14,9 +10,7 @@ const { chromium } = require(path.join(cliRoot, 'node_modules/playwright'));
 const outDir = path.resolve('output/playwright');
 fs.mkdirSync(outDir, { recursive: true });
 
-const exe =
-  process.env.CHROME_PATH ||
-  path.join(process.env.LOCALAPPDATA || '', 'ms-playwright/chromium-1234/chrome-win64/chrome.exe');
+const exe = resolveChromePath();
 
 const TARGET = process.argv[2] || 'https://www.xiaoheihe.cn/app/bbs/home';
 const TAG = 'probe-' + (process.argv[3] || 'home');
@@ -42,7 +36,6 @@ async function probe(scheme) {
     const sample = (name) =>
       getComputedStyle(root).getPropertyValue(name).trim() || null;
 
-    // 统计浅色表面数量
     let light = 0;
     let dark = 0;
     const lightList = [];

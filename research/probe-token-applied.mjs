@@ -1,22 +1,13 @@
-/**
- * 修正版：确认「注入的令牌 override 是否真的生效」，再判断 JS 是否消费令牌。
- * 关键修正：
- *   - 用 !important + 晚于站点样式表插入（否则 :root 同优先级会输给站点）
- *   - 先自检令牌值是否被改写（防止实验无效）
- *   - 用稳定 URL（详情页），避免首页随机内容造成 A/B 噪声
- * node research/probe-token-applied.mjs
- */
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import fs from 'node:fs';
+import { resolveChromePath } from '../scripts/lib/chromium.mjs';
 
 const require = createRequire(import.meta.url);
 const cliRoot = path.join(process.env.APPDATA || '', 'npm/node_modules/@playwright/cli');
 const { chromium } = require(path.join(cliRoot, 'node_modules/playwright'));
 
-const exe =
-  process.env.CHROME_PATH ||
-  path.join(process.env.LOCALAPPDATA || '', 'ms-playwright/chromium-1234/chrome-win64/chrome.exe');
+const exe = resolveChromePath();
 
 const browser = await chromium.launch({ headless: true, executablePath: exe });
 
@@ -48,7 +39,6 @@ async function run(label, inject) {
         const s = document.createElement('style');
         s.id = 'probe-tokens';
         s.textContent = css;
-        // 追加到最后，并持续保持在最后，确保赢过站点样式表
         document.documentElement.appendChild(s);
       };
       if (document.documentElement) apply();
@@ -58,7 +48,6 @@ async function run(label, inject) {
   }
 
   const page = await context.newPage();
-  // 稳定 URL：详情页（内容固定，A/B 可比）
   await page.goto('https://www.xiaoheihe.cn/app/bbs/link/189860812', {
     waitUntil: 'domcontentloaded',
     timeout: 90000,

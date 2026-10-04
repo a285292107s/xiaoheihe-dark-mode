@@ -1,23 +1,12 @@
-/**
- * 代价核算：新分片「即时重建」（第十四节的修复）在首屏加载时多花多少主线程时间。
- *
- *   node research/probe-build-cost.mjs
- *
- * 对照组的做法：把产物里 `scheduleImmediateBuild` 的守卫改成恒真返回，
- * 即退回修复前「只等 400ms 防抖」的行为，其余完全相同。
- * 输出为长任务（PerformanceObserver longtask）个数 / 总时长 / 最长一条，
- * 以及 DOMContentLoaded 与 load 的时刻。
- */
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import fs from 'node:fs';
+import { resolveChromePath } from '../scripts/lib/chromium.mjs';
 
 const require = createRequire(import.meta.url);
 const cliRoot = path.join(process.env.APPDATA || '', 'npm/node_modules/@playwright/cli');
 const { chromium } = require(path.join(cliRoot, 'node_modules/playwright'));
-const exe =
-  process.env.CHROME_PATH ||
-  path.join(process.env.LOCALAPPDATA || '', 'ms-playwright/chromium-1234/chrome-win64/chrome.exe');
+const exe = resolveChromePath();
 
 const userscript = fs.readFileSync(path.resolve('dist/xiaoheihe-dark-mode.user.js'), 'utf8');
 const CODE = userscript.replace(/^\/\/ ==UserScript==[\s\S]*?\/\/ ==\/UserScript==\s*/, '');

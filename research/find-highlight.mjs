@@ -1,22 +1,13 @@
-/**
- * 在详情页的 JS 分片里定位「楼层选中/高亮」的实现。
- *
- *   node research/find-highlight.mjs [url]
- *
- * 思路：评论组件必然包含 class 名 `link-comment__comment-item`，
- * 找到含它的 chunk，再在附近搜状态类名与高亮相关代码。
- */
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import fs from 'node:fs';
+import { resolveChromePath } from '../scripts/lib/chromium.mjs';
 
 const require = createRequire(import.meta.url);
 const cliRoot = path.join(process.env.APPDATA || '', 'npm/node_modules/@playwright/cli');
 const { chromium } = require(path.join(cliRoot, 'node_modules/playwright'));
 
-const exe =
-  process.env.CHROME_PATH ||
-  path.join(process.env.LOCALAPPDATA || '', 'ms-playwright/chromium-1234/chrome-win64/chrome.exe');
+const exe = resolveChromePath();
 
 const URL_ = process.argv[2] || 'https://www.xiaoheihe.cn/app/bbs/link/190535650';
 const jsDir = path.resolve('research/js');
@@ -70,11 +61,9 @@ for (const url of urls) {
 }
 console.log(`已缓存 ${downloaded.length} 个分片，合计 ${(downloaded.reduce((a, b) => a + b.bytes, 0) / 1048576).toFixed(1)}MB`);
 
-// 1) 找出含评论组件 class 的分片
 const owners = downloaded.filter((d) => d.text.includes(KEY));
 console.log(`\n含 "${KEY}" 的分片：${owners.map((o) => o.name).join(', ') || '无'}`);
 
-// 2) 在这些分片里找状态相关标识符
 for (const o of owners) {
   console.log(`\n########## ${o.name} (${(o.bytes / 1024).toFixed(0)}KB) ##########`);
   const seen = new Set();
@@ -85,7 +74,6 @@ for (const o of owners) {
     const from = Math.max(0, idx - 700);
     const to = Math.min(o.text.length, idx + 900);
     const ctx = o.text.slice(from, to);
-    // 只打印含状态线索的上下文，避免噪声
     if (STATE_RE.test(ctx)) {
       const key = ctx.slice(0, 120);
       if (!seen.has(key)) {
@@ -108,7 +96,6 @@ for (const o of owners) {
   }
 }
 
-// 3) 全量搜 highlight / 选中相关关键词
 console.log('\n########## 关键词命中统计 ##########');
 for (const kw of ['highlight', 'is-highlight', 'highlightFloor', 'activeFloor', 'floorId', 'jumpToFloor', 'scrollToComment', 'commentId']) {
   const hit = downloaded.filter((d) => d.text.includes(kw)).map((d) => d.name);

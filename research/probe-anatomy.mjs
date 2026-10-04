@@ -1,17 +1,12 @@
-/**
- * 修正版解剖：绕开 CSSStyleRule.cssRules 陷阱；并对 EP 令牌做自检。
- * node research/probe-anatomy.mjs
- */
 import { createRequire } from 'node:module';
 import path from 'node:path';
+import { resolveChromePath } from '../scripts/lib/chromium.mjs';
 
 const require = createRequire(import.meta.url);
 const cliRoot = path.join(process.env.APPDATA || '', 'npm/node_modules/@playwright/cli');
 const { chromium } = require(path.join(cliRoot, 'node_modules/playwright'));
 
-const exe =
-  process.env.CHROME_PATH ||
-  path.join(process.env.LOCALAPPDATA || '', 'ms-playwright/chromium-1234/chrome-win64/chrome.exe');
+const exe = resolveChromePath();
 
 const browser = await chromium.launch({ headless: true, executablePath: exe });
 const context = await browser.newContext({
@@ -20,7 +15,6 @@ const context = await browser.newContext({
   userAgent:
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
 });
-// 注入红色 --el-* 并自检
 await context.addInitScript(() => {
   const apply = () => {
     const s = document.createElement('style');
@@ -51,7 +45,6 @@ await page.goto('https://www.xiaoheihe.cn/app/bbs/link/189860812', {
   waitUntil: 'domcontentloaded', timeout: 90000,
 });
 await page.waitForTimeout(8000);
-// 打开搜索框（EP autocomplete）以让 EP 组件出现在 DOM
 await page.evaluate(() => {
   const inp = document.querySelector('input');
   if (inp) { inp.focus(); inp.click(); }
@@ -79,7 +72,6 @@ const out = await page.evaluate(() => {
     }
   }
 
-  // 修正后的 CSSOM 遍历：用 constructor.name / 有 selectorText 来判定
   let totalRules = 0, pseudoRules = 0, gradientRules = 0, urlBgRules = 0, shadowRules = 0, literalColorRules = 0;
   const pseudoSel = [];
   const visit = (rules) => {
@@ -100,7 +92,6 @@ const out = await page.evaluate(() => {
   };
   for (const s of document.styleSheets) { try { visit(s.cssRules); } catch (e) {} }
 
-  // 导航 logo 的绘制方式
   const navLogo = document.querySelector('.nav-content-left-logo');
   let logoInfo = null;
   if (navLogo) {

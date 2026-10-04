@@ -1,30 +1,18 @@
-/**
- * 针对性复现：用站点真实 CSS 渲染「4:3 图片网格 + 未加载占位块」，
- * 对比浅色/深色下占位块相对卡片的可见度，验证表面梯度修复。
- *
- *   node research/repro-placeholder.mjs
- *
- * 缺陷背景：`.hb-cpt__image--default` 的 #f3f4f5 在浅色下只比卡片 #fff 暗 4.4%，
- * 线性映射后变成暗 9.8%（放大 2.2 倍），详情页两张并排的占位块（1256x460）
- * 在深色下就成了整块突兀的灰板。修复后应回落到 ~1.6%。
- */
 import { createRequire } from 'node:module';
 import http from 'node:http';
 import path from 'node:path';
 import fs from 'node:fs';
+import { resolveChromePath } from '../scripts/lib/chromium.mjs';
 
 const require = createRequire(import.meta.url);
 const cliRoot = path.join(process.env.APPDATA || '', 'npm/node_modules/@playwright/cli');
 const { chromium } = require(path.join(cliRoot, 'node_modules/playwright'));
 
-const exe =
-  process.env.CHROME_PATH ||
-  path.join(process.env.LOCALAPPDATA || '', 'ms-playwright/chromium-1234/chrome-win64/chrome.exe');
+const exe = resolveChromePath();
 
 const reproDir = path.resolve('research/repro');
 fs.mkdirSync(reproDir, { recursive: true });
 
-// 站点真实样式表（相对路径引用本地分片）
 const cssFiles = [
   ...fs.readdirSync(path.resolve('research/css')).filter((f) => f.endsWith('.css')),
   ...fs.readdirSync(path.resolve('research/css-detail')).filter((f) => f.endsWith('.css')),
@@ -39,7 +27,6 @@ const links = cssFiles
 const html = `<!DOCTYPE html>
 <html><head><meta charset="utf-8">${links}
 <style>
-  /* 复现详情页的载体：白色卡片 + 两列 4:3 图片网格 */
   body { margin: 0; background: #f7f8f9; font-family: sans-serif; }
   .card { max-width: 1256px; margin: 24px auto; background: #fff; border-radius: 8px; padding: 16px; }
   .grid { display: flex; gap: 0; }
@@ -63,8 +50,6 @@ const html = `<!DOCTYPE html>
 const htmlPath = path.join(reproDir, 'placeholder.html');
 fs.writeFileSync(htmlPath, html, 'utf8');
 
-// 必须用 HTTP 服务：file:// 页面下同目录的 file:// 样式表会被 Chrome 视为跨域，
-// cssRules 抛异常，引擎会整批跳过站点 CSS，测不出真实行为。
 const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8' };
 const server = http.createServer((req, res) => {
   const urlPath = decodeURIComponent((req.url || '/').split('?')[0]);
@@ -98,7 +83,6 @@ const page = await context.newPage();
 await page.goto(`${origin}/repro/placeholder.html`, { waitUntil: 'load', timeout: 60000 });
 await page.waitForTimeout(1200);
 
-// 先确认站点样式表真的可读（否则整个复现无意义）
 const readable = await page.evaluate(() => {
   let ok = 0;
   let err = 0;

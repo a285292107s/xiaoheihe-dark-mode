@@ -1,18 +1,13 @@
-/**
- * 调试：为什么 `.hb-cpt__image--default` 的 background 没被改写？
- *   node research/debug-placeholder.mjs
- */
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import fs from 'node:fs';
+import { resolveChromePath } from '../scripts/lib/chromium.mjs';
 
 const require = createRequire(import.meta.url);
 const cliRoot = path.join(process.env.APPDATA || '', 'npm/node_modules/@playwright/cli');
 const { chromium } = require(path.join(cliRoot, 'node_modules/playwright'));
 
-const exe =
-  process.env.CHROME_PATH ||
-  path.join(process.env.LOCALAPPDATA || '', 'ms-playwright/chromium-1234/chrome-win64/chrome.exe');
+const exe = resolveChromePath();
 
 const htmlPath = path.resolve('research/repro/placeholder.html');
 const userscript = fs.readFileSync(path.resolve('dist/xiaoheihe-dark-mode.user.js'), 'utf8');
@@ -27,7 +22,6 @@ await page.evaluate(() => window.__hbSetDark(true));
 await page.waitForTimeout(1200);
 
 const info = await page.evaluate(() => {
-  // 1) 站点原始规则里这条规则的声明形态
   const found = [];
   for (const s of document.styleSheets) {
     let rules;
@@ -43,13 +37,11 @@ const info = await page.evaluate(() => {
     }
   }
 
-  // 2) 我们生成的覆盖表里有没有这条
   const mine = document.getElementById('hb-dark-overrides');
   const text = mine ? mine.textContent : '';
   const idx = text.indexOf('hb-cpt__image--default');
   const generated = idx >= 0 ? text.slice(Math.max(0, idx - 120), idx + 220) : null;
 
-  // 3) 实际计算值
   const cs = getComputedStyle(document.querySelector('.hb-cpt__image--default'));
 
   return {

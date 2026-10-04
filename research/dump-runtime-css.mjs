@@ -1,23 +1,13 @@
-/**
- * 抓取运行时 CSS：不仅 link[rel=stylesheet]，还包括 JS 动态注入的 <style>。
- *
- *   node research/dump-runtime-css.mjs [url]
- *
- * 起因：详情页 document.styleSheets 有 21 个，而 link[rel=stylesheet] 只有 19 个，
- * 说明有样式表是运行时注入的 —— 之前的离线语料（只按 link 抓）漏掉了它们，
- * 所以"楼层选中高亮"的规则一直找不到。
- */
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import fs from 'node:fs';
+import { resolveChromePath } from '../scripts/lib/chromium.mjs';
 
 const require = createRequire(import.meta.url);
 const cliRoot = path.join(process.env.APPDATA || '', 'npm/node_modules/@playwright/cli');
 const { chromium } = require(path.join(cliRoot, 'node_modules/playwright'));
 
-const exe =
-  process.env.CHROME_PATH ||
-  path.join(process.env.LOCALAPPDATA || '', 'ms-playwright/chromium-1234/chrome-win64/chrome.exe');
+const exe = resolveChromePath();
 
 const URL_ = process.argv[2] || 'https://www.xiaoheihe.cn/app/bbs/link/190707314';
 const outDir = path.resolve('research/css-runtime');
@@ -77,7 +67,6 @@ for (const s of sheets) {
 }
 console.log(`\n内联 <style> 落盘数：${saved}；样式表总数：${sheets.length}`);
 
-// 直接在内联样式里找「评论高亮」线索
 console.log('\n########## 内联样式中的 comment/target/highlight 规则 ##########');
 for (const s of sheets) {
   if (!s.text) continue;
@@ -92,7 +81,6 @@ for (const s of sheets) {
   }
 }
 
-// 找所有全尺寸覆盖层（任意来源）
 console.log('\n########## 全尺寸覆盖层（含内联），限制在评论相关选择器 ##########');
 for (const s of sheets) {
   if (!s.text) continue;

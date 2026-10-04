@@ -1,21 +1,8 @@
-/**
- * 离线反查：哪个源色 / 哪条规则会产出指定颜色。
- *
- *   node research/trace-color.mjs 37404a
- *
- * 这个脚本起源于一次真实缺陷的定位：站点页面底色 `#f7f8f9` 被错映射成
- * `rgb(55,64,74)`，在信息流 4px 分隔条和 `#page-bbs-community::before`
- * （position:fixed;height:146px;width:100%）上表现为满屏灰色色块。
- *
- * ⚠️ 下面的映射实现是 `src/dark-engine.ts` 的**副本**，用于在没有浏览器时做离线分析。
- *    改动引擎的映射规则时请同步这里，否则结论会失真。
- */
 import fs from 'node:fs';
 import path from 'node:path';
 
 const TARGET = (process.argv[2] || '37404a').toLowerCase().replace('#', '');
 
-// ---- 与 dark-engine.ts 保持一致的映射实现 ----
 const NAMED = {
   white: [255, 255, 255], black: [0, 0, 0], red: [255, 0, 0], green: [0, 128, 0],
   blue: [0, 0, 255], gray: [128, 128, 128], grey: [128, 128, 128],
@@ -99,7 +86,6 @@ const hex = (c) => '#' + [c.r, c.g, c.b].map((v) => Math.round(clamp(v, 0, 255))
 const CANVAS = { r: 14, g: 17, b: 22, a: 1 };
 const CARD = { r: 38, g: 44, b: 51, a: 1 };
 
-/** 中性判据：绝对彩度 + HSV 饱和度。不能用 HSL 饱和度（近白处会爆掉）。 */
 function isNeutral(c) {
   const max = Math.max(c.r, c.g, c.b);
   const min = Math.min(c.r, c.g, c.b);
@@ -113,7 +99,6 @@ function lerpRgb(a, b, t, alpha) {
   return { r: a.r + (b.r - a.r) * t, g: a.g + (b.g - a.g) * t, b: a.b + (b.b - a.b) * t, a: alpha };
 }
 
-/** 表面梯度缓出曲线：让近白表面收敛到卡片色，避免放大近白差异 */
 function surfaceCurve(t0) {
   const t = clamp(t0, 0, 1);
   const inv = 1 - t;
@@ -144,7 +129,6 @@ function mapSurface(c, selector = '', canvasKeys = new Set()) {
 const dir = path.resolve('research/css');
 const files = fs.readdirSync(dir).filter((f) => f.endsWith('.css'));
 
-// 先扫一遍，收集「页面画布色」（:root / html / body 上的底色）
 const CANVAS_SELECTOR = /^(?::root|html|body)(\s*,\s*(?::root|html|body))*$/i;
 const canvasKeys = new Set();
 for (const file of files) {
@@ -199,6 +183,5 @@ for (const h of hits.slice(0, 40)) {
 }
 if (!hits.length) console.log('  （无命中）');
 
-// 汇总源色
 const sources = [...new Set(hits.map((h) => h.source))];
 console.log(`\n涉及源色：${sources.join(', ') || '无'}`);

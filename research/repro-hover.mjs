@@ -1,26 +1,14 @@
-/**
- * 只测一件事：hover 那一层楼时，它的内容是否被覆盖、被什么覆盖。
- *
- *   node research/repro-hover.mjs
- *
- * 手段：
- *   - 打出 hover 时 ::before 的计算值；
- *   - 打出引擎为这条 hover 规则生成的覆盖声明（看 alpha 有没有丢）；
- *   - hover 前后对同一块区域截图并做逐像素差；
- *   - 用 getComputedStyle 直接读 hover 态的正文颜色与「实际被画上去的背景」。
- */
 import { createRequire } from 'node:module';
 import http from 'node:http';
 import path from 'node:path';
 import fs from 'node:fs';
+import { resolveChromePath } from '../scripts/lib/chromium.mjs';
 
 const require = createRequire(import.meta.url);
 const cliRoot = path.join(process.env.APPDATA || '', 'npm/node_modules/@playwright/cli');
 const { chromium } = require(path.join(cliRoot, 'node_modules/playwright'));
 
-const exe =
-  process.env.CHROME_PATH ||
-  path.join(process.env.LOCALAPPDATA || '', 'ms-playwright/chromium-1234/chrome-win64/chrome.exe');
+const exe = resolveChromePath();
 
 const reproDir = path.resolve('research/repro');
 const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8' };
@@ -71,7 +59,6 @@ const READ_PSEUDO = () => {
   };
 };
 
-// 引擎为 hover 规则生成了什么
 const GENERATED = () => {
   const el = document.getElementById('hb-dark-overrides');
   const t = el ? el.textContent : '';
@@ -101,8 +88,6 @@ await page.screenshot({ path: path.join(reproDir, 'hover-after.png'), clip: box 
 await browser.close();
 server.close();
 
-// ---- 逐像素差 ----
 AddType: {
-  // 用 Node 内置 zlib 解 PNG 太麻烦，这里直接交给 PowerShell 侧读取
 }
 console.log('\n截图已保存: research/repro/hover-before.png / hover-after.png');

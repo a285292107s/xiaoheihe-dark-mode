@@ -1,48 +1,20 @@
-/*
- * 右下角两个开关的样式，注入在 Shadow DOM 内部。
- *
- * 设计口径：冷淡扁平 —— 一块实心面 + 1px 描边 + 一层接触影，没有别的东西。
- * 它要压在任何宿主页面上（纯白列表、深色详情页、游戏封面图）都读得出来，
- * 又不能抢内容。
- *
- * 六个硬约定：
- *   1) 视觉值全部走 :host 上的 --hbd-* 令牌，调配色只改这一块。
- *   2) 不用内高光 / 渐变 / 多层投影。上一版在顶面压过一条
- *      `inset 0 1px 0 rgba(255,255,255,.06)`，本意是「顶面受光」，
- *      但在 2x 下读起来就是一层自上而下的渐变，把按钮做旧了。
- *      现在形状只由 1px 描边定，投影只留一层 1px 接触影。
- *   3) 宿主背景不可知，所以焦点环做成「浅内圈 + 深外圈」：任何底色上至少有一圈
- *      可用（最坏情况是中间灰，较强的一圈仍有约 4.2:1）。单色也避免了一枚彩色
- *      outline 在彩色封面图上融掉。
- *   4) 动效只碰 background-color / box-shadow / transform，时长走令牌，
- *      prefers-reduced-motion 下全部归零。
- *   5) 两个开关是同一件东西的两个入口，共用一个 .hbd-btn 材质类，
- *      只有纵向位置不同（一列，间距走 --hbd-gap）；所以这里不写死任何一个按钮的
- *      完整外观，加第三个开关只需要再补一条 bottom。
- *   6) 每个圆点各自 position: fixed 定位，没有包一层 flex 容器 ——
- *      老按钮的 bottom 因此一个字节都没动，加开关不会挪走已经验收过的那个圆点。
- */
 :host {
-  /* all: initial 砍断站点继承下来的字号 / 字族 / 颜色。
-     自定义属性不受 all 影响，所以令牌写在它后面。
-     令牌前缀用 --hbd- 而不是 --hb-：站点自己就有 695 个 --hb-* 自定义属性，
-     同名的话读代码时极易看混（隔离上没问题，inherit 打不过 :host 里的声明）。 */
   all: initial;
 
-  --hbd-face: #14191e; /* 按钮面，取站点品牌黑（本身已偏冷） */
-  --hbd-face-hover: #1a1f25; /* hover 只抬一档，比上一版更冷 */
-  --hbd-ink: #dce3ea; /* 图标墨色：冷调浅灰。不用纯白，也不与页面白字抢 */
-  --hbd-edge: rgba(255, 255, 255, 0.13); /* 1px 描边：深色底上全靠它成形 */
+  --hbd-face: #14191e;
+  --hbd-face-hover: #1a1f25;
+  --hbd-ink: #dce3ea;
+  --hbd-edge: rgba(255, 255, 255, 0.13);
   --hbd-edge-hover: rgba(255, 255, 255, 0.22);
-  --hbd-ring-light: #f4f7fa; /* 焦点环内圈（深底上可见） */
-  --hbd-ring-dark: #0b0f13; /* 焦点环外圈（浅底上可见） */
-  --hbd-contact: 0 1px 2px rgba(0, 0, 0, 0.28); /* 唯一一层投影，只把按钮从内容上贴开 */
-  --hbd-size: 44px; /* 触控目标，不要再调小 */
-  --hbd-gap: 12px; /* 两个圆点之间的缝：够看出是两个目标，又不至于读成两簇 */
-  --hbd-inset: 16px; /* 距视口右边 */
-  --hbd-bottom: 24px; /* 最下面那个圆点距视口底边 */
+  --hbd-ring-light: #f4f7fa;
+  --hbd-ring-dark: #0b0f13;
+  --hbd-contact: 0 1px 2px rgba(0, 0, 0, 0.28);
+  --hbd-size: 44px;
+  --hbd-gap: 12px;
+  --hbd-inset: 16px;
+  --hbd-bottom: 24px;
   --hbd-icon-size: 20px;
-  --hbd-icon-stroke: 1.75; /* 20px 下等效约 1.46px，1x 屏不糊、2x 屏够精细 */
+  --hbd-icon-stroke: 1.75;
   --hbd-ease: cubic-bezier(0.2, 0, 0, 1);
   --hbd-t-hover: 160ms;
   --hbd-t-press: 90ms;
@@ -67,7 +39,6 @@
   background: var(--hbd-face);
   color: var(--hbd-ink);
   cursor: pointer;
-  /* 页面把 pointer-events 关掉时（全屏遮罩）按钮也不该跟着失效 */
   pointer-events: auto;
   -webkit-tap-highlight-color: transparent;
 
@@ -79,30 +50,29 @@
     transform var(--hbd-t-press) var(--hbd-ease);
 }
 
-/* 深色开关在下、精简开关在上：一列向上生长，新开关往上传不会动到老开关的位置 */
 #heybox-dark-toggle {
   bottom: var(--hbd-bottom);
 }
 #heybox-declutter-toggle {
   bottom: calc(var(--hbd-bottom) + var(--hbd-size) + var(--hbd-gap));
 }
+#heybox-reply-toggle {
+  bottom: calc(var(--hbd-bottom) + 2 * (var(--hbd-size) + var(--hbd-gap)));
+}
+#heybox-cards-toggle {
+  bottom: calc(var(--hbd-bottom) + 3 * (var(--hbd-size) + var(--hbd-gap)));
+}
 
-/* hover 只做两件小事：面抬一档、描边提亮。不放大、不加投影 ——
-   缩放会让按钮在密集列表上方抖，投影外扩会让它显得在「呼吸」。
-   面抬一档在浅色页面上是唯一的反馈来源（那时描边是看不见的）。 */
 .hbd-btn:hover {
   background: var(--hbd-face-hover);
   box-shadow: 0 0 0 1px var(--hbd-edge-hover), var(--hbd-contact);
 }
 
-/* 按压像按实体键：整体下沉 1px。90ms 内出反馈。 */
 .hbd-btn:active {
   transform: translateY(1px);
   box-shadow: 0 0 0 1px var(--hbd-edge), var(--hbd-contact);
 }
 
-/* 双色焦点环：outline 只能是一色，做不到「任何底色上都可见」，所以用两圈
-   box-shadow。先画的在上层，读作「浅圈 0~2px、深圈 2~4px」。 */
 .hbd-btn:focus-visible {
   outline: none;
   box-shadow:
@@ -117,8 +87,6 @@
   justify-content: center;
 }
 
-/* 图标几何由 ui.ts 提供（path 数据），视觉规格留在这里：
-   改线宽 / 尺寸 / 圆角端点不用碰 TS。 */
 .hbd-btn svg {
   display: block;
   width: var(--hbd-icon-size);
@@ -128,9 +96,6 @@
   stroke-width: var(--hbd-icon-stroke);
   stroke-linecap: round;
   stroke-linejoin: round;
-  /* 换图标 = 换节点，动画因此在每次切换时重放一遍。
-     纯淡入、不做缩放位移：换的是同一个位置上的同一类符号，没有方向可言。
-     不依赖 animationend 做任何状态判定。 */
   animation: hbd-icon-in var(--hbd-t-icon) var(--hbd-ease) both;
 }
 
@@ -152,8 +117,6 @@
   }
 }
 
-/* 强制配色下 box-shadow 会被系统丢掉，按钮会连形状一起消失。
-   这里换成系统色与真实边框，焦点环交给 Highlight。 */
 @media (forced-colors: active) {
   .hbd-btn {
     background: ButtonFace;
