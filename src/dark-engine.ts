@@ -601,6 +601,14 @@ html.${ROOT_CLASS} #page-bbs-link .page-header__user-info .page-header__follow-b
   background-color: #464b50;
 }
 
+html.${ROOT_CLASS} .search-input .el-input__wrapper {
+  box-shadow: none;
+}
+
+html.${ROOT_CLASS} .bbs-content__image {
+  box-shadow: none;
+}
+
 @media (prefers-color-scheme: dark) {
   html.${ROOT_CLASS} .article-vote .vote-wrapper .vote-submit.active p {
     background-image: none;
