@@ -1,7 +1,9 @@
 
-import { lookupMeta } from './comment-api-cache';
-import { isRowClickSynthesized } from './reply-btn';
+import { lookupMeta, type ThreadReplyMeta } from './comment-api-cache';
+import { ensureOwnStyle, removeOwnStyle } from './own-style';
+import { appendToRowDock, dropRowControl, pruneEmptyRowDocks } from './row-dock';
 import commentCardsCss from './comment-cards.css?inline';
+import rowDockCss from './row-dock.css?inline';
 import tokensCss from './tokens.css?inline';
 
 const STORAGE_KEY = 'heybox-comment-cards';
@@ -13,34 +15,26 @@ const AVATAR_CLASS = 'hb-tc__avatar';
 const AVATAR_FALLBACK_CLASS = 'hb-tc__avatar--fallback';
 const REPLYTO_CLASS = 'hb-tc__replyto';
 export const CARD_REPLY_CLASS = 'hb-card-reply';
-export const CARD_FLOOR_CLASS = 'hb-tc__floor';
-export const CARD_FOLD_CLASS = 'hb-tc__fold';
+const CARD_FLOOR_CLASS = 'hb-tc__floor';
+const CARD_FOLD_CLASS = 'hb-tc__fold';
 const CARD_LINK_CLASS = 'hb-tc__link';
 const FLASH_CLASS = 'hb-tc--flash';
 const FLASH_MS = 1200;
 const FOLDED_CLASS = 'hb-tc--folded';
 
+export const CARD_ATTR = 'data-hb-tc';
 const OWN_ATTR = 'data-hb-own';
-const DONE_ATTR = 'data-hb-tc';
 
 const CHILD_ROW_SELECTOR = '.comment-children-item';
 const MAIN_ROW_SELECTOR = '.link-comment__comment-item';
 const THREAD_SELECTOR = '.link-comment__comment-children';
-const OPERATION_BOX_SELECTOR = '.comment-item-header__operation-box';
+const CONTENT_CONTAINER_SELECTOR = '.comment-item__content-container';
 const CONTENT_SELECTOR = '.children-item__comment-content';
 const CREATOR_SELECTOR = '.children-item__comment-creator';
 const REPLYTO_SITE_SELECTOR = '.children-item__reply-to';
 const OTHER_INFO_SELECTOR = '.children-item__other-info';
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const RETRY_DELAYS = [500, 1500, 4000];
-
-export interface ThreadReplyMeta {
-  authorAvatar?: string;
-  authorName?: string;
-  replyToName?: string;
-  replyToUserId?: string;
-  replyId?: string;
-}
 
 const PLANE_PATHS = ['M21.3 3.2 2.9 10.4 12.6 20.4Z', 'M9.1 12.7 21.3 3.2'];
 
@@ -49,8 +43,6 @@ type CardsListener = (enabled: boolean) => void;
 const listeners = new Set<CardsListener>();
 
 let applied = false;
-let styleAttached = false;
-let headProbe: MutationObserver | null = null;
 let observer: MutationObserver | null = null;
 let retryTimer: number | null = null;
 const pendingMeta = new Set<HTMLElement>();
@@ -136,20 +128,12 @@ function softHue(seed: string): number {
 }
 
 
-export function getThreadMeta(commentId: string): ThreadReplyMeta | null {
-  if (!commentId) return null;
-  const meta = lookupMeta(commentId) as ThreadReplyMeta | null | undefined;
-  if (!meta || typeof meta !== 'object') return null;
-  return meta;
-}
-
-
 function applyFallbackHue(box: HTMLElement, row: HTMLElement): void {
   box.style.setProperty('--hb-ui-hue', String(softHue(creatorUserIdOf(row) || creatorNameOf(row) || 'hb')));
 }
 
 function buildAvatar(row: HTMLElement): HTMLElement {
-  const meta = getThreadMeta(row.dataset.commentId ?? '');
+  const meta = lookupMeta(row.dataset.commentId ?? '');
 
   const box = document.createElement('span');
   box.className = AVATAR_CLASS;
@@ -191,7 +175,7 @@ function buildReplyTo(row: HTMLElement): HTMLElement | null {
   if (!site) return null;
   if (normalizeText(site.textContent) !== ':') return null;
 
-  const meta = getThreadMeta(row.dataset.commentId ?? '');
+  const meta = lookupMeta(row.dataset.commentId ?? '');
   if (!meta) return null;
 
   const thread = threadOf(row);
@@ -316,15 +300,13 @@ function attachReplyButton(row: HTMLElement, btn: HTMLButtonElement): void {
 
     if (!row.isConnected) return;
 
-    if (isRowClickSynthesized(btn)) return;
-
     row.click();
   });
 }
 
 
 function rowStamped(row: HTMLElement): boolean {
-  return row.getAttribute(DONE_ATTR) === '1' && row.classList.contains(CARD_CLASS);
+  return row.getAttribute(CARD_ATTR) === '1' && row.classList.contains(CARD_CLASS);
 }
 
 function decorateRow(row: HTMLElement): boolean {
@@ -344,7 +326,6 @@ function decorateRow(row: HTMLElement): boolean {
     else row.appendChild(avatar);
     touched = true;
   }
-  row.classList.toggle('hb-tc-no-avatar', !avatar);
   if (row.classList.contains(CARD_CLASS) === false) {
     row.classList.add(CARD_CLASS);
     touched = true;
@@ -379,13 +360,12 @@ function decorateRow(row: HTMLElement): boolean {
     touched = true;
   }
 
-  if (avatar && avatar !== row.firstElementChild) {
-    const first = row.firstElementChild;
-    if (first) row.insertBefore(avatar, first);
+  if (avatar !== row.firstElementChild) {
+    row.insertBefore(avatar, row.firstElementChild);
     touched = true;
   }
 
-  row.setAttribute(DONE_ATTR, '1');
+  row.setAttribute(CARD_ATTR, '1');
 
   if (!hadStamp || touched) {
     const fallbackAvatar = !avatar || avatar.classList.contains(AVATAR_FALLBACK_CLASS);
@@ -464,24 +444,34 @@ function decorateFold(mainRow: HTMLElement): void {
   const key = mainRowKey(mainRow);
   const thread = mainRow.querySelector<HTMLElement>(THREAD_SELECTOR);
   const count = thread ? thread.querySelectorAll<HTMLElement>(CHILD_ROW_SELECTOR).length : 0;
-  const box = mainRow.querySelector<HTMLElement>(OPERATION_BOX_SELECTOR);
-  const existing = box ? box.querySelector<HTMLButtonElement>(`:scope > .${CARD_FOLD_CLASS}`) : null;
+  const anchor = mainRow.querySelector<HTMLElement>(CONTENT_CONTAINER_SELECTOR);
+  const existing = anchor
+    ? anchor.querySelector<HTMLButtonElement>(`.${CARD_FOLD_CLASS}`)
+    : null;
   const folded = count > 0 && key !== '' && foldedRoots.has(key);
 
   if (thread) thread.classList.toggle(FOLDED_CLASS, folded);
 
-  if (!box || count === 0 || key === '') {
-    existing?.remove();
+  if (!anchor || count === 0 || key === '') {
+    if (anchor) dropRowControl(anchor, CARD_FOLD_CLASS);
+    else pruneEmptyRowDocks();
     return;
   }
 
   const btn = existing ?? createFoldButton(mainRow);
-  if (!existing) box.appendChild(btn);
+  if (!existing) appendToRowDock(anchor, btn, THREAD_SELECTOR);
   syncFoldButton(btn, count, folded);
 }
 
 function decorateThreads(): void {
   for (const mainRow of document.querySelectorAll<HTMLElement>(MAIN_ROW_SELECTOR)) decorateFold(mainRow);
+}
+
+function ensureFoldsInPlace(): void {
+  for (const mainRow of document.querySelectorAll<HTMLElement>(MAIN_ROW_SELECTOR)) {
+    if (!mainRow.isConnected) continue;
+    if (!mainRow.querySelector(`.${CARD_FOLD_CLASS}`)) decorateFold(mainRow);
+  }
 }
 
 let retryRound = 0;
@@ -504,7 +494,7 @@ function scheduleRetry(): void {
         pendingMeta.delete(row);
         continue;
       }
-      const meta = getThreadMeta(row.dataset.commentId ?? '');
+      const meta = lookupMeta(row.dataset.commentId ?? '');
       if (meta) {
         pendingMeta.delete(row);
         decorateRow(row);
@@ -512,47 +502,6 @@ function scheduleRetry(): void {
     }
     if (pendingMeta.size > 0) scheduleRetry();
   }, delay);
-}
-
-
-function stopHeadProbe(): void {
-  headProbe?.disconnect();
-  headProbe = null;
-}
-
-function ensureStyle(): void {
-  if (styleAttached && document.getElementById(STYLE_ID)) return;
-
-  const head = document.head;
-  if (!head) {
-    if (headProbe) return;
-    headProbe = new MutationObserver(() => {
-      if (!document.head) return;
-      stopHeadProbe();
-      ensureStyle();
-    });
-    headProbe.observe(document, { childList: true, subtree: true });
-    return;
-  }
-
-  const existing = document.getElementById(STYLE_ID);
-  if (existing) {
-    styleAttached = true;
-    return;
-  }
-
-  const el = document.createElement('style');
-  el.id = STYLE_ID;
-  el.setAttribute(OWN_ATTR, '');
-  el.textContent = `${tokensCss}\n${commentCardsCss}`;
-  head.appendChild(el);
-  styleAttached = true;
-}
-
-function removeStyle(): void {
-  document.getElementById(STYLE_ID)?.remove();
-  styleAttached = false;
-  stopHeadProbe();
 }
 
 
@@ -579,6 +528,7 @@ function ensureObserver(): void {
       }
     }
     for (const main of touchedThreads) decorateFold(main);
+    ensureFoldsInPlace();
     if (pendingMeta.size > 0) scheduleRetry();
   });
   observer.observe(document.documentElement, { childList: true, subtree: true });
@@ -614,14 +564,14 @@ function detach(): void {
   )) {
     node.remove();
   }
-  for (const row of document.querySelectorAll(`[${DONE_ATTR}]`)) {
-    row.removeAttribute(DONE_ATTR);
+  for (const row of document.querySelectorAll(`[${CARD_ATTR}]`)) {
+    row.removeAttribute(CARD_ATTR);
     row.removeAttribute('data-hb-reply-kind');
     row.classList.remove(CARD_CLASS);
     row.classList.remove(FLASH_CLASS);
-    row.classList.remove('hb-tc-no-avatar');
   }
   for (const thread of document.querySelectorAll(`.${FOLDED_CLASS}`)) thread.classList.remove(FOLDED_CLASS);
+  pruneEmptyRowDocks();
   foldedRoots.clear();
 }
 
@@ -647,12 +597,12 @@ export function applyCommentCards(enabled: boolean): void {
 
   if (enabled) {
     root.classList.add(ROOT_CLASS);
-    ensureStyle();
+    ensureOwnStyle(STYLE_ID, `${tokensCss}\n${rowDockCss}\n${commentCardsCss}`);
     attach();
   } else {
     root.classList.remove(ROOT_CLASS);
     detach();
-    removeStyle();
+    removeOwnStyle(STYLE_ID);
   }
 
   try {

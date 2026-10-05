@@ -1,0 +1,17 @@
+
+.hb-row-dock {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: var(--hb-ui-gap-block);
+}
+
+.hb-row-dock > * {
+  margin-left: 0;
+  order: 1;
+}
+
+.hb-row-dock > .hb-tc__fold {
+  order: 0;
+}

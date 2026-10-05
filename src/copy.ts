@@ -1,16 +1,14 @@
 
 import copyCss from './copy.css?inline';
+import { ensureOwnStyle, removeOwnStyle } from './own-style';
 
 const STORAGE_KEY = 'heybox-copy';
 const STYLE_ID = 'hb-copy';
-
-export const COPY_CLASS = 'hb-copy';
+const COPY_CLASS = 'hb-copy';
 
 const SNAPSHOT_TTL = 3000;
 
 const FOCUS_GRAB_WINDOW = 500;
-
-let headProbe: MutationObserver | null = null;
 
 let rescueAttached = false;
 let snapshot: { text: string; revokedAt: number } | null = null;
@@ -119,46 +117,18 @@ export function isCopyEnabled(): boolean {
   }
 }
 
-function ensureStyle(): void {
-  if (document.getElementById(STYLE_ID)) return;
-
-  const head = document.head;
-  if (!head) {
-    if (headProbe) return;
-    headProbe = new MutationObserver(() => {
-      if (!document.head) return;
-      stopHeadProbe();
-      ensureStyle();
-    });
-    headProbe.observe(document, { childList: true, subtree: true });
-    return;
-  }
-
-  const el = document.createElement('style');
-  el.id = STYLE_ID;
-  el.setAttribute('data-hb-own', '');
-  el.textContent = copyCss;
-  head.appendChild(el);
-}
-
-function stopHeadProbe(): void {
-  headProbe?.disconnect();
-  headProbe = null;
-}
-
 export function applyCopy(enabled: boolean): void {
   const root = document.documentElement;
   if (!root) return;
 
   if (enabled) {
     root.classList.add(COPY_CLASS);
-    ensureStyle();
+    ensureOwnStyle(STYLE_ID, copyCss);
     attach();
   } else {
     detach();
     root.classList.remove(COPY_CLASS);
-    stopHeadProbe();
-    document.getElementById(STYLE_ID)?.remove();
+    removeOwnStyle(STYLE_ID);
   }
 
   try {

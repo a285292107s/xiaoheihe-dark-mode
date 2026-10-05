@@ -323,10 +323,7 @@ interface AnyRule {
   selectorText?: string;
   style?: CSSStyleDeclaration;
   cssRules?: CSSRuleList;
-  conditionText?: string;
-  media?: MediaList;
   keyText?: string;
-  name?: string;
 }
 
 interface PendingRule {

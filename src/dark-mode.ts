@@ -33,24 +33,12 @@ export function isDarkEnabled(): boolean {
 }
 
 function ensureBaseStyle(): void {
-  const inject = (): void => {
-    if (document.getElementById(BASE_STYLE_ID)) return;
-    const el = document.createElement('style');
-    el.id = BASE_STYLE_ID;
-    el.setAttribute('data-hb-own', '');
-    el.textContent = baseCss;
-    (document.head ?? document.documentElement).appendChild(el);
-  };
-
-  inject();
   if (document.getElementById(BASE_STYLE_ID)) return;
-
-  const obs = new MutationObserver(() => {
-    if (!document.head && !document.documentElement) return;
-    obs.disconnect();
-    inject();
-  });
-  obs.observe(document, { childList: true, subtree: true });
+  const el = document.createElement('style');
+  el.id = BASE_STYLE_ID;
+  el.setAttribute('data-hb-own', '');
+  el.textContent = baseCss;
+  (document.head ?? document.documentElement).appendChild(el);
 }
 
 export function applyDark(enabled: boolean): void {

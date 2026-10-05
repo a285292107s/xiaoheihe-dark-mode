@@ -1,17 +1,16 @@
+
 html.hb-reply-btn .hb-reply {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
+  width: var(--hb-ui-size-control);
   height: var(--hb-ui-size-control);
-  padding: 0 8px;
-  margin-left: 8px;
-  border: 1px solid var(--hb-ui-edge-control);
-  border-radius: var(--hb-ui-radius-pill);
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--hb-ui-radius-control);
   background: transparent;
-  color: var(--hb-ui-ink-soft);
-  font-size: var(--hb-ui-font-label);
-  line-height: 1;
-  white-space: nowrap;
+  color: var(--hb-ui-ink-muted);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   -webkit-user-select: none;
@@ -22,6 +21,17 @@ html.hb-reply-btn .hb-reply {
     border-color 120ms ease,
     background-color 120ms ease,
     transform 90ms ease;
+}
+
+html.hb-reply-btn .hb-reply svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 html.hb-reply-btn .hb-reply:hover {

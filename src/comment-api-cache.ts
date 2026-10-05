@@ -130,20 +130,8 @@ const xhrListening = new WeakSet<object>();
 
 let attached = false;
 
-let origXhrOpen: AnyFn | null = null;
-let origXhrSend: AnyFn | null = null;
-let patchedXhrOpen: AnyFn | null = null;
-let patchedXhrSend: AnyFn | null = null;
-
-let origFetch: FetchLike | null = null;
-let patchedFetch: FetchLike | null = null;
-
 function matchesApiUrl(url: string): boolean {
-  try {
-    return url !== '' && API_URL_PATTERN.test(url);
-  } catch {
-    return false;
-  }
+  return url !== '' && API_URL_PATTERN.test(url);
 }
 
 function urlFromOpenArgs(args: unknown[]): string {
@@ -179,7 +167,6 @@ function readXhrPayload(xhr: XMLHttpRequest): unknown {
 }
 
 function patchXhr(): void {
-  if (origXhrOpen) return;
   const proto = (globalThis as { XMLHttpRequest?: { prototype: XMLHttpRequest } }).XMLHttpRequest?.prototype;
   if (!proto) return;
 
@@ -215,27 +202,9 @@ function patchXhr(): void {
 
   proto.open = nextOpen as unknown as XMLHttpRequest['open'];
   proto.send = nextSend as unknown as XMLHttpRequest['send'];
-  origXhrOpen = openFn;
-  origXhrSend = sendFn;
-  patchedXhrOpen = nextOpen;
-  patchedXhrSend = nextSend;
-}
-
-function unpatchXhr(): void {
-  if (!origXhrOpen) return;
-  const proto = (globalThis as { XMLHttpRequest?: { prototype: XMLHttpRequest } }).XMLHttpRequest?.prototype;
-  if (proto) {
-    if ((proto.open as unknown) === patchedXhrOpen) proto.open = origXhrOpen as unknown as XMLHttpRequest['open'];
-    if ((proto.send as unknown) === patchedXhrSend) proto.send = origXhrSend as unknown as XMLHttpRequest['send'];
-  }
-  origXhrOpen = null;
-  origXhrSend = null;
-  patchedXhrOpen = null;
-  patchedXhrSend = null;
 }
 
 function patchFetch(): void {
-  if (origFetch) return;
   const g = globalThis as { fetch?: FetchLike };
   const fn = g.fetch;
   if (typeof fn !== 'function') return;
@@ -271,16 +240,6 @@ function patchFetch(): void {
   };
 
   g.fetch = nextFetch;
-  origFetch = fn;
-  patchedFetch = nextFetch;
-}
-
-function unpatchFetch(): void {
-  if (!origFetch) return;
-  const g = globalThis as { fetch?: FetchLike };
-  if (g.fetch === patchedFetch) g.fetch = origFetch;
-  origFetch = null;
-  patchedFetch = null;
 }
 
 export function attachApiCache(): void {
@@ -292,19 +251,6 @@ export function attachApiCache(): void {
   }
   try {
     patchFetch();
-  } catch {
-  }
-}
-
-export function detachApiCache(): void {
-  if (!attached) return;
-  attached = false;
-  try {
-    unpatchXhr();
-  } catch {
-  }
-  try {
-    unpatchFetch();
   } catch {
   }
 }

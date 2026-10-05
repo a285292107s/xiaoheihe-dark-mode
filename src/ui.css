@@ -56,11 +56,8 @@
 #heybox-declutter-toggle {
   bottom: calc(var(--hbd-bottom) + var(--hbd-size) + var(--hbd-gap));
 }
-#heybox-reply-toggle {
+#heybox-comment-toggle {
   bottom: calc(var(--hbd-bottom) + 2 * (var(--hbd-size) + var(--hbd-gap)));
-}
-#heybox-cards-toggle {
-  bottom: calc(var(--hbd-bottom) + 3 * (var(--hbd-size) + var(--hbd-gap)));
 }
 
 .hbd-btn:hover {

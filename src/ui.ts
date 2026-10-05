@@ -8,8 +8,7 @@ import uiCss from './ui.css?inline';
 const HOST_ID = 'heybox-dark-mode-root';
 const DARK_BUTTON_ID = 'heybox-dark-toggle';
 const DECLUTTER_BUTTON_ID = 'heybox-declutter-toggle';
-const REPLY_BUTTON_ID = 'heybox-reply-toggle';
-const CARDS_BUTTON_ID = 'heybox-cards-toggle';
+const COMMENT_BUTTON_ID = 'heybox-comment-toggle';
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 const ICON_MOON = ['M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z'];
@@ -25,14 +24,6 @@ const ICON_PANEL_FULL = [
   'M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z',
   'M6 9.5h12',
   'M6 14h8',
-];
-
-const ICON_REPLY = [
-  'M4 5.5h16a1.5 1.5 0 0 1 1.5 1.5v8A1.5 1.5 0 0 1 20 16.5H12l-4.2 3.2a.5.5 0 0 1-.8-.4V16.5H4A1.5 1.5 0 0 1 2.5 15V7A1.5 1.5 0 0 1 4 5.5Z',
-];
-const ICON_REPLY_OFF = [
-  'M4 5.5h16a1.5 1.5 0 0 1 1.5 1.5v8A1.5 1.5 0 0 1 20 16.5H12l-4.2 3.2a.5.5 0 0 1-.8-.4V16.5H4A1.5 1.5 0 0 1 2.5 15V7A1.5 1.5 0 0 1 4 5.5Z',
-  'M3.8 20.2 20.2 3.8',
 ];
 
 const ICON_CARDS = [
@@ -115,22 +106,12 @@ function paintDeclutter(control: Control, on: boolean): void {
   );
 }
 
-function paintReplyBtn(control: Control, on: boolean): void {
-  paint(
-    control,
-    on ? ICON_REPLY : ICON_REPLY_OFF,
-    undefined,
-    on ? '关闭评论免打扰（恢复点整行弹回复框）' : '点正文不再弹回复框（改用行内「回复」按钮）',
-    on,
-  );
-}
-
-function paintCards(control: Control, on: boolean): void {
+function paintCommentEnhance(control: Control, on: boolean): void {
   paint(
     control,
     on ? ICON_CARDS : ICON_CARDS_OFF,
     on ? CARDS_AVATAR_DOT : undefined,
-    on ? '恢复楼中楼原本的一行式显示' : '把楼中楼每条回复显示成卡片',
+    on ? '关闭评论区增强（恢复一行式楼中楼，点正文重新弹回复框）' : '开启评论区增强（楼中楼卡片化 + 点正文不弹回复框）',
     on,
   );
 }
@@ -150,22 +131,25 @@ export function mountControls(): void {
 
   const darkControl = createControl(shadow, DARK_BUTTON_ID);
   const declutterControl = createControl(shadow, DECLUTTER_BUTTON_ID);
-  const replyControl = createControl(shadow, REPLY_BUTTON_ID);
-  const cardsControl = createControl(shadow, CARDS_BUTTON_ID);
+  const commentControl = createControl(shadow, COMMENT_BUTTON_ID);
+
+  const commentEnhanceOn = (): boolean => isReplyBtnEnabled() && isCommentCardsEnabled();
 
   darkControl.button.addEventListener('click', () => applyDark(!isDarkEnabled()));
   declutterControl.button.addEventListener('click', () => applyDeclutter(!isDeclutterEnabled()));
-  replyControl.button.addEventListener('click', () => applyReplyBtn(!isReplyBtnEnabled()));
-  cardsControl.button.addEventListener('click', () => applyCommentCards(!isCommentCardsEnabled()));
+  commentControl.button.addEventListener('click', () => {
+    const next = !commentEnhanceOn();
+    applyReplyBtn(next);
+    applyCommentCards(next);
+  });
 
   onDarkChange((dark) => paintDark(darkControl, dark));
   onDeclutterChange((on) => paintDeclutter(declutterControl, on));
-  onReplyBtnChange((on) => paintReplyBtn(replyControl, on));
-  onCommentCardsChange((on) => paintCards(cardsControl, on));
+  onReplyBtnChange(() => paintCommentEnhance(commentControl, commentEnhanceOn()));
+  onCommentCardsChange(() => paintCommentEnhance(commentControl, commentEnhanceOn()));
   paintDark(darkControl, isDarkEnabled());
   paintDeclutter(declutterControl, isDeclutterEnabled());
-  paintReplyBtn(replyControl, isReplyBtnEnabled());
-  paintCards(cardsControl, isCommentCardsEnabled());
+  paintCommentEnhance(commentControl, commentEnhanceOn());
 
   document.documentElement.appendChild(host);
 }

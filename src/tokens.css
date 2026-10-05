@@ -1,7 +1,9 @@
 
 html.hb-comment-cards [data-hb-tc],
 html.hb-comment-cards .hb-tc__fold,
-html.hb-reply-btn .hb-reply {
+html.hb-reply-btn .hb-reply,
+html.hb-comment-cards .hb-row-dock,
+html.hb-reply-btn .hb-row-dock {
   --hb-ui-hue: 210;
 
   --hb-ui-font-meta: 10px;
@@ -38,7 +40,9 @@ html.hb-reply-btn .hb-reply {
 
 html.hb-dark.hb-comment-cards [data-hb-tc],
 html.hb-dark.hb-comment-cards .hb-tc__fold,
-html.hb-dark.hb-reply-btn .hb-reply {
+html.hb-dark.hb-reply-btn .hb-reply,
+html.hb-dark.hb-comment-cards .hb-row-dock,
+html.hb-dark.hb-reply-btn .hb-row-dock {
   --hb-ui-surface: #2e353d;
   --hb-ui-ink: #dce3ea;
   --hb-ui-ink-muted: #b6bec7;

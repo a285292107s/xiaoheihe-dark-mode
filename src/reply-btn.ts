@@ -1,5 +1,9 @@
 
+import { CARD_ATTR, CARD_REPLY_CLASS } from './comment-cards';
+import { ensureOwnStyle, removeOwnStyle } from './own-style';
+import { appendToRowDock, buildPlaneIcon, dropRowControl, pruneEmptyRowDocks } from './row-dock';
 import replyBtnCss from './reply-btn.css?inline';
+import rowDockCss from './row-dock.css?inline';
 import tokensCss from './tokens.css?inline';
 
 const STORAGE_KEY = 'heybox-reply-btn';
@@ -8,35 +12,18 @@ const REPLY_CLASS = 'hb-reply-btn';
 
 const MAIN_ROW_SELECTOR = '.link-comment__comment-item';
 const CHILD_ROW_SELECTOR = '.comment-children-item';
-const ROW_SELECTOR = MAIN_ROW_SELECTOR;
-const MAIN_ANCHOR_SELECTOR = '.comment-item-header__operation-box';
+const MAIN_ANCHOR_SELECTOR = '.comment-item__content-container';
+const THREAD_SELECTOR = '.link-comment__comment-children';
 const BTN_CLASS = 'hb-reply';
-const CARD_REPLY_CLASS = 'hb-card-reply';
 const ROW_BTN_SELECTOR = `.${BTN_CLASS}, .${CARD_REPLY_CLASS}`;
-
-const HB_CARD_ATTR = 'data-hb-tc';
 
 type ReplyListener = (enabled: boolean) => void;
 const listeners = new Set<ReplyListener>();
 
-let headProbe: MutationObserver | null = null;
 let observer: MutationObserver | null = null;
 let guardAttached = false;
 
 let passThrough = 0;
-
-let syntheticTarget: HTMLElement | null = null;
-
-function setSyntheticTarget(el: HTMLElement | null): void {
-  syntheticTarget = el;
-}
-
-export function isRowClickSynthesized(el?: Element | null): boolean {
-  if (passThrough <= 0) return false;
-  if (!el) return true;
-  const target = el as HTMLElement;
-  return syntheticTarget === target || target.contains(syntheticTarget);
-}
 
 function nodeToElement(node: EventTarget | Node | null): HTMLElement | null {
   if (!node) return null;
@@ -59,7 +46,7 @@ function shouldBlock(el: HTMLElement | null): boolean {
   if (!el) return false;
   if (isSiteInteractive(el) || isImageZone(el)) return false;
 
-  if (el.closest(`[${HB_CARD_ATTR}]`) || el.closest(CHILD_ROW_SELECTOR)) return true;
+  if (el.closest(`[${CARD_ATTR}]`) || el.closest(CHILD_ROW_SELECTOR)) return true;
 
   const mainRow = el.closest(MAIN_ROW_SELECTOR);
   if (!mainRow) return false;
@@ -77,10 +64,8 @@ function onClickCapture(event: MouseEvent): void {
     if (host) {
       passThrough += 1;
       try {
-        setSyntheticTarget(el);
         host.click();
       } finally {
-        setSyntheticTarget(null);
         passThrough -= 1;
       }
     }
@@ -95,41 +80,14 @@ function onClickCapture(event: MouseEvent): void {
   event.stopPropagation();
 }
 
-function ensureStyle(): void {
-  if (document.getElementById(STYLE_ID)) return;
-
-  const head = document.head;
-  if (!head) {
-    if (headProbe) return;
-    headProbe = new MutationObserver(() => {
-      if (!document.head) return;
-      stopHeadProbe();
-      ensureStyle();
-    });
-    headProbe.observe(document, { childList: true, subtree: true });
-    return;
-  }
-
-  const el = document.createElement('style');
-  el.id = STYLE_ID;
-  el.setAttribute('data-hb-own', '');
-  el.textContent = `${tokensCss}\n${replyBtnCss}`;
-  head.appendChild(el);
-}
-
-function stopHeadProbe(): void {
-  headProbe?.disconnect();
-  headProbe = null;
-}
-
 function createButton(): HTMLButtonElement {
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.className = BTN_CLASS;
   btn.setAttribute('data-hb-own', '');
-  btn.textContent = '回复';
   btn.title = '回复这条评论';
   btn.setAttribute('aria-label', '回复这条评论');
+  btn.appendChild(buildPlaneIcon());
   btn.addEventListener('mousedown', (e) => e.stopPropagation());
   return btn;
 }
@@ -139,13 +97,13 @@ function decorateRow(row: Element): void {
   if (row.querySelector(`.${BTN_CLASS}`)) return;
 
   const anchor = row.querySelector(MAIN_ANCHOR_SELECTOR);
-  if (!anchor || !anchor.parentElement) return;
+  if (!anchor) return;
 
-  anchor.appendChild(createButton());
+  appendToRowDock(anchor as HTMLElement, createButton(), THREAD_SELECTOR);
 }
 
 function decorateAll(): void {
-  for (const row of document.querySelectorAll(ROW_SELECTOR)) decorateRow(row);
+  for (const row of document.querySelectorAll(MAIN_ROW_SELECTOR)) decorateRow(row);
 }
 
 function ensureObserver(): void {
@@ -155,9 +113,12 @@ function ensureObserver(): void {
       for (const node of r.addedNodes) {
         if (node.nodeType !== 1) continue;
         const el = node as HTMLElement;
-        if (el.matches(ROW_SELECTOR)) decorateRow(el);
-        for (const row of el.querySelectorAll(ROW_SELECTOR)) decorateRow(row);
+        if (el.matches(MAIN_ROW_SELECTOR)) decorateRow(el);
+        for (const row of el.querySelectorAll(MAIN_ROW_SELECTOR)) decorateRow(row);
       }
+    }
+    for (const anchor of document.querySelectorAll(MAIN_ANCHOR_SELECTOR)) {
+      if (!anchor.querySelector(`.${BTN_CLASS}`)) decorateRow(anchor.closest(MAIN_ROW_SELECTOR) ?? anchor);
     }
   });
   observer.observe(document.documentElement, { childList: true, subtree: true });
@@ -177,7 +138,12 @@ function detach(): void {
   document.removeEventListener('click', onClickCapture, true);
   observer?.disconnect();
   observer = null;
-  for (const b of document.querySelectorAll(`.${BTN_CLASS}`)) b.remove();
+  for (const b of document.querySelectorAll(`.${BTN_CLASS}`)) {
+    const anchor = b.closest(MAIN_ANCHOR_SELECTOR);
+    b.remove();
+    if (anchor) dropRowControl(anchor, BTN_CLASS);
+  }
+  pruneEmptyRowDocks();
 }
 
 export function onReplyBtnChange(fn: ReplyListener): () => void {
@@ -201,13 +167,12 @@ export function applyReplyBtn(enabled: boolean): void {
 
   if (enabled) {
     root.classList.add(REPLY_CLASS);
-    ensureStyle();
+    ensureOwnStyle(STYLE_ID, `${tokensCss}\n${rowDockCss}\n${replyBtnCss}`);
     attach();
   } else {
     detach();
     root.classList.remove(REPLY_CLASS);
-    stopHeadProbe();
-    document.getElementById(STYLE_ID)?.remove();
+    removeOwnStyle(STYLE_ID);
   }
 
   try {
