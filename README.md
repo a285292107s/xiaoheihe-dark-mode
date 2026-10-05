@@ -6,7 +6,7 @@
 
 另带两个可开关的功能，和一个常驻的修复层：
 
-- **精简模式**（右下角第二个开关，默认开启）：隐藏顶部导航的「首页」入口与社区页信息流右侧那一栏。
+- **精简模式**（右下角第二个开关，默认开启）：隐藏顶部导航的「首页」入口，以及社区页信息流与帖子详情页右侧的那一栏。
 - **复制解锁**（常驻开启，**没有开关按钮**）：让评论区与楼中楼的内容真的能选中、复制。
   根因不是站点的禁选样式，而是「点评论 = 回复此楼」这条流程会展开 ProseMirror 回复框、
   抢走焦点并把正在建立的选区毁掉；脚本在选区被这样毁掉后的 3 秒内用快照救回一次 Ctrl+C
@@ -64,7 +64,7 @@ https://raw.githubusercontent.com/a285292107s/xiaoheihe-dark-mode/main/dist/xiao
 | 按钮 | 作用 | 偏好键 |
 |---|---|---|
 | 最下面那个（月亮 / 太阳） | 深色 / 浅色 | `localStorage` 的 `heybox-dark-mode`（`'1'` / `'0'`）。**未设置过时跟随系统** `prefers-color-scheme` |
-| 倒数第二个（面板） | 精简模式：隐藏首页入口与社区页右侧栏 | `localStorage` 的 `heybox-declutter`（`'1'` / `'0'`）。**未设置过时默认开启** |
+| 倒数第二个（面板） | 精简模式：隐藏首页入口与社区页 / 帖子详情页右侧栏 | `localStorage` 的 `heybox-declutter`（`'1'` / `'0'`）。**未设置过时默认开启** |
 | 最上面那个（气泡） | 评论区增强：楼中楼卡片化 + 评论免打扰（点正文不弹回复框，改用发言内容右下方的纸飞机） | `localStorage` 的 `heybox-comment-cards` 与 `heybox-reply-btn`（`'1'` / `'0'`），一次点击两个键一起读写。**未设置过时默认开启** |
 
 两个开关互不依赖：可以只开一个，也可以全开。
@@ -111,16 +111,18 @@ https://raw.githubusercontent.com/a285292107s/xiaoheihe-dark-mode/main/dist/xiao
 
 ## 精简模式隐藏了什么
 
-只有两处（全在 [`src/declutter.css`](src/declutter.css)）：
+三处（全在 [`src/declutter.css`](src/declutter.css)）：
 
 | 选择器 | 位置 | 说明 |
 |---|---|---|
 | `.nav .nav-content .nav-links > .nav-link:first-child` | 全站顶部导航 | 「首页」入口。导航项由站点的配置数组渲染，首项恒为「首页」（英文变体是 Home）；CSS 无法按文本匹配，所以只能用位置表达 |
 | `#page-bbs-community > .content > .right` | 社区页信息流右侧 | 热门社区 / 下载 App / 页脚那一栏。等价于 `#page-bbs-community > div.content > div` —— `.content` 下只有 `main.list` 与它两个元素子节点 |
+| `#page-bbs-link > .content > .right` | 帖子详情页右侧 | 「相似内容」推荐那一栏，与社区页用的是同一套 `cpt-right-side right` 组件 |
 
-只藏侧栏是不够的：容器宽 1032px，而列表被站点自己的 `max-width:660px` 卡着，
+社区页只藏侧栏是不够的：容器宽 1032px，而列表被站点自己的 `max-width:660px` 卡着，
 藏完会在右边空出 356px。所以精简层同时复用了站点**自己的** `<1080px` 布局
 （侧栏隐藏 + 列表取消上限 + 内容居中），与站点在窄屏下的表现逐条一致。
+详情页不用补：主列 `.list` 本来就是 `flex: 1 1 0%`，侧栏一藏就自己撑满容器。
 
 实现上只是 `<html>` 上一个类名 + 一层带 `data-hb-own` 的样式表：
 选择器都多一层 `html.hb-declutter` 前缀，权重高过站点规则，因此**不需要 `!important`**，
@@ -356,8 +358,8 @@ GET /bbs/app/link/tree?…&link_id=<id>
 - 精简模式隐藏的「首页」入口是**按位置**选的（导航首项）。站点若调整导航顺序，
   这条规则要跟着改；`verify:declutter` 会在真实站点上断言首项文字仍是「首页」/`Home`，
   顺序一变就红。
-- 精简模式只处理社区页（`#page-bbs-community`）的右侧栏，其它页面的侧栏不受影响，
-  也没有接「隐藏搜索框 / 隐藏页脚」之类的额外项。
+- 精简模式只处理社区页（`#page-bbs-community`）与帖子详情页（`#page-bbs-link`）的右侧栏，
+  其它页面的侧栏不受影响，也没有接「隐藏搜索框 / 隐藏页脚」之类的额外项。
 - 复制解锁的救回只在**选区被站点毁掉的 3 秒内**有效：先选中、趁编辑器还没抢完焦点按 Ctrl+C 最稳。
   若先点了评论、隔了几秒才想起复制，脚本救不回，站点也不会重新给你一个选区。
 - 选区落在 `contenteditable`（回复框、搜索框等）里时脚本完全不插手，那里归站点的复制管线管。
@@ -487,7 +489,7 @@ src/
   dark-mode.ts       深色开关状态、偏好存储、基础层注入、订阅
   dark-base.css      基础层：画布底色、color-scheme、滚动条、placeholder、选区
   declutter.ts       精简开关状态、偏好存储、样式注入、订阅
-  declutter.css      精简层：隐藏首页入口与社区页右侧栏（含列表加宽）
+  declutter.css      精简层：隐藏首页入口与社区页 / 帖子详情页右侧栏（社区列表加宽）
   copy.ts            复制解锁：选区快照 + 夺焦判别 + copy 事件兜底
   copy.css           复制层：把 html/body 钉回 user-select:text
   reply-btn.ts       评论免打扰：捕获期拦两级评论行点击 + 一级评论行内右下角补纸飞机按钮

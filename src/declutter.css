@@ -13,3 +13,7 @@ html.hb-declutter #page-bbs-community > .content {
 html.hb-declutter #page-bbs-community > .content > .list {
   max-width: none;
 }
+
+html.hb-declutter #page-bbs-link > .content > .right {
+  display: none;
+}

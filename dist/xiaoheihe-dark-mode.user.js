@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         小黑盒深色模式
 // @namespace    xiaoheihe-dark-mode
-// @version      0.8.0
+// @version      0.8.1
 // @author       油猴脚本-小黑盒页面优化
-// @description  为小黑盒网页版（xiaoheihe.cn）提供深色模式、页面精简、复制解锁、一级评论免打扰与楼中楼卡片化：按角色重映射站点 CSS 规则（含伪元素与交互态），可隐藏顶部「首页」入口与社区页右侧栏，可在站点回复编辑器夺焦毁掉选区、剪贴板数据被清空时把选中内容救回剪贴板，可把一级评论「回复此楼」的触发从「点整行」收进发言内容右下方一枚纸飞机 —— 点正文只选中、不弹框；楼中楼每条回复则排成卡片（第一行头像/用户名/回复对象/时间，第二行起正文），回复入口是卡片末尾的纸飞机图标，点它即展开站点回复框并引用这一条。深色、精简、评论区增强（免打扰与卡片化一起开关）三项各自记忆偏好、可随时切换；复制解锁常驻开启，没有开关按钮。
+// @description  为小黑盒网页版（xiaoheihe.cn）提供深色模式、页面精简、复制解锁、一级评论免打扰与楼中楼卡片化：按角色重映射站点 CSS 规则（含伪元素与交互态），可隐藏顶部「首页」入口与社区页 / 帖子详情页右侧栏，可在站点回复编辑器夺焦毁掉选区、剪贴板数据被清空时把选中内容救回剪贴板，可把一级评论「回复此楼」的触发从「点整行」收进发言内容右下方一枚纸飞机 —— 点正文只选中、不弹框；楼中楼每条回复则排成卡片（第一行头像/用户名/回复对象/时间，第二行起正文），回复入口是卡片末尾的纸飞机图标，点它即展开站点回复框并引用这一条。深色、精简、评论区增强（免打扰与卡片化一起开关）三项各自记忆偏好、可随时切换；复制解锁常驻开启，没有开关按钮。
 // @license      MIT
 // @icon         https://cdn.max-c.com/heybox/logo/app_251.png
 // @homepageURL  https://github.com/a285292107s/xiaoheihe-dark-mode
@@ -1017,7 +1017,7 @@ html.${ROOT_CLASS$1} {
 		w.__hbRebuild = () => rebuildDarkEngine();
 		w.__hbIsDark = () => isDarkEnabled();
 	}
-	var declutter_default = "html.hb-declutter .nav .nav-content .nav-links>.nav-link:first-child,html.hb-declutter #page-bbs-community>.content>.right{display:none}html.hb-declutter #page-bbs-community>.content{justify-content:center}html.hb-declutter #page-bbs-community>.content>.list{max-width:none}";
+	var declutter_default = "html.hb-declutter .nav .nav-content .nav-links>.nav-link:first-child,html.hb-declutter #page-bbs-community>.content>.right{display:none}html.hb-declutter #page-bbs-community>.content{justify-content:center}html.hb-declutter #page-bbs-community>.content>.list{max-width:none}html.hb-declutter #page-bbs-link>.content>.right{display:none}";
 	var pendingStyles = new Map();
 	var headWaiter = null;
 	function injectNow(id, css, head) {
