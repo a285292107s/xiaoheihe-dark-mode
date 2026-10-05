@@ -26,13 +26,12 @@ const ICON_PANEL_FULL = [
   'M6 14h8',
 ];
 
-const ICON_CARDS = [
-  'M3.25 5.25h17.5a1 1 0 0 1 1 1v11.5a1 1 0 0 1-1 1H3.25a1 1 0 0 1-1-1V6.25a1 1 0 0 1 1-1Z',
-  'M7.7 10.5h11.4',
-  'M7.7 13.7h7.4',
+const ICON_BUBBLE = [
+  'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z',
+  'M8.5 8.5h7',
+  'M8.5 12h4.5',
 ];
-const ICON_CARDS_OFF = [...ICON_CARDS, 'M3.8 20.2 20.2 3.8'];
-const CARDS_AVATAR_DOT = { cx: 6.4, cy: 10.6, r: 1.7 };
+const ICON_BUBBLE_OFF = [...ICON_BUBBLE, 'M3.8 20.2 20.2 3.8'];
 
 function buildIcon(
   paths: readonly string[],
@@ -93,7 +92,7 @@ function paint(
 const SUN_CORE = { cx: 12, cy: 12, r: 4 };
 
 function paintDark(control: Control, dark: boolean): void {
-  paint(control, dark ? ICON_SUN : ICON_MOON, dark ? SUN_CORE : undefined, dark ? '切换到浅色模式' : '切换到深色模式', dark);
+  paint(control, dark ? ICON_MOON : ICON_SUN, dark ? undefined : SUN_CORE, dark ? '切换到浅色模式' : '切换到深色模式', dark);
 }
 
 function paintDeclutter(control: Control, on: boolean): void {
@@ -109,8 +108,8 @@ function paintDeclutter(control: Control, on: boolean): void {
 function paintCommentEnhance(control: Control, on: boolean): void {
   paint(
     control,
-    on ? ICON_CARDS : ICON_CARDS_OFF,
-    on ? CARDS_AVATAR_DOT : undefined,
+    on ? ICON_BUBBLE : ICON_BUBBLE_OFF,
+    undefined,
     on ? '关闭评论区增强（恢复一行式楼中楼，点正文重新弹回复框）' : '开启评论区增强（楼中楼卡片化 + 点正文不弹回复框）',
     on,
   );

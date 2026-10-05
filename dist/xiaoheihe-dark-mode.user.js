@@ -2143,17 +2143,12 @@ html.${ROOT_CLASS$1} {
 		"M6 9.5h12",
 		"M6 14h8"
 	];
-	var ICON_CARDS = [
-		"M3.25 5.25h17.5a1 1 0 0 1 1 1v11.5a1 1 0 0 1-1 1H3.25a1 1 0 0 1-1-1V6.25a1 1 0 0 1 1-1Z",
-		"M7.7 10.5h11.4",
-		"M7.7 13.7h7.4"
+	var ICON_BUBBLE = [
+		"M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z",
+		"M8.5 8.5h7",
+		"M8.5 12h4.5"
 	];
-	var ICON_CARDS_OFF = [...ICON_CARDS, "M3.8 20.2 20.2 3.8"];
-	var CARDS_AVATAR_DOT = {
-		cx: 6.4,
-		cy: 10.6,
-		r: 1.7
-	};
+	var ICON_BUBBLE_OFF = [...ICON_BUBBLE, "M3.8 20.2 20.2 3.8"];
 	function buildIcon(paths, circle) {
 		const svg = document.createElementNS(SVG_NS, "svg");
 		svg.setAttribute("viewBox", "0 0 24 24");
@@ -2199,13 +2194,13 @@ html.${ROOT_CLASS$1} {
 		r: 4
 	};
 	function paintDark(control, dark) {
-		paint(control, dark ? ICON_SUN : ICON_MOON, dark ? SUN_CORE : void 0, dark ? "切换到浅色模式" : "切换到深色模式", dark);
+		paint(control, dark ? ICON_MOON : ICON_SUN, dark ? void 0 : SUN_CORE, dark ? "切换到浅色模式" : "切换到深色模式", dark);
 	}
 	function paintDeclutter(control, on) {
 		paint(control, on ? ICON_PANEL_FULL : ICON_PANEL_WITH_RAIL, void 0, on ? "关闭精简模式（恢复首页入口与右侧栏）" : "开启精简模式（隐藏首页入口与右侧栏）", on);
 	}
 	function paintCommentEnhance(control, on) {
-		paint(control, on ? ICON_CARDS : ICON_CARDS_OFF, on ? CARDS_AVATAR_DOT : void 0, on ? "关闭评论区增强（恢复一行式楼中楼，点正文重新弹回复框）" : "开启评论区增强（楼中楼卡片化 + 点正文不弹回复框）", on);
+		paint(control, on ? ICON_BUBBLE : ICON_BUBBLE_OFF, void 0, on ? "关闭评论区增强（恢复一行式楼中楼，点正文重新弹回复框）" : "开启评论区增强（楼中楼卡片化 + 点正文不弹回复框）", on);
 	}
 	function mountControls() {
 		if (document.getElementById(HOST_ID)) return;
