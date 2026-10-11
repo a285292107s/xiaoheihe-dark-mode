@@ -31,7 +31,19 @@
 
 ## 安装
 
-需要 [Tampermonkey](https://www.tampermonkey.net/)（或 Violentmonkey 等兼容管理器）。
+先装一个用户脚本管理器，推荐 [**脚本猫 ScriptCat**](https://scriptcat.org/zh-CN) ——
+国产扩展，中文界面，Chrome / Edge / Firefox 商店都能直装
+（[Chrome](https://chromewebstore.google.com/detail/scriptcat/ndcooeababalnlpkfedmmbbbgkljhpjf) ·
+[Edge](https://microsoftedge.microsoft.com/addons/detail/scriptcat/liilgpjgabokdklappibcjfablkpcekh) ·
+[Firefox](https://addons.mozilla.org/zh-CN/firefox/addon/scriptcat/)），
+也有配套的中文脚本站与[中文文档](https://docs.scriptcat.org/docs/use/use/)。
+[Tampermonkey](https://www.tampermonkey.net/) 与
+[Violentmonkey](https://violentmonkey.github.io/) 同样可用。
+
+本脚本不依赖任何管理器专有 API（`GM_*` 一个都不用，偏好只写 `localStorage`），
+所以上面三个管理器里跑起来完全一致；前提是脚本头里的 `@run-at document-start`
+要被真正遵守，否则楼中楼卡片会补不上首屏那批头像
+（原因见 [docs/known-limits.md](docs/known-limits.md#卡片化数据与降级)）。
 
 **安装地址**（点开即安装）：
 
