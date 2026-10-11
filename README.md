@@ -428,9 +428,9 @@ GET /bbs/app/link/tree?…&link_id=<id>
 ## 开发
 
 ```bash
-npm install
-npm run build        # tsc -b && vite build -> dist/xiaoheihe-dark-mode.user.js
-npm run dev          # 预览壳（index.html）：加载 fixtures 里的真实页面 DOM 快照
+pnpm install
+pnpm run build       # tsc -b && vite build -> dist/xiaoheihe-dark-mode.user.js
+pnpm run dev         # 预览壳（index.html）：加载 fixtures 里的真实页面 DOM 快照
 npm run verify:all   # 构建 + 全部验收（推荐）
 ```
 
