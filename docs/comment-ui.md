@@ -150,12 +150,32 @@ GET /bbs/app/link/tree?…&link_id=<id>
    的处理器挂在行上。折叠按钮插在同一行的操作条里，不 `stopPropagation` 就会顺路把回复框打开
    （它只是折叠，不该弹输入框）。
 
-### 纸飞机为什么要合成一次 click
+### 纸飞机为什么要合成一次 click，以及为什么必须先把选区清掉
 
 站点把「回复谁 + 在哪一楼」的状态收在自己的处理器里，发送时提交的是
 `{ link_id, reply_id, root_id, text }`（`reply_id` = 被回复的那条，`root_id` = 所在主楼），
-而**点楼中楼行**正是那个处理器把 `reply_id` 设成这一条的入口。所以纸飞机不自己造输入框，
+而**点整行**正是那个处理器把 `reply_id` 设成这一条的入口。所以纸飞机不自己造输入框，
 只在行上合成一次 `click`，站点原生的回复框就会展开、引用这一条、把 `reply_id` 记对。
 
-「恰好一次」的保证：免打扰层对纸飞机只做「不要按『点正文』拦」这一步（放行），
-合成 click 的只有卡片层一处。
+**一级评论的处理器还多一道闸。** 真机上它的 handler 是：
+
+```js
+function r(){ An() && setReplyComment(n.value, n.value) }
+```
+
+`An()` 即 `!window.getSelection().toString()` —— **只要有选区，点整行就不设回复对象**。
+这是站点自己的区分：带着选区的点击被当成「想复制」，而不是「想回复」。
+
+浏览器里「选中一段文字后再点按钮」，真实 `mousedown` 会先把选区塌掉，等 `click` 派发时
+选区已经没了，闸门放行。但 `HTMLElement.click()` **只派发 click，不经过 mousedown**，
+于是选区原样还在，闸门把这一下吞掉：回复框照常展开（展开与设对象是两条路径），
+`reply_id` 却仍是 `-1` —— 从用户视角看就是「点了纸飞机，结果发出去是主评论」。
+
+所以合成 click 之前必须先 `removeAllRanges()`，把真实鼠标会做的那一步补上
+（[`src/reply-btn.ts`](../src/reply-btn.ts) 的 `clearSelection()`）。楼中楼的处理器没有这道闸，
+带选区也照常设对象，但同样走这一步 —— 两层的入口行为保持一致。
+
+「恰好一次」的保证：免打扰层在 `document` 捕获阶段接住两级纸飞机（`.hb-reply` 与
+`.hb-card-reply` 走同一分支），此处 `stopPropagation()` 之后事件不再下行，
+按钮自身挂的监听不会拿到这一下 —— 每次点纸飞机**只合成一次**行 click。真机实测：
+一级与楼中楼各点一次，`HTMLElement.prototype.click` 各只被调用一次。

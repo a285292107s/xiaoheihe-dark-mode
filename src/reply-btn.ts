@@ -55,6 +55,11 @@ function shouldBlock(el: HTMLElement | null): boolean {
   return true;
 }
 
+function clearSelection(): void {
+  const sel = window.getSelection();
+  if (sel) sel.removeAllRanges();
+}
+
 function onClickCapture(event: MouseEvent): void {
   const el = nodeToElement(event.target);
 
@@ -64,6 +69,7 @@ function onClickCapture(event: MouseEvent): void {
     if (host) {
       passThrough += 1;
       try {
+        clearSelection();
         host.click();
       } finally {
         passThrough -= 1;
