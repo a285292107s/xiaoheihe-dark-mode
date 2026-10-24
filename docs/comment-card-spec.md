@@ -28,8 +28,8 @@
 
 卡片**不画描边**，边界由表面差承担：卡片表面（`--hb-ui-surface`）比它所在的
 `.link-comment__comment-children` 容器亮一档（浅色 `#ffffff` vs `#fafbfc`，
-深色 `#2e353d` vs `#262c33`）。指针扫过时也只换表面 —— 染一层本层的淡色
-（`--hb-ui-accent-wash`），不靠描边。
+深色 `#1d242e` vs `#171c24`）。指针扫过时也只换表面 —— 抬到 `--hb-ui-surface-hover`
+（`#232b36`），不靠描边、不染大面积主色。
 
 ## 卡片上三件从别家评论区学来的东西
 

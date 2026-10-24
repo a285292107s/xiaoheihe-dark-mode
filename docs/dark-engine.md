@@ -19,8 +19,18 @@
 
 ## 映射是单调的，不做取反
 
-表面保持「越亮越浮起」的顺序压进深色带（画布 `#0e1116`、卡片 `#262c33`），
-文字整体压进浅色带且越重要越亮。取反会丢掉层级关系，页面会变成一片均质灰。
+表面按四档压进深色带：画布 `#0b0e12` → 面板 `#11151b` → 浮起面 `#171c24` → 覆盖层 `#1d242e`。
+原色越亮映射越高，白色卡片在白底页上的层级因此保留下来。
+文字走三档中性色（`#e6eaf0` → `#a4aeba` → `#7f8b99`），彩色文字只保留色相、压掉饱和度。
+边框统一改成白色低透明度细线，原色越深线越实。取反会丢掉层级关系，页面会变成一片均质灰。
+
+## 调色板只有一个来源
+
+四档表面与三档文字写在 `src/dark-base.css` 的 `html.hb-dark` 上（`--hbd-canvas` / `--hbd-surface` /
+`--hbd-raised` / `--hbd-overlay` / `--hbd-ink` / `--hbd-ink-muted` / `--hbd-ink-soft`）。
+引擎在每次构建前读这些令牌，`dark-engine.ts` 里的 `PALETTE_FALLBACK` 只在令牌缺失时兜底。
+例外层、Element Plus 令牌与评论区共享令牌都引用同一批 `--hbd-*`，不再各写一套灰。
+改配色只改 `dark-base.css` 这一处；关掉开关时令牌随基础层一起撤除，站点回到原样。
 
 ## 不追加 `!important`
 
@@ -30,14 +40,19 @@
 
 ## 想自己调配色
 
-改 `src/dark-engine.ts` 顶部的两个锚点即可，其余映射都从它们插值：
+改 `src/dark-base.css` 里 `html.hb-dark` 的 `--hbd-*` 令牌即可，其余映射都从它们插值：
 
-```ts
-const CANVAS: RGBA = { r: 14, g: 17, b: 22, a: 1 };  // #0e1116 页面画布
-const CARD:   RGBA = { r: 38, g: 44, b: 51, a: 1 };  // #262c33 浮起卡片
+```css
+--hbd-canvas: #0b0e12;
+--hbd-surface: #11151b;
+--hbd-raised: #171c24;
+--hbd-overlay: #1d242e;
+--hbd-ink: #e6eaf0;
+--hbd-ink-muted: #a4aeba;
+--hbd-ink-soft: #7f8b99;
 ```
 
-基础层画布色要同步改 `src/dark-base.css`（`html.hb-dark` 的 `background-color`），
+对比度下限：正文对浮起面不低于 4.5:1，次要文字不低于 4.5:1，装饰性细线不承担信息。
 改完跑一遍 `pnpm run build`。
 
 ## 例外层
@@ -48,8 +63,8 @@ const CARD:   RGBA = { r: 38, g: 44, b: 51, a: 1 };  // #262c33 浮起卡片
 
 渐变按钮一律走「`background-image: none` + 单一 `background-color`」：站点在
 `linear-gradient(46deg, #464b50, #14191e)` 这类品牌黑上叠白字，深色主题里这层渐变
-已经被压到与卡片几乎同亮度，只剩一条读不出方向的脏边。次级控件统一填 `#464b50`，
-导航主 CTA 填 `#f2f4f7` 配深色字；按钮文字色沿用站点声明，不再另配。
+已经被压到与卡片几乎同亮度，只剩一条读不出方向的脏边。次级控件统一填 `--hbd-hover`，
+导航主 CTA 填 `--hbd-paper` 配 `--hbd-paper-ink` 的深色字；按钮文字色沿用站点声明，不再另配。
 
 例外层没有 `!important`，选择器必须逐条压过站点原规则，所以每条都按站点的完整
 选择器路径书写（含 `[data-v-*]` 作用域属性）。站点改类名或换作用域哈希时，对应规则

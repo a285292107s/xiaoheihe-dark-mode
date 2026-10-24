@@ -62,7 +62,7 @@ interface Control {
   iconSlot: HTMLElement;
 }
 
-function createControl(shadow: ShadowRoot, id: string): Control {
+function createControl(dock: HTMLElement, id: string): Control {
   const button = document.createElement('button');
   button.id = id;
   button.className = 'hbd-btn';
@@ -72,7 +72,7 @@ function createControl(shadow: ShadowRoot, id: string): Control {
   iconSlot.className = 'hbd-icon';
   button.appendChild(iconSlot);
 
-  shadow.appendChild(button);
+  dock.appendChild(button);
   return { button, iconSlot };
 }
 
@@ -128,9 +128,15 @@ export function mountControls(): void {
   style.textContent = uiCss;
   shadow.appendChild(style);
 
-  const darkControl = createControl(shadow, DARK_BUTTON_ID);
-  const declutterControl = createControl(shadow, DECLUTTER_BUTTON_ID);
-  const commentControl = createControl(shadow, COMMENT_BUTTON_ID);
+  const dock = document.createElement('div');
+  dock.className = 'hbd-dock';
+  dock.setAttribute('role', 'group');
+  dock.setAttribute('aria-label', '页面显示选项');
+  shadow.appendChild(dock);
+
+  const darkControl = createControl(dock, DARK_BUTTON_ID);
+  const declutterControl = createControl(dock, DECLUTTER_BUTTON_ID);
+  const commentControl = createControl(dock, COMMENT_BUTTON_ID);
 
   const commentEnhanceOn = (): boolean => isReplyBtnEnabled() && isCommentCardsEnabled();
 

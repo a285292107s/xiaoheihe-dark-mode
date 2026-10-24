@@ -38,7 +38,7 @@ html.hb-comment-cards .link-comment__comment-children .comment-children-item.hb-
 }
 
 html.hb-comment-cards [data-hb-tc].hb-tc:hover {
-  background-color: var(--hb-ui-accent-wash);
+  background-color: var(--hb-ui-surface-hover);
 }
 
 html.hb-comment-cards [data-hb-tc] > .hb-tc__avatar {

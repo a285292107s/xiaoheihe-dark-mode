@@ -1,31 +1,51 @@
 :host {
   all: initial;
 
-  --hbd-face: #14191e;
-  --hbd-face-hover: #1a1f25;
-  --hbd-ink: #dce3ea;
-  --hbd-edge: rgba(255, 255, 255, 0.13);
-  --hbd-edge-hover: rgba(255, 255, 255, 0.22);
-  --hbd-ring-light: #f4f7fa;
-  --hbd-ring-dark: #0b0f13;
-  --hbd-contact: 0 1px 2px rgba(0, 0, 0, 0.28);
-  --hbd-size: 44px;
-  --hbd-gap: 12px;
-  --hbd-inset: 16px;
-  --hbd-bottom: 24px;
-  --hbd-icon-size: 20px;
-  --hbd-icon-stroke: 1.75;
+  --hbd-dock-face: rgba(13, 17, 22, 0.78);
+  --hbd-dock-line: rgba(255, 255, 255, 0.08);
+  --hbd-dock-highlight: rgba(255, 255, 255, 0.06);
+  --hbd-ink: #9aa5b3;
+  --hbd-ink-strong: #e6eaf0;
+  --hbd-accent: #a8ccf0;
+  --hbd-accent-wash: rgba(127, 178, 229, 0.12);
+  --hbd-contact: 0 14px 34px rgba(0, 0, 0, 0.42);
+  --hbd-size: 36px;
+  --hbd-radius: 9px;
+  --hbd-dock-radius: 14px;
+  --hbd-pad: 5px;
+  --hbd-gap: 2px;
+  --hbd-inset: 18px;
+  --hbd-bottom: 20px;
+  --hbd-icon-size: 18px;
+  --hbd-icon-stroke: 1.7;
   --hbd-ease: cubic-bezier(0.2, 0, 0, 1);
-  --hbd-t-hover: 160ms;
+  --hbd-t-hover: 150ms;
   --hbd-t-press: 90ms;
-  --hbd-t-icon: 160ms;
+  --hbd-t-icon: 150ms;
+}
+
+.hbd-dock {
+  position: fixed;
+  right: var(--hbd-inset);
+  bottom: var(--hbd-bottom);
+  z-index: 2147483646;
+
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--hbd-gap);
+  padding: var(--hbd-pad);
+  border: 1px solid var(--hbd-dock-line);
+  border-radius: var(--hbd-dock-radius);
+
+  background: var(--hbd-dock-face);
+  box-shadow: var(--hbd-contact), inset 0 1px 0 var(--hbd-dock-highlight);
+  backdrop-filter: blur(18px) saturate(135%);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  pointer-events: auto;
 }
 
 .hbd-btn {
-  position: fixed;
-  right: var(--hbd-inset);
-  z-index: 2147483646;
-
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -34,48 +54,42 @@
   height: var(--hbd-size);
   padding: 0;
   border: 0;
-  border-radius: 50%;
+  border-radius: var(--hbd-radius);
 
-  background: var(--hbd-face);
+  background: transparent;
   color: var(--hbd-ink);
   cursor: pointer;
   pointer-events: auto;
   -webkit-tap-highlight-color: transparent;
 
-  box-shadow: 0 0 0 1px var(--hbd-edge), var(--hbd-contact);
-
   transition:
     background-color var(--hbd-t-hover) var(--hbd-ease),
-    box-shadow var(--hbd-t-hover) var(--hbd-ease),
+    color var(--hbd-t-hover) var(--hbd-ease),
     transform var(--hbd-t-press) var(--hbd-ease);
 }
 
-#heybox-dark-toggle {
-  bottom: var(--hbd-bottom);
-}
-#heybox-declutter-toggle {
-  bottom: calc(var(--hbd-bottom) + var(--hbd-size) + var(--hbd-gap));
-}
-#heybox-comment-toggle {
-  bottom: calc(var(--hbd-bottom) + 2 * (var(--hbd-size) + var(--hbd-gap)));
-}
-
 .hbd-btn:hover {
-  background: var(--hbd-face-hover);
-  box-shadow: 0 0 0 1px var(--hbd-edge-hover), var(--hbd-contact);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--hbd-ink-strong);
 }
 
 .hbd-btn:active {
   transform: translateY(1px);
-  box-shadow: 0 0 0 1px var(--hbd-edge), var(--hbd-contact);
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.hbd-btn[aria-pressed='true'] {
+  color: var(--hbd-accent);
+}
+
+.hbd-btn[aria-pressed='true']:hover {
+  background: var(--hbd-accent-wash);
+  color: #cfe4ff;
 }
 
 .hbd-btn:focus-visible {
-  outline: none;
-  box-shadow:
-    0 0 0 2px var(--hbd-ring-light),
-    0 0 0 4px var(--hbd-ring-dark),
-    var(--hbd-contact);
+  outline: 2px solid var(--hbd-accent);
+  outline-offset: 2px;
 }
 
 .hbd-icon {
@@ -105,6 +119,14 @@
   }
 }
 
+@media (prefers-reduced-transparency: reduce) {
+  .hbd-dock {
+    background: #0d1117;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hbd-btn {
     transition: none;
@@ -114,12 +136,26 @@
   }
 }
 
+@media (max-width: 640px) {
+  .hbd-dock {
+    right: 12px;
+    bottom: 14px;
+  }
+}
+
 @media (forced-colors: active) {
-  .hbd-btn {
+  .hbd-dock {
     background: ButtonFace;
-    color: ButtonText;
-    border: 1px solid ButtonText;
+    border-color: ButtonText;
     box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .hbd-btn {
+    color: ButtonText;
+  }
+  .hbd-btn[aria-pressed='true'] {
+    color: Highlight;
   }
   .hbd-btn:focus-visible {
     outline: 2px solid Highlight;

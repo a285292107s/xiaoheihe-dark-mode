@@ -9,33 +9,34 @@ html.hb-reply-btn .hb-row-dock {
   --hb-ui-font-meta: 10px;
   --hb-ui-font-label: 13px;
   --hb-ui-font-title: 14px;
-  --hb-ui-size-control: 24px;
-  --hb-ui-radius-card: 5px;
-  --hb-ui-radius-control: 5px;
+  --hb-ui-size-control: 26px;
+  --hb-ui-radius-card: 6px;
+  --hb-ui-radius-control: 6px;
   --hb-ui-radius-pill: 999px;
 
   --hb-ui-pad-x: 12px;
   --hb-ui-pad-y: 10px;
-  --hb-ui-avatar-size: 34px;
-  --hb-ui-avatar-gap: 10px;
+  --hb-ui-avatar-size: 32px;
+  --hb-ui-avatar-gap: 9px;
   --hb-ui-line-1: 20px;
   --hb-ui-line-2: 14px;
   --hb-ui-gap-line: 1px;
   --hb-ui-gap-block: 10px;
 
   --hb-ui-surface: #ffffff;
-  --hb-ui-ink: #14191e;
-  --hb-ui-ink-muted: #4b5359;
-  --hb-ui-ink-soft: #697077;
-  --hb-ui-accent: #3ea3e3;
-  --hb-ui-accent-strong: #1a6da6;
-  --hb-ui-accent-wash: rgba(62, 163, 227, 0.1);
-  --hb-ui-edge-control: rgba(20, 25, 30, 0.28);
-  --hb-ui-edge-control-hover: rgba(26, 109, 166, 0.55);
-  --hb-ui-avatar-tile: hsl(var(--hb-ui-hue) 34% 90%);
-  --hb-ui-avatar-ink: hsl(var(--hb-ui-hue) 45% 26%);
-  --hb-ui-ring-light: #f4f7fa;
-  --hb-ui-ring-dark: #0b0f13;
+  --hb-ui-surface-hover: #f5f8fb;
+  --hb-ui-ink: #12171d;
+  --hb-ui-ink-muted: #4f5862;
+  --hb-ui-ink-soft: #667080;
+  --hb-ui-accent: #2f7fb8;
+  --hb-ui-accent-strong: #1d6a9f;
+  --hb-ui-accent-wash: rgba(47, 127, 184, 0.09);
+  --hb-ui-edge-control: rgba(18, 23, 29, 0.26);
+  --hb-ui-edge-control-hover: rgba(29, 106, 159, 0.55);
+  --hb-ui-avatar-tile: hsl(var(--hb-ui-hue) 32% 91%);
+  --hb-ui-avatar-ink: hsl(var(--hb-ui-hue) 42% 28%);
+  --hb-ui-ring-light: #ffffff;
+  --hb-ui-ring-dark: #0b0e12;
 }
 
 html.hb-dark.hb-comment-cards [data-hb-tc],
@@ -43,15 +44,18 @@ html.hb-dark.hb-comment-cards .hb-tc__fold,
 html.hb-dark.hb-reply-btn .hb-reply,
 html.hb-dark.hb-comment-cards .hb-row-dock,
 html.hb-dark.hb-reply-btn .hb-row-dock {
-  --hb-ui-surface: #2e353d;
-  --hb-ui-ink: #dce3ea;
-  --hb-ui-ink-muted: #b6bec7;
-  --hb-ui-ink-soft: #9aa3ac;
-  --hb-ui-accent: #62a3e3;
-  --hb-ui-accent-strong: #8ec7f2;
-  --hb-ui-accent-wash: rgba(98, 163, 227, 0.16);
-  --hb-ui-edge-control: rgba(255, 255, 255, 0.28);
-  --hb-ui-edge-control-hover: rgba(142, 199, 242, 0.6);
-  --hb-ui-avatar-tile: hsl(var(--hb-ui-hue) 26% 30%);
-  --hb-ui-avatar-ink: hsl(var(--hb-ui-hue) 30% 88%);
+  --hb-ui-surface: var(--hbd-overlay, #1d242e);
+  --hb-ui-surface-hover: var(--hbd-hover, #232b36);
+  --hb-ui-ink: var(--hbd-ink, #e6eaf0);
+  --hb-ui-ink-muted: var(--hbd-ink-muted, #a4aeba);
+  --hb-ui-ink-soft: var(--hbd-ink-soft, #7f8b99);
+  --hb-ui-accent: #7fb2e5;
+  --hb-ui-accent-strong: #a8ccf0;
+  --hb-ui-accent-wash: rgba(127, 178, 229, 0.12);
+  --hb-ui-edge-control: rgba(255, 255, 255, 0.16);
+  --hb-ui-edge-control-hover: rgba(168, 204, 240, 0.5);
+  --hb-ui-avatar-tile: hsl(var(--hb-ui-hue) 22% 24%);
+  --hb-ui-avatar-ink: hsl(var(--hb-ui-hue) 28% 88%);
+  --hb-ui-ring-light: #e6eaf0;
+  --hb-ui-ring-dark: #0b0e12;
 }

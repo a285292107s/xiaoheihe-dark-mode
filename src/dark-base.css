@@ -1,34 +1,55 @@
 
 html.hb-dark {
-  color-scheme: dark;
+  --hbd-canvas: #0b0e12;
+  --hbd-surface: #11151b;
+  --hbd-raised: #171c24;
+  --hbd-overlay: #1d242e;
+  --hbd-hover: #232b36;
+  --hbd-line: rgba(255, 255, 255, 0.07);
+  --hbd-line-strong: rgba(255, 255, 255, 0.12);
+  --hbd-ink: #e6eaf0;
+  --hbd-ink-muted: #a4aeba;
+  --hbd-ink-soft: #7f8b99;
+  --hbd-accent: #7fb2e5;
+  --hbd-accent-strong: #a8ccf0;
+  --hbd-accent-wash: rgba(127, 178, 229, 0.12);
+  --hbd-paper: #e9eef5;
+  --hbd-paper-ink: #0b0e12;
 
-  background-color: #0e1116 !important;
+  color-scheme: dark;
+  accent-color: var(--hbd-accent);
+
+  background-color: var(--hbd-canvas) !important;
 }
 
 html.hb-dark body {
-  background-color: #0e1116;
+  background-color: var(--hbd-canvas);
 }
 
 html.hb-dark ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 html.hb-dark ::-webkit-scrollbar-track {
-  background: #0e1116;
+  background: transparent;
 }
 html.hb-dark ::-webkit-scrollbar-thumb {
-  background: #333b45;
-  border-radius: 4px;
+  background: #2a3340;
+  border: 2px solid var(--hbd-canvas);
+  border-radius: 999px;
 }
 html.hb-dark ::-webkit-scrollbar-thumb:hover {
-  background: #4a5360;
+  background: #3a4553;
+}
+html.hb-dark ::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 html.hb-dark input::placeholder,
 html.hb-dark textarea::placeholder {
-  color: #6f7782;
+  color: var(--hbd-ink-soft);
 }
 
 html.hb-dark ::selection {
-  background: rgba(94, 176, 255, 0.32);
+  background: rgba(127, 178, 229, 0.3);
 }

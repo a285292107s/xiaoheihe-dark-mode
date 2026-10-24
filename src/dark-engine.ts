@@ -172,8 +172,35 @@ function roleOfVar(name: string): Role | null {
 }
 
 
-const CANVAS: RGBA = { r: 14, g: 17, b: 22, a: 1 };
-const CARD: RGBA = { r: 38, g: 44, b: 51, a: 1 };
+type PaletteKey = 'canvas' | 'surface' | 'raised' | 'overlay' | 'ink' | 'inkMuted' | 'inkSoft';
+
+const PALETTE_FALLBACK: Record<PaletteKey, RGBA> = {
+  canvas: { r: 11, g: 14, b: 18, a: 1 },
+  surface: { r: 17, g: 21, b: 27, a: 1 },
+  raised: { r: 23, g: 28, b: 36, a: 1 },
+  overlay: { r: 29, g: 36, b: 46, a: 1 },
+  ink: { r: 230, g: 234, b: 240, a: 1 },
+  inkMuted: { r: 164, g: 174, b: 186, a: 1 },
+  inkSoft: { r: 127, g: 139, b: 153, a: 1 },
+};
+
+const palette: Record<PaletteKey, RGBA> = { ...PALETTE_FALLBACK };
+
+function syncPalette(): void {
+  const style = getComputedStyle(document.documentElement);
+  const token = (name: string, fallback: RGBA): RGBA =>
+    parseColor(style.getPropertyValue(name).trim()) ?? fallback;
+  palette.canvas = token('--hbd-canvas', PALETTE_FALLBACK.canvas);
+  palette.surface = token('--hbd-surface', PALETTE_FALLBACK.surface);
+  palette.raised = token('--hbd-raised', PALETTE_FALLBACK.raised);
+  palette.overlay = token('--hbd-overlay', PALETTE_FALLBACK.overlay);
+  palette.ink = token('--hbd-ink', PALETTE_FALLBACK.ink);
+  palette.inkMuted = token('--hbd-ink-muted', PALETTE_FALLBACK.inkMuted);
+  palette.inkSoft = token('--hbd-ink-soft', PALETTE_FALLBACK.inkSoft);
+}
+
+const SURFACE_FLOOR = 185;
+const SURFACE_SPAN = 70;
 
 function isNeutral(c: RGBA): boolean {
   const max = Math.max(c.r, c.g, c.b);
@@ -197,31 +224,43 @@ function lerpRgb(a: RGBA, b: RGBA, t: number, alpha: number): RGBA {
   };
 }
 
-function surfaceCurve(t0: number): number {
-  const t = clamp(t0, 0, 1);
-  const inv = 1 - t;
-  return 1 - inv * inv;
+function surfaceTone(luminance: number, alpha: number): RGBA {
+  const t = clamp((luminance - SURFACE_FLOOR) / SURFACE_SPAN, 0, 1);
+  return t <= 0.5
+    ? lerpRgb(palette.canvas, palette.surface, t * 2, alpha)
+    : lerpRgb(palette.surface, palette.raised, (t - 0.5) * 2, alpha);
+}
+
+function textTone(luminance: number, alpha: number): RGBA {
+  if (luminance <= 55) return { ...palette.ink, a: alpha };
+  if (luminance <= 115) {
+    return lerpRgb(palette.ink, palette.inkMuted, (luminance - 55) / 60, alpha);
+  }
+  if (luminance <= 170) {
+    return lerpRgb(palette.inkMuted, palette.inkSoft, (luminance - 115) / 55, alpha);
+  }
+  return { ...palette.inkSoft, a: alpha };
 }
 
 function mapSurface(c: RGBA, selector: string): RGBA | null {
   if (canvasKeys.has(colorKey(c))) {
     return isInteractiveSelector(selector)
-      ? lerpRgb(CANVAS, CARD, 1, c.a)
-      : { ...CANVAS, a: c.a };
+      ? { ...palette.raised, a: c.a }
+      : { ...palette.canvas, a: c.a };
   }
 
   const L = lum(c);
 
   if (isNeutral(c)) {
-    if (L < 185) return null;
-    return lerpRgb(CANVAS, CARD, surfaceCurve((L - 185) / 70), c.a);
+    if (L < SURFACE_FLOOR) return null;
+    return surfaceTone(L, c.a);
   }
 
   if (L > 150) {
     const [h, s] = rgbToHsl(c.r, c.g, c.b);
     const t = (clamp(L, 150, 255) - 150) / 105;
-    const nl = 0.1 + t * 0.1;
-    const rgb = hslToRgb(h, Math.min(s, 0.5), nl);
+    const nl = 0.105 + t * 0.105;
+    const rgb = hslToRgb(h, Math.min(s, 0.42), nl);
     return { r: rgb[0], g: rgb[1], b: rgb[2], a: c.a };
   }
 
@@ -231,35 +270,31 @@ function mapSurface(c: RGBA, selector: string): RGBA | null {
 function mapText(c: RGBA): RGBA | null {
   if (c.a < 0.05) return null;
   const L = lum(c);
-  const [h, s, l] = rgbToHsl(c.r, c.g, c.b);
 
-  if (!isNeutral(c)) {
-    if (L > 150) return null;
-    const nl = clamp(Math.max(l, 0.62), 0.62, 0.8);
-    const rgb = hslToRgb(h, Math.min(s, 0.8), nl);
-    return { r: rgb[0], g: rgb[1], b: rgb[2], a: c.a };
+  if (isNeutral(c)) {
+    if (L >= 190) return null;
+    return textTone(L, c.a);
   }
 
-  if (L >= 190) return null;
-  const t = 190 + ((190 - L) / 190) * 55;
-  const v = Math.round(clamp(t, 150, 245));
-  return { r: v, g: v, b: Math.round(clamp(v * 1.012, 0, 255)), a: c.a };
+  if (L > 150) return null;
+  const [h, s] = rgbToHsl(c.r, c.g, c.b);
+  const lightness = clamp(0.78 - (L / 150) * 0.14, 0.64, 0.78);
+  const rgb = hslToRgb(h, Math.min(s, 0.55), lightness);
+  return { r: rgb[0], g: rgb[1], b: rgb[2], a: c.a };
 }
 
 function mapBorder(c: RGBA): RGBA | null {
   if (c.a < 0.06) return null;
   const L = lum(c);
-  const [h, s] = rgbToHsl(c.r, c.g, c.b);
 
   if (!isNeutral(c)) {
-    if (L < 130) return null;
-    const rgb = hslToRgb(h, Math.min(s, 0.5), 0.45);
-    return { r: rgb[0], g: rgb[1], b: rgb[2], a: c.a };
+    const [h, s] = rgbToHsl(c.r, c.g, c.b);
+    const rgb = hslToRgb(h, Math.min(s, 0.45), 0.4);
+    return { r: rgb[0], g: rgb[1], b: rgb[2], a: c.a >= 1 ? 0.7 : c.a };
   }
 
-  if (L < 170) return null;
-  const alpha = clamp(0.06 + ((255 - L) / 255) * 0.34, 0.06, 0.3);
-  return { r: 255, g: 255, b: 255, a: alpha };
+  const alpha = clamp(0.05 + ((255 - L) / 255) * 0.13, 0.05, 0.18);
+  return { r: 255, g: 255, b: 255, a: Math.round(alpha * 1000) / 1000 };
 }
 
 function mapColor(role: Role, c: RGBA, selector: string): RGBA | null {
@@ -586,9 +621,21 @@ function restoreInline(): void {
 
 const EXCEPTIONS_CSS = `
 html.${ROOT_CLASS} .nav {
-  --publish-bg: #f2f4f7;
-  --publish-color: #14191e;
-  --publish-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  --publish-bg: var(--hbd-paper, #e9eef5);
+  --publish-color: var(--hbd-paper-ink, #0b0e12);
+  --publish-shadow: 0 8px 24px rgba(0, 0, 0, 0.42);
+  background-color: rgba(11, 14, 18, 0.84);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  html.${ROOT_CLASS} .nav {
+    background-color: #0b0e12;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }
 
 html.${ROOT_CLASS} .hb-cpt__topic-entrance .hot-topic__look,
@@ -602,7 +649,7 @@ html.${ROOT_CLASS} .hb-color__btn--confirm,
 html.${ROOT_CLASS} .hb-cpt__alert-wrapper .hb-cpt__alert .hb-cpt__alert-btn-box .alert-btn-box__btn.confirm,
 html.${ROOT_CLASS} .hb-cpt__slide-tab.block .slide-tab-tab__bar {
   background-image: none;
-  background-color: #464b50;
+  background-color: var(--hbd-hover, #232b36);
 }
 
 html.${ROOT_CLASS} .vjs-track-settings-controls button,
@@ -620,38 +667,36 @@ html.${ROOT_CLASS} .bbs-content__image {
   box-shadow: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html.${ROOT_CLASS} .article-vote .vote-wrapper .vote-submit.active p {
-    background-image: none;
-    background-color: #a1a7b2;
-    color: #101112;
-  }
+html.${ROOT_CLASS} .article-vote .vote-wrapper .vote-submit.active p {
+  background-image: none;
+  background-color: var(--hbd-accent, #7fb2e5);
+  color: var(--hbd-paper-ink, #0b0e12);
 }
 
 html.${ROOT_CLASS} {
-  --el-color-white: #1b1f24;
-  --el-color-black: #e6e8eb;
-  --el-bg-color: #1b1f24;
-  --el-bg-color-page: #0e1116;
-  --el-bg-color-overlay: #22272e;
-  --el-text-color-primary: #e6e8eb;
-  --el-text-color-regular: #c9ced6;
-  --el-text-color-secondary: #9aa1ab;
-  --el-text-color-placeholder: #6f7782;
-  --el-text-color-disabled: #4d545d;
-  --el-border-color: #2e3540;
-  --el-border-color-light: #2a3138;
-  --el-border-color-lighter: #262c33;
-  --el-border-color-extra-light: #22272e;
-  --el-border-color-dark: #3a424e;
-  --el-fill-color: #262c33;
-  --el-fill-color-light: #22272e;
-  --el-fill-color-lighter: #1f242a;
-  --el-fill-color-extra-light: #1b1f24;
-  --el-fill-color-blank: #1b1f24;
-  --el-mask-color: rgba(14, 17, 22, 0.7);
-  --el-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  --el-box-shadow-light: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --el-color-white: var(--hbd-raised, #171c24);
+  --el-color-black: var(--hbd-ink, #e6eaf0);
+  --el-bg-color: var(--hbd-raised, #171c24);
+  --el-bg-color-page: var(--hbd-canvas, #0b0e12);
+  --el-bg-color-overlay: var(--hbd-overlay, #1d242e);
+  --el-text-color-primary: var(--hbd-ink, #e6eaf0);
+  --el-text-color-regular: #c3cbd6;
+  --el-text-color-secondary: var(--hbd-ink-muted, #a4aeba);
+  --el-text-color-placeholder: var(--hbd-ink-soft, #7f8b99);
+  --el-text-color-disabled: #4a535f;
+  --el-border-color: #2a333f;
+  --el-border-color-light: #252d37;
+  --el-border-color-lighter: #202730;
+  --el-border-color-extra-light: #1b212a;
+  --el-border-color-dark: #364150;
+  --el-fill-color: var(--hbd-overlay, #1d242e);
+  --el-fill-color-light: #191f27;
+  --el-fill-color-lighter: #151a21;
+  --el-fill-color-extra-light: var(--hbd-surface, #11151b);
+  --el-fill-color-blank: var(--hbd-raised, #171c24);
+  --el-mask-color: rgba(11, 14, 18, 0.72);
+  --el-box-shadow: 0 8px 24px rgba(0, 0, 0, 0.48);
+  --el-box-shadow-light: 0 4px 14px rgba(0, 0, 0, 0.38);
 }
 `;
 
@@ -663,6 +708,7 @@ let retimer: number | null = null;
 let enabled = false;
 
 function build(): void {
+  syncPalette();
   collect();
 
   if (!styleEl) {

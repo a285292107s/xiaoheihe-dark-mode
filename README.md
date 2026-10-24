@@ -19,14 +19,15 @@
 应急/调试可用控制台 `__hbSetCopy(false)`。
 
 ```
-产物     82 KB（gzip 21 KB），无运行时依赖
+产物     85 KB（gzip 22 KB），无运行时依赖
 开销     一次遍历 4700~5500 条规则约 20~35ms（实测）；元素级只处理「确实带内联颜色」的那约 20 个元素
-例外     2245 字节（人工审计的例外层，其余全部就地改写站点声明）
+例外     2879 字节（人工审计的例外层，其余全部就地改写站点声明）
 精简     324 字节 CSS + 一个捕获期 click 监听（只接管导航 logo）
 复制     944 字节 CSS + 四个事件监听（无样式重排开销）
 免打扰   2.4 KB 注入 CSS（含共享令牌）+ 一个捕获期 click 监听（只在评论行内生效）
 卡片化   7.6 KB 注入 CSS（含共享令牌）+ 一个忽略自己节点的 MutationObserver；数据靠截获站点自己的评论接口（不发额外请求）
-令牌     src/tokens.css 是上面两层的**唯一**颜色 / 字号 / 圆角来源，两层各注入一份
+令牌     src/dark-base.css 的 --hbd-* 是深色引擎与站点内各层的唯一调色板；
+         src/tokens.css 是两条评论层的颜色 / 字号 / 圆角来源，两层各注入一份
 ```
 
 ## 安装
@@ -57,7 +58,7 @@ https://raw.githubusercontent.com/a285292107s/xiaoheihe-dark-mode/main/dist/xiao
 
 ## 使用
 
-右下角三个圆形按钮，上下叠成一列：
+右下角一枚竖向控制坞，三个图标按钮上下排列：
 
 | 按钮 | 作用 | 偏好键 |
 |---|---|---|
@@ -165,7 +166,7 @@ pnpm run build       # tsc -b && vite build -> dist/xiaoheihe-dark-mode.user.js
 src/
   dark-engine.ts     引擎：角色判定 + 就地改写 + 例外层 + 生命周期
   dark-mode.ts       深色开关状态、偏好存储、基础层注入、订阅
-  dark-base.css      基础层：画布底色、color-scheme、滚动条、placeholder、选区
+  dark-base.css      基础层：--hbd-* 调色板、画布底色、color-scheme、滚动条、placeholder、选区
   declutter.ts       精简开关状态、偏好存储、样式注入、订阅、导航 logo 点击接管
   declutter.css      精简层：导航只留 logo、隐藏社区页 / 帖子详情页右侧栏（社区列表加宽）
   copy.ts            复制解锁：选区快照 + 夺焦判别 + copy 事件兜底
@@ -179,7 +180,7 @@ src/
   row-dock.css       行尾 dock 版式：右对齐一行、控件间距（免打扰层与卡片层各注入一份）
   own-style.ts       共享的样式表注入：等 head 出现再注入带 data-hb-own 的样式，撤除时一并取消待注入
   tokens.css         两层共用的唯一令牌源：颜色 / 字号 / 圆角 / 尺寸
-  ui.ts / ui.css     右下角三个开关（原生 DOM，挂在同一个 Shadow DOM 里；配色与动效令牌在 ui.css 顶部）
+  ui.ts / ui.css     右下角控制坞（三个开关，原生 DOM，挂在同一个 Shadow DOM 里；配色与动效令牌在 ui.css 顶部）
   main.ts            入口
 docs/                文档（见 docs/README.md 索引）
 harness/             离线复刻页：把真机评论 DOM 挂成可测页面（生成器与产出说明见 harness/README.md）
