@@ -591,11 +591,25 @@ html.${ROOT_CLASS} .nav {
   --publish-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
 }
 
-html.${ROOT_CLASS} .hot-topic__look,
+html.${ROOT_CLASS} .hb-cpt__topic-entrance .hot-topic__look,
 html.${ROOT_CLASS} .link-section-user .link-user__follow-btn:not(.followed),
-html.${ROOT_CLASS} #page-bbs-link .page-header__user-info .page-header__follow-btn:not(.followed) {
+html.${ROOT_CLASS} #page-bbs-link .page-header__user-info .page-header__follow-btn:not(.followed),
+html.${ROOT_CLASS} .image-text__mini-program .mini-program__content .mini-program__btn,
+html.${ROOT_CLASS} .com-game-card .game-info .line-2 .wishlist-box,
+html.${ROOT_CLASS} .com-mod-card .mod-card-download,
+html.${ROOT_CLASS} .website-login .website-login__submit[data-v-7ee09acd],
+html.${ROOT_CLASS} .hb-color__btn--confirm,
+html.${ROOT_CLASS} .hb-cpt__alert-wrapper .hb-cpt__alert .hb-cpt__alert-btn-box .alert-btn-box__btn.confirm,
+html.${ROOT_CLASS} .hb-cpt__slide-tab.block .slide-tab-tab__bar {
   background-image: none;
   background-color: #464b50;
+}
+
+html.${ROOT_CLASS} .vjs-track-settings-controls button,
+html.${ROOT_CLASS} .vjs-track-settings-controls button:is(:hover, :focus, :active) {
+  background-image: none;
+  background-color: #f1f2f3;
+  color: #2b333f;
 }
 
 html.${ROOT_CLASS} .search-input .el-input__wrapper {
