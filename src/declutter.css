@@ -1,5 +1,5 @@
 
-html.hb-declutter .nav .nav-content .nav-links > .nav-link:first-child {
+html.hb-declutter .nav .nav-content .nav-links > .nav-link {
   display: none;
 }
 

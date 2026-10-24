@@ -24,6 +24,41 @@ export function isDeclutterEnabled(): boolean {
   }
 }
 
+const NAV_LOGO_SELECTOR = '.nav .nav-content .nav-icon';
+const NAV_LINK_SELECTOR = '.nav .nav-content .nav-links > .nav-link';
+const COMMUNITY_LABELS = new Set(['社区', 'Community']);
+
+function findCommunityLink(): HTMLButtonElement | null {
+  const links = document.querySelectorAll<HTMLButtonElement>(NAV_LINK_SELECTOR);
+  for (const link of links) {
+    if (COMMUNITY_LABELS.has(link.textContent?.trim() ?? '')) return link;
+  }
+  return links[1] ?? null;
+}
+
+function handleNavLogoClick(event: MouseEvent): void {
+  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  if (!document.documentElement.classList.contains(DECLUTTER_CLASS)) return;
+
+  const target = event.target;
+  if (!(target instanceof Element) || !target.closest(NAV_LOGO_SELECTOR)) return;
+
+  const community = findCommunityLink();
+  if (!community) return;
+
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  community.click();
+}
+
+let navLogoBound = false;
+
+function bindNavLogo(): void {
+  if (navLogoBound) return;
+  navLogoBound = true;
+  window.addEventListener('click', handleNavLogoClick, true);
+}
+
 export function applyDeclutter(enabled: boolean): void {
   const root = document.documentElement;
   if (!root) return;
@@ -53,6 +88,7 @@ export function applyDeclutter(enabled: boolean): void {
 export function initDeclutter(): boolean {
   const enabled = isDeclutterEnabled();
   applyDeclutter(enabled);
+  bindNavLogo();
   return enabled;
 }
 
