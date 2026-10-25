@@ -90,8 +90,8 @@ function paintDeclutter(control: Control, on: boolean): void {
     control,
     on ? ICON_PANEL_FULL : ICON_PANEL_WITH_RAIL,
     undefined,
-    on ? '隐藏右栏' : '显示右栏',
-    on ? '恢复首页入口与右侧栏' : '隐藏首页入口与右侧栏',
+    on ? '纯净模式' : '常规模式',
+    on ? '切换到常规模式' : '切换到纯净模式',
     on,
   );
 }

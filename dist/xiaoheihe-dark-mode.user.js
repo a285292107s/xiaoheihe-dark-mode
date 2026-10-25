@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         小黑盒深色模式
 // @namespace    xiaoheihe-dark-mode
-// @version      0.8.9
+// @version      0.9.0
 // @author       油猴脚本-小黑盒页面优化
-// @description  为小黑盒网页版（xiaoheihe.cn）提供深色模式、页面精简、复制解锁、一级评论免打扰与楼中楼卡片化：按角色重映射站点 CSS 规则（含伪元素与交互态），可把顶部导航精简为只剩 logo（点 logo 等同点「社区」）并隐藏社区页 / 帖子详情页右侧栏，可在站点回复编辑器夺焦毁掉选区、剪贴板数据被清空时把选中内容救回剪贴板，可把一级评论「回复此楼」的触发从「点整行」收进发言内容右下方一枚纸飞机 —— 点正文只选中、不弹框；楼中楼每条回复则排成卡片（第一行头像/用户名/回复对象/时间，第二行起正文），回复入口是卡片末尾的纸飞机图标，点它即展开站点回复框并引用这一条。深色、精简、评论区增强（免打扰与卡片化一起开关）三项各自记忆偏好、可随时切换；复制解锁常驻开启，没有开关按钮。
+// @description  为小黑盒网页版（xiaoheihe.cn）提供深色模式、纯净模式、复制解锁、一级评论免打扰与楼中楼卡片化：按角色重映射站点 CSS 规则（含伪元素与交互态），纯净模式可把顶部导航精简为只剩 logo（点 logo 等同点「社区」）并隐藏社区页 / 帖子详情页右侧栏，可在站点回复编辑器夺焦毁掉选区、剪贴板数据被清空时把选中内容救回剪贴板，可把一级评论「回复此楼」的触发从「点整行」收进发言内容右下方一枚纸飞机 —— 点正文只选中、不弹框；楼中楼每条回复则排成卡片（第一行头像/用户名/回复对象/时间，第二行起正文），回复入口是卡片末尾的纸飞机图标，点它即展开站点回复框并引用这一条。深色、纯净模式、评论区增强（免打扰与卡片化一起开关）三项各自记忆偏好、可随时切换；复制解锁常驻开启，没有开关按钮。
 // @license      MIT
 // @icon         https://cdn.max-c.com/heybox/logo/app_251.png
 // @homepageURL  https://github.com/a285292107s/xiaoheihe-dark-mode
@@ -1337,7 +1337,6 @@ html.${ROOT_CLASS$1} {
 	}
 	function handleNavLogoClick(event) {
 		if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-		if (!document.documentElement.classList.contains(DECLUTTER_CLASS)) return;
 		const target = event.target;
 		if (!(target instanceof Element) || !target.closest(NAV_LOGO_SELECTOR)) return;
 		const community = findCommunityLink();
@@ -1352,15 +1351,22 @@ html.${ROOT_CLASS$1} {
 		navLogoBound = true;
 		window.addEventListener("click", handleNavLogoClick, true);
 	}
+	function unbindNavLogo() {
+		if (!navLogoBound) return;
+		navLogoBound = false;
+		window.removeEventListener("click", handleNavLogoClick, true);
+	}
 	function applyDeclutter(enabled) {
 		const root = document.documentElement;
 		if (!root) return;
 		if (enabled) {
 			root.classList.add(DECLUTTER_CLASS);
 			ensureOwnStyle(STYLE_ID$2, declutter_default);
+			bindNavLogo();
 		} else {
 			root.classList.remove(DECLUTTER_CLASS);
 			removeOwnStyle(STYLE_ID$2);
+			unbindNavLogo();
 		}
 		try {
 			localStorage.setItem(STORAGE_KEY$3, enabled ? "1" : "0");
@@ -1374,7 +1380,6 @@ html.${ROOT_CLASS$1} {
 	function initDeclutter() {
 		const enabled = isDeclutterEnabled();
 		applyDeclutter(enabled);
-		bindNavLogo();
 		return enabled;
 	}
 	function exposeDeclutterHooks() {
@@ -2533,7 +2538,7 @@ html.${ROOT_CLASS$1} {
 		paint(control, dark ? ICON_MOON : ICON_SUN, dark ? void 0 : SUN_CORE, dark ? "深色模式" : "浅色模式", dark ? "切换到浅色模式" : "切换到深色模式", dark);
 	}
 	function paintDeclutter(control, on) {
-		paint(control, on ? ICON_PANEL_FULL : ICON_PANEL_WITH_RAIL, void 0, on ? "隐藏右栏" : "显示右栏", on ? "恢复首页入口与右侧栏" : "隐藏首页入口与右侧栏", on);
+		paint(control, on ? ICON_PANEL_FULL : ICON_PANEL_WITH_RAIL, void 0, on ? "纯净模式" : "常规模式", on ? "切换到常规模式" : "切换到纯净模式", on);
 	}
 	function paintCommentEnhance(control, on) {
 		paint(control, on ? ICON_BUBBLE : ICON_BUBBLE_OFF, void 0, on ? "评论增强" : "默认评论", on ? "恢复默认评论" : "开启评论增强", on);

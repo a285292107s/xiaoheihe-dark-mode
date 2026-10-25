@@ -38,7 +38,6 @@ function findCommunityLink(): HTMLButtonElement | null {
 
 function handleNavLogoClick(event: MouseEvent): void {
   if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-  if (!document.documentElement.classList.contains(DECLUTTER_CLASS)) return;
 
   const target = event.target;
   if (!(target instanceof Element) || !target.closest(NAV_LOGO_SELECTOR)) return;
@@ -59,6 +58,12 @@ function bindNavLogo(): void {
   window.addEventListener('click', handleNavLogoClick, true);
 }
 
+function unbindNavLogo(): void {
+  if (!navLogoBound) return;
+  navLogoBound = false;
+  window.removeEventListener('click', handleNavLogoClick, true);
+}
+
 export function applyDeclutter(enabled: boolean): void {
   const root = document.documentElement;
   if (!root) return;
@@ -66,9 +71,11 @@ export function applyDeclutter(enabled: boolean): void {
   if (enabled) {
     root.classList.add(DECLUTTER_CLASS);
     ensureOwnStyle(STYLE_ID, declutterCss);
+    bindNavLogo();
   } else {
     root.classList.remove(DECLUTTER_CLASS);
     removeOwnStyle(STYLE_ID);
+    unbindNavLogo();
   }
 
   try {
@@ -88,7 +95,6 @@ export function applyDeclutter(enabled: boolean): void {
 export function initDeclutter(): boolean {
   const enabled = isDeclutterEnabled();
   applyDeclutter(enabled);
-  bindNavLogo();
   return enabled;
 }
 
