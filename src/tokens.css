@@ -1,3 +1,78 @@
+:root {
+  --hbd-hue: 210;
+  --hbd-ease: cubic-bezier(0.2, 0, 0, 1);
+  --hbd-t-press: 120ms;
+  --hbd-t-hover: 150ms;
+  --hbd-t-open: 200ms;
+
+  --hbd-dock-surface: rgba(237, 242, 250, 0.95);
+  --hbd-dock-surface-solid: #edf2fa;
+  --hbd-dock-line: rgba(15, 23, 32, 0.12);
+  --hbd-dock-line-active: rgba(15, 23, 32, 0.2);
+  --hbd-dock-ink: #43525e;
+  --hbd-dock-ink-strong: #0b1219;
+  --hbd-dock-accent: #1d6a9f;
+  --hbd-dock-accent-ink: #175a86;
+  --hbd-dock-accent-wash: rgba(47, 127, 184, 0.12);
+  --hbd-dock-hover: rgba(15, 23, 32, 0.055);
+  --hbd-dock-active: rgba(15, 23, 32, 0.09);
+  --hbd-dock-contact: 0 12px 30px rgba(15, 32, 51, 0.14), 0 1px 2px rgba(15, 32, 51, 0.08);
+  --hbd-dock-edge: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --hbd-dock-glow: 0 0 24px rgba(47, 127, 184, 0.1);
+  --hbd-dock-focus-inner: #1d6a9f;
+  --hbd-dock-focus-outer: rgba(47, 127, 184, 0.25);
+
+  --hbd-shell-canvas: #fafbfc;
+  --hbd-shell-surface: rgba(250, 252, 255, 0.92);
+  --hbd-shell-surface-solid: #f7fafd;
+  --hbd-shell-line: rgba(15, 23, 32, 0.1);
+  --hbd-shell-edge: inset 0 -1px 0 rgba(15, 23, 32, 0.05);
+  --hbd-shell-ink: #43525e;
+  --hbd-shell-ink-strong: #0b1219;
+  --hbd-shell-ink-soft: #5a6672;
+  --hbd-shell-accent: #1d6a9f;
+  --hbd-shell-accent-wash: rgba(47, 127, 184, 0.12);
+  --hbd-shell-accent-wash-strong: rgba(47, 127, 184, 0.18);
+  --hbd-shell-accent-line: rgba(47, 127, 184, 0.28);
+  --hbd-shell-hover: rgba(15, 23, 32, 0.05);
+  --hbd-shell-active: rgba(15, 23, 32, 0.09);
+  --hbd-shell-focus: #1d6a9f;
+}
+
+html.hb-dark {
+  --hbd-dock-surface: rgba(13, 20, 28, 0.92);
+  --hbd-dock-surface-solid: #0d131a;
+  --hbd-dock-line: rgba(190, 220, 255, 0.14);
+  --hbd-dock-line-active: rgba(190, 220, 255, 0.24);
+  --hbd-dock-ink: #93a4b8;
+  --hbd-dock-ink-strong: #e9eff7;
+  --hbd-dock-accent: #a9d6ff;
+  --hbd-dock-accent-ink: #d8ecff;
+  --hbd-dock-accent-wash: rgba(114, 189, 255, 0.15);
+  --hbd-dock-hover: rgba(255, 255, 255, 0.06);
+  --hbd-dock-active: rgba(255, 255, 255, 0.09);
+  --hbd-dock-contact: 0 18px 42px rgba(0, 0, 0, 0.5);
+  --hbd-dock-edge: inset 0 1px 0 rgba(190, 225, 255, 0.12);
+  --hbd-dock-glow: 0 0 28px rgba(138, 196, 255, 0.12);
+  --hbd-dock-focus-inner: rgba(184, 220, 255, 0.9);
+  --hbd-dock-focus-outer: rgba(138, 196, 255, 0.18);
+
+  --hbd-shell-canvas: #070b10;
+  --hbd-shell-surface: rgba(9, 14, 20, 0.94);
+  --hbd-shell-surface-solid: #0b0e12;
+  --hbd-shell-line: rgba(190, 220, 255, 0.1);
+  --hbd-shell-edge: inset 0 -1px 0 rgba(190, 220, 255, 0.06);
+  --hbd-shell-ink: #93a4b8;
+  --hbd-shell-ink-strong: #e9eff7;
+  --hbd-shell-ink-soft: #7f91a4;
+  --hbd-shell-accent: #a9d6ff;
+  --hbd-shell-accent-wash: rgba(114, 189, 255, 0.15);
+  --hbd-shell-accent-wash-strong: rgba(127, 178, 229, 0.16);
+  --hbd-shell-accent-line: rgba(114, 189, 255, 0.24);
+  --hbd-shell-hover: rgba(255, 255, 255, 0.055);
+  --hbd-shell-active: rgba(255, 255, 255, 0.09);
+  --hbd-shell-focus: #a9d6ff;
+}
 
 html.hb-comment-cards [data-hb-tc],
 html.hb-comment-cards .hb-tc__fold,
@@ -6,37 +81,51 @@ html.hb-comment-cards .hb-row-dock,
 html.hb-reply-btn .hb-row-dock {
   --hb-ui-hue: 210;
 
-  --hb-ui-font-meta: 10px;
+  --hb-ui-font-meta: 11px;
   --hb-ui-font-label: 13px;
   --hb-ui-font-title: 14px;
-  --hb-ui-size-control: 26px;
-  --hb-ui-radius-card: 6px;
-  --hb-ui-radius-control: 6px;
+  --hb-ui-font-body: 14px;
+  --hb-ui-size-control: 28px;
+  --hb-ui-radius-card: 10px;
+  --hb-ui-radius-control: 8px;
   --hb-ui-radius-pill: 999px;
+  --hb-ui-ease: var(--hbd-ease);
+  --hb-ui-t-hover: 150ms;
+  --hb-ui-t-press: 120ms;
+  --hb-ui-control-transition:
+    color var(--hb-ui-t-hover) var(--hb-ui-ease),
+    border-color var(--hb-ui-t-hover) var(--hb-ui-ease),
+    background-color var(--hb-ui-t-hover) var(--hb-ui-ease),
+    transform var(--hb-ui-t-press) var(--hb-ui-ease);
 
   --hb-ui-pad-x: 12px;
-  --hb-ui-pad-y: 10px;
+  --hb-ui-pad-y: 12px;
   --hb-ui-avatar-size: 32px;
-  --hb-ui-avatar-gap: 9px;
-  --hb-ui-line-1: 20px;
-  --hb-ui-line-2: 14px;
-  --hb-ui-gap-line: 1px;
-  --hb-ui-gap-block: 10px;
+  --hb-ui-avatar-gap: 8px;
+  --hb-ui-line-1: 22px;
+  --hb-ui-line-2: 16px;
+  --hb-ui-line-body: 22px;
+  --hb-ui-gap-line: 0;
+  --hb-ui-gap-block: 8px;
 
   --hb-ui-surface: #ffffff;
-  --hb-ui-surface-hover: #f5f8fb;
-  --hb-ui-ink: #12171d;
-  --hb-ui-ink-muted: #4f5862;
-  --hb-ui-ink-soft: #667080;
+  --hb-ui-surface-hover: #f2f7fd;
+  --hb-ui-chip: rgba(15, 23, 32, 0.055);
+  --hb-ui-card-line: rgba(15, 23, 32, 0.08);
+  --hb-ui-ink: #1b2733;
+  --hb-ui-ink-name: #0b1219;
+  --hb-ui-ink-muted: #46535f;
+  --hb-ui-ink-soft: #5a6672;
   --hb-ui-accent: #2f7fb8;
   --hb-ui-accent-strong: #1d6a9f;
-  --hb-ui-accent-wash: rgba(47, 127, 184, 0.09);
-  --hb-ui-edge-control: rgba(18, 23, 29, 0.26);
+  --hb-ui-accent-wash: rgba(47, 127, 184, 0.1);
   --hb-ui-edge-control-hover: rgba(29, 106, 159, 0.55);
-  --hb-ui-avatar-tile: hsl(var(--hb-ui-hue) 32% 91%);
-  --hb-ui-avatar-ink: hsl(var(--hb-ui-hue) 42% 28%);
+  --hb-ui-avatar-tile: hsl(var(--hb-ui-hue) 36% 92%);
+  --hb-ui-avatar-ink: hsl(var(--hb-ui-hue) 45% 26%);
+  --hb-ui-avatar-ring: rgba(15, 23, 32, 0.08);
   --hb-ui-ring-light: #ffffff;
-  --hb-ui-ring-dark: #0b0e12;
+  --hb-ui-ring-dark: #070b10;
+  --hb-ui-focus-ring: 0 0 0 2px var(--hb-ui-ring-light), 0 0 0 3px var(--hb-ui-ring-dark);
 }
 
 html.hb-dark.hb-comment-cards [data-hb-tc],
@@ -44,18 +133,22 @@ html.hb-dark.hb-comment-cards .hb-tc__fold,
 html.hb-dark.hb-reply-btn .hb-reply,
 html.hb-dark.hb-comment-cards .hb-row-dock,
 html.hb-dark.hb-reply-btn .hb-row-dock {
-  --hb-ui-surface: var(--hbd-overlay, #1d242e);
-  --hb-ui-surface-hover: var(--hbd-hover, #232b36);
-  --hb-ui-ink: var(--hbd-ink, #e6eaf0);
-  --hb-ui-ink-muted: var(--hbd-ink-muted, #a4aeba);
-  --hb-ui-ink-soft: var(--hbd-ink-soft, #7f8b99);
-  --hb-ui-accent: #7fb2e5;
-  --hb-ui-accent-strong: #a8ccf0;
-  --hb-ui-accent-wash: rgba(127, 178, 229, 0.12);
-  --hb-ui-edge-control: rgba(255, 255, 255, 0.16);
-  --hb-ui-edge-control-hover: rgba(168, 204, 240, 0.5);
-  --hb-ui-avatar-tile: hsl(var(--hb-ui-hue) 22% 24%);
-  --hb-ui-avatar-ink: hsl(var(--hb-ui-hue) 28% 88%);
-  --hb-ui-ring-light: #e6eaf0;
-  --hb-ui-ring-dark: #0b0e12;
+  --hb-ui-surface: var(--hbd-overlay, #1a2430);
+  --hb-ui-surface-hover: var(--hbd-hover, #222f3d);
+  --hb-ui-chip: rgba(190, 220, 255, 0.06);
+  --hb-ui-card-line: rgba(190, 220, 255, 0.1);
+  --hb-ui-ink: #dbe5f0;
+  --hb-ui-ink-name: #f7fbff;
+  --hb-ui-ink-muted: #a8b6c6;
+  --hb-ui-ink-soft: #94a4b8;
+  --hb-ui-accent: var(--hbd-accent, #72bdff);
+  --hb-ui-accent-strong: var(--hbd-accent-strong, #a9d6ff);
+  --hb-ui-accent-wash: rgba(114, 189, 255, 0.15);
+  --hb-ui-edge-control-hover: rgba(184, 220, 255, 0.55);
+  --hb-ui-avatar-tile: hsl(var(--hb-ui-hue) 26% 24%);
+  --hb-ui-avatar-ink: hsl(var(--hb-ui-hue) 30% 90%);
+  --hb-ui-avatar-ring: rgba(190, 220, 255, 0.16);
+  --hb-ui-ring-light: #e9eff7;
+  --hb-ui-ring-dark: #070b10;
+  --hb-ui-focus-ring: 0 0 0 2px var(--hb-ui-ring-light), 0 0 0 3px var(--hb-ui-ring-dark);
 }

@@ -3,80 +3,113 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#fafbfc" id="meta-theme" />
+
   <title>小黑盒深色模式 · 效果预览</title>
   <style data-hb-own>
     html, body { margin: 0; padding: 0; }
+    html { --bar-h: 44px; }
     #hb-bar {
-      --bar-face: rgba(11, 14, 18, 0.9);
-      --bar-line: rgba(255, 255, 255, 0.07);
-      --bar-ink: #9aa5b3;
-      --bar-ink-strong: #e6eaf0;
-      --bar-accent: #a8ccf0;
-      --bar-accent-wash: rgba(127, 178, 229, 0.12);
+      --bar-line: var(--hbd-shell-line);
+      --bar-ink: var(--hbd-shell-ink);
+      --bar-ink-strong: var(--hbd-shell-ink-strong);
+      --bar-accent: var(--hbd-shell-accent);
+      --bar-accent-wash: var(--hbd-shell-accent-wash);
       position: fixed;
       left: 0; right: 0; top: 0;
       z-index: 2147483600;
       box-sizing: border-box;
-      height: 44px;
+      height: var(--bar-h);
       display: flex;
       align-items: center;
       gap: 4px;
       padding: 0 16px;
       font: 12px/1 system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
       -webkit-font-smoothing: antialiased;
-      background: var(--bar-face);
+      white-space: nowrap;
+      background: var(--hbd-shell-surface);
       color: var(--bar-ink-strong);
-      backdrop-filter: blur(18px) saturate(135%);
+      backdrop-filter: blur(20px) saturate(140%);
       border-bottom: 1px solid var(--bar-line);
+      box-shadow: var(--hbd-shell-edge);
+    }
+    #hb-bar .mark {
+      flex: 0 0 auto;
+      width: 10px;
+      height: 10px;
+      margin-right: 8px;
+      border-radius: 3px;
+      background: var(--bar-accent);
     }
     #hb-bar .brand {
+      flex: 0 0 auto;
       font-weight: 600;
       letter-spacing: 0;
       margin-right: 12px;
     }
+    #hb-bar .brand-short { display: none; }
     #hb-bar button {
+      flex: 0 0 auto;
       font: inherit;
       height: 28px;
-      padding: 0 10px;
-      border-radius: 7px;
+      padding: 0 8px;
+      border-radius: 8px;
       border: 1px solid transparent;
       background: transparent;
       color: var(--bar-ink);
       cursor: pointer;
-      transition: background-color 150ms cubic-bezier(0.2, 0, 0, 1), color 150ms cubic-bezier(0.2, 0, 0, 1);
+      transition: background-color var(--hbd-t-hover) var(--hbd-ease), color var(--hbd-t-hover) var(--hbd-ease);
     }
-    #hb-bar button:hover { background: rgba(255, 255, 255, 0.055); color: var(--bar-ink-strong); }
-    #hb-bar button:active { background: rgba(255, 255, 255, 0.09); }
+    #hb-bar button:hover { background: var(--hbd-shell-hover); color: var(--bar-ink-strong); }
+    #hb-bar button:active { background: var(--hbd-shell-active); }
     #hb-bar button.on {
       background: var(--bar-accent-wash);
-      color: #cfe4ff;
-      box-shadow: inset 0 0 0 1px rgba(127, 178, 229, 0.18);
+      color: var(--bar-ink-strong);
+      box-shadow: inset 0 0 0 1px var(--hbd-shell-accent-line);
       font-weight: 600;
     }
-    #hb-bar button.on:hover { background: rgba(127, 178, 229, 0.16); }
-    #hb-bar button:focus-visible { outline: 2px solid var(--bar-accent); outline-offset: 2px; }
+    #hb-bar button.on:hover { background: var(--hbd-shell-accent-wash-strong); }
+    #hb-bar button:focus-visible { outline: 2px solid var(--hbd-shell-focus); outline-offset: 2px; }
     #hb-bar .rule {
+      flex: 0 0 auto;
       width: 1px;
       height: 16px;
       margin: 0 8px;
       background: var(--bar-line);
     }
     #hb-bar .spacer { flex: 1; }
-    #hb-bar .hint { color: #6f7a87; font-size: 11px; letter-spacing: 0; }
+    #hb-bar .hint { color: var(--hbd-shell-ink-soft); font-size: 11px; letter-spacing: 0; overflow: hidden; text-overflow: ellipsis; }
+    @media (max-width: 767px) {
+      html { --bar-h: 52px; }
+      #hb-bar { padding: 0 12px; }
+      #hb-bar .brand-long,
+      #hb-bar .hint,
+      #hb-bar .rule { display: none; }
+      #hb-bar .brand-short { display: inline; }
+      #hb-bar button { height: 44px; min-width: 44px; padding: 0 12px; }
+    }
     @media (prefers-reduced-motion: reduce) {
       #hb-bar button { transition: none; }
     }
     @media (prefers-reduced-transparency: reduce) {
-      #hb-bar { background: #0b0e12; backdrop-filter: none; }
+      #hb-bar { background: var(--hbd-shell-surface-solid); backdrop-filter: none; }
     }
-    #hb-stage { padding-top: 44px; }
-    #hb-stage.is-dark { background: #0b0e12; }
+    @media (forced-colors: active) {
+      #hb-bar { background: Canvas; color: CanvasText; border-bottom-color: ButtonText; box-shadow: none; backdrop-filter: none; }
+      #hb-bar .mark { background: Highlight; }
+      #hb-bar button { color: ButtonText; }
+      #hb-bar button.on { background: Canvas; color: Highlight; box-shadow: inset 0 0 0 1px Highlight; }
+      #hb-bar .hint { color: CanvasText; }
+    }
+    #hb-stage { padding-top: var(--bar-h); }
+    #hb-stage.is-dark { background: var(--hbd-canvas); }
   </style>
 </head>
 <body>
   <div id="hb-bar" data-hb-own>
-    <strong class="brand">小黑盒深色模式</strong>
+    <span class="mark" aria-hidden="true"></span>
+    <strong class="brand"
+      ><span class="brand-long">小黑盒深色模式</span><span class="brand-short">小黑盒</span></strong
+    >
     <button data-page="home" class="on" aria-pressed="true">首页</button>
     <button data-page="detail" aria-pressed="false">帖子详情</button>
     <span class="spacer"></span>
@@ -89,7 +122,9 @@
   <script type="module">
     const stage = document.getElementById('hb-stage');
     const themeBtn = document.getElementById('hb-theme');
-    const metaTheme = document.getElementById('meta-theme');
+    const metaTheme = document.createElement('meta');
+    metaTheme.name = 'theme-color';
+    document.head.appendChild(metaTheme);
     const STORAGE_KEY = 'heybox-dark-mode';
 
     const loaded = {
@@ -142,7 +177,8 @@
       const on = isDarkNow();
       stage.classList.toggle('is-dark', on);
       themeBtn.textContent = on ? '浅色' : '深色';
-      metaTheme.setAttribute('content', on ? '#0b0e12' : '#fafbfc');
+      const canvas = getComputedStyle(document.documentElement).getPropertyValue('--hbd-shell-canvas').trim();
+      if (canvas) metaTheme.setAttribute('content', canvas);
     }
 
     themeBtn.addEventListener('click', () => setTheme(!isDarkNow()));

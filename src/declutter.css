@@ -1,9 +1,9 @@
-
 html.hb-declutter .nav .nav-content .nav-links > .nav-link {
   display: none;
 }
 
-html.hb-declutter #page-bbs-community > .content > .right {
+html.hb-declutter #page-bbs-community > .content > .right,
+html.hb-declutter #page-bbs-link > .content > .right {
   display: none;
 }
 
@@ -12,8 +12,4 @@ html.hb-declutter #page-bbs-community > .content {
 }
 html.hb-declutter #page-bbs-community > .content > .list {
   max-width: none;
-}
-
-html.hb-declutter #page-bbs-link > .content > .right {
-  display: none;
 }

@@ -1,10 +1,9 @@
 
 import { lookupMeta, type ThreadReplyMeta } from './comment-api-cache';
 import { ensureOwnStyle, removeOwnStyle } from './own-style';
-import { appendToRowDock, dropRowControl, pruneEmptyRowDocks } from './row-dock';
+import { appendToRowDock, buildPlaneIcon, dropRowControl, pruneEmptyRowDocks } from './row-dock';
+import { buildSvg } from './svg';
 import commentCardsCss from './comment-cards.css?inline';
-import rowDockCss from './row-dock.css?inline';
-import tokensCss from './tokens.css?inline';
 
 const STORAGE_KEY = 'heybox-comment-cards';
 const ROOT_CLASS = 'hb-comment-cards';
@@ -33,10 +32,9 @@ const CONTENT_SELECTOR = '.children-item__comment-content';
 const CREATOR_SELECTOR = '.children-item__comment-creator';
 const REPLYTO_SITE_SELECTOR = '.children-item__reply-to';
 const OTHER_INFO_SELECTOR = '.children-item__other-info';
-const SVG_NS = 'http://www.w3.org/2000/svg';
 const RETRY_DELAYS = [500, 1500, 4000];
-
-const PLANE_PATHS = ['M21.3 3.2 2.9 10.4 12.6 20.4Z', 'M9.1 12.7 21.3 3.2'];
+const NARROW_QUERY = window.matchMedia('(max-width: 480px)');
+const VIEWPORT_PAD = 12;
 
 type CardsListener = (enabled: boolean) => void;
 
@@ -45,6 +43,8 @@ const listeners = new Set<CardsListener>();
 let applied = false;
 let observer: MutationObserver | null = null;
 let retryTimer: number | null = null;
+let fitFrame = 0;
+let fitTimer = 0;
 const pendingMeta = new Set<HTMLElement>();
 
 
@@ -272,22 +272,11 @@ function buildFloor(index: number): HTMLElement {
 function buildReplyButton(): HTMLButtonElement {
   const btn = document.createElement('button');
   btn.type = 'button';
-  btn.className = CARD_REPLY_CLASS;
+  btn.className = `${CARD_REPLY_CLASS} hb-icon-btn`;
   btn.setAttribute(OWN_ATTR, '');
   btn.setAttribute('aria-label', '回复这条评论');
   btn.title = '回复这条评论';
-
-  const svg = document.createElementNS(SVG_NS, 'svg');
-  svg.setAttribute('viewBox', '0 0 24 24');
-  svg.setAttribute('aria-hidden', 'true');
-  svg.setAttribute('focusable', 'false');
-  for (const d of PLANE_PATHS) {
-    const path = document.createElementNS(SVG_NS, 'path');
-    path.setAttribute('d', d);
-    svg.appendChild(path);
-  }
-  btn.appendChild(svg);
-
+  btn.appendChild(buildPlaneIcon());
   btn.addEventListener('mousedown', (e) => e.stopPropagation());
   return btn;
 }
@@ -376,9 +365,44 @@ function decorateRow(row: HTMLElement): boolean {
   return touched || !hadStamp;
 }
 
+function fitRows(): void {
+  fitFrame = 0;
+  const narrow = NARROW_QUERY.matches;
+  const rows = [...document.querySelectorAll<HTMLElement>(CHILD_ROW_SELECTOR)];
+  const shifts: Array<[HTMLElement, number]> = [];
+
+  for (const row of rows) {
+    if (!narrow) {
+      row.style.removeProperty('--hb-tc-shift');
+      row.style.removeProperty('--hb-tc-fit');
+      continue;
+    }
+    const parent = row.parentElement;
+    if (!parent) continue;
+    const style = getComputedStyle(parent);
+    const start = parent.getBoundingClientRect().left + parseFloat(style.paddingLeft);
+    shifts.push([row, Math.min(0, Math.round(VIEWPORT_PAD - start))]);  }
+
+  const width = `${Math.round(window.innerWidth - VIEWPORT_PAD * 2)}px`;
+  for (const [row, shift] of shifts) {
+    row.style.setProperty('--hb-tc-shift', `${shift}px`);
+    row.style.setProperty('--hb-tc-fit', width);
+  }
+}
+
+function scheduleFit(): void {
+  if (fitFrame === 0) fitFrame = requestAnimationFrame(fitRows);
+  if (fitTimer !== 0) return;
+  fitTimer = window.setTimeout(() => {
+    fitTimer = 0;
+    fitRows();
+  }, 500);
+}
+
 function decorateAll(): void {
   for (const row of document.querySelectorAll<HTMLElement>(CHILD_ROW_SELECTOR)) decorateRow(row);
   decorateThreads();
+  scheduleFit();
   if (pendingMeta.size > 0) scheduleRetry();
 }
 
@@ -399,13 +423,7 @@ function createFoldButton(mainRow: HTMLElement): HTMLButtonElement {
   btn.setAttribute(OWN_ATTR, '');
   btn.dataset.expanded = 'true';
 
-  const svg = document.createElementNS(SVG_NS, 'svg');
-  svg.setAttribute('viewBox', '0 0 24 24');
-  svg.setAttribute('aria-hidden', 'true');
-  svg.setAttribute('focusable', 'false');
-  const path = document.createElementNS(SVG_NS, 'path');
-  path.setAttribute('d', CHEVRON_UP_PATH);
-  svg.appendChild(path);
+  const svg = buildSvg([CHEVRON_UP_PATH]);
 
   const label = document.createElement('span');
   label.className = FOLD_LABEL_CLASS;
@@ -529,9 +547,15 @@ function ensureObserver(): void {
     }
     for (const main of touchedThreads) decorateFold(main);
     ensureFoldsInPlace();
+    scheduleFit();
     if (pendingMeta.size > 0) scheduleRetry();
   });
   observer.observe(document.documentElement, { childList: true, subtree: true });
+}
+
+function onViewportChange(): void {
+  if (!applied) return;
+  scheduleFit();
 }
 
 function attach(): void {
@@ -539,11 +563,16 @@ function attach(): void {
   applied = true;
   decorateAll();
   ensureObserver();
+  window.addEventListener('resize', onViewportChange);
+  NARROW_QUERY.addEventListener('change', onViewportChange);
 }
 
 function detach(): void {
   if (!applied) return;
   applied = false;
+
+  window.removeEventListener('resize', onViewportChange);
+  NARROW_QUERY.removeEventListener('change', onViewportChange);
 
   observer?.disconnect();
   observer = null;
@@ -551,6 +580,14 @@ function detach(): void {
   if (retryTimer !== null) {
     window.clearTimeout(retryTimer);
     retryTimer = null;
+  }
+  if (fitFrame !== 0) {
+    cancelAnimationFrame(fitFrame);
+    fitFrame = 0;
+  }
+  if (fitTimer !== 0) {
+    window.clearTimeout(fitTimer);
+    fitTimer = 0;
   }
   if (flashTimer !== null) {
     window.clearTimeout(flashTimer);
@@ -569,6 +606,10 @@ function detach(): void {
     row.removeAttribute('data-hb-reply-kind');
     row.classList.remove(CARD_CLASS);
     row.classList.remove(FLASH_CLASS);
+  }
+  for (const row of document.querySelectorAll<HTMLElement>(CHILD_ROW_SELECTOR)) {
+    row.style.removeProperty('--hb-tc-shift');
+    row.style.removeProperty('--hb-tc-fit');
   }
   for (const thread of document.querySelectorAll(`.${FOLDED_CLASS}`)) thread.classList.remove(FOLDED_CLASS);
   pruneEmptyRowDocks();
@@ -597,7 +638,7 @@ export function applyCommentCards(enabled: boolean): void {
 
   if (enabled) {
     root.classList.add(ROOT_CLASS);
-    ensureOwnStyle(STYLE_ID, `${tokensCss}\n${rowDockCss}\n${commentCardsCss}`);
+    ensureOwnStyle(STYLE_ID, commentCardsCss);
     attach();
   } else {
     root.classList.remove(ROOT_CLASS);

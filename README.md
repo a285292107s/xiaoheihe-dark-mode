@@ -19,15 +19,15 @@
 应急/调试可用控制台 `__hbSetCopy(false)`。
 
 ```
-产物     85 KB（gzip 22 KB），无运行时依赖
+产物     89 KB（gzip 23 KB），无运行时依赖
 开销     一次遍历 4700~5500 条规则约 20~35ms（实测）；元素级只处理「确实带内联颜色」的那约 20 个元素
-例外     2879 字节（人工审计的例外层，其余全部就地改写站点声明）
+例外     5654 字节（人工审计的例外层，其余全部就地改写站点声明）
 精简     324 字节 CSS + 一个捕获期 click 监听（只接管导航 logo）
 复制     944 字节 CSS + 四个事件监听（无样式重排开销）
-免打扰   2.4 KB 注入 CSS（含共享令牌）+ 一个捕获期 click 监听（只在评论行内生效）
-卡片化   7.6 KB 注入 CSS（含共享令牌）+ 一个忽略自己节点的 MutationObserver；数据靠截获站点自己的评论接口（不发额外请求）
+免打扰   2.8 KB 注入 CSS（含共享令牌）+ 一个捕获期 click 监听（只在评论行内生效）
+卡片化   9.0 KB 注入 CSS（含共享令牌）+ 一个忽略自己节点的 MutationObserver；数据靠截获站点自己的评论接口（不发额外请求）
 令牌     src/dark-base.css 的 --hbd-* 是深色引擎与站点内各层的唯一调色板；
-         src/tokens.css 是两条评论层的颜色 / 字号 / 圆角来源，两层各注入一份
+         src/tokens.css 是评论层与共享控件的颜色 / 字号 / 圆角来源，只注入一份
 ```
 
 ## 安装
@@ -43,8 +43,7 @@
 
 本脚本不依赖任何管理器专有 API（`GM_*` 一个都不用，偏好只写 `localStorage`），
 所以上面三个管理器里跑起来完全一致；前提是脚本头里的 `@run-at document-start`
-要被真正遵守，否则楼中楼卡片会补不上首屏那批头像
-（原因见 [docs/known-limits.md](docs/known-limits.md#卡片化数据与降级)）。
+要被真正遵守，否则楼中楼卡片会补不上首屏那批头像。
 
 **安装地址**（点开即安装）：
 
@@ -131,7 +130,7 @@ click 监听：样式选择器都多一层 `html.hb-declutter` 前缀，权重�
 
 ## 已知限制
 
-影响安装决策的几条（完整清单见 [docs/known-limits.md](docs/known-limits.md)）：
+影响安装决策的几条：
 
 - 只覆盖桌面网页版，不含 App 与移动端页面；站点自己的深色模式与脚本可同时开，但结果未经验证。
 - 精简模式按类名隐藏导航里的全部页面入口；logo 的「等同社区」依赖导航中的社区按钮仍然存在、且站点继续用普通 click 处理器驱动路由。社区按钮消失时 logo 退回站点原本的首页跳转；站点若改走 `isTrusted` 校验，logo 点击会**静默**无效。
@@ -140,15 +139,6 @@ click 监听：样式选择器都多一层 `html.hb-declutter` 前缀，权重�
 - 点评论里的**图片**仍会连带弹出回复框（并照常打开大图），这是站点自己的实现，拆不开。
 - 免打扰只认站点那两层评论行结构、且只在详情页生效；站点改类名或改点击实现会**静默**退回原样。
 - 卡片的头像是从站点评论接口读来的，接口改结构时会降级成按 userid 着色的字母块。
-
-## 文档
-
-实现在哪、为什么这样做的完整说明见 [docs/](docs/README.md) 索引：
-
-- [docs/comment-ui.md](docs/comment-ui.md) —— 评论区三层（复制解锁 / 评论免打扰 / 楼中楼卡片化）的原理
-- [docs/comment-card-spec.md](docs/comment-card-spec.md) —— 卡片的版式与字段口径
-- [docs/dark-engine.md](docs/dark-engine.md) —— 深色引擎的架构决定与调配色
-- [docs/known-limits.md](docs/known-limits.md) —— 完整已知限制
 
 ## 开发
 
@@ -159,6 +149,29 @@ pnpm run build       # tsc -b && vite build -> dist/xiaoheihe-dark-mode.user.js
 ```
 
 改动后跑 `pnpm run build`，类型与构建通过是默认的验证要求；本仓库没有自动化测试。
+
+### 深色表面只有三级
+
+画布 `--hbd-canvas` → 卡片 `--hbd-raised` → 卡片内的悬浮块 `--hbd-overlay`。
+`--hbd-surface` 是页面级表面，**不用来画卡片内部**。
+
+例外层（`src/dark-engine.ts` 的 `EXCEPTIONS_CSS`）上不上色，取决于站点在**浅色**下的实际底色：
+
+- 浅色下透明、靠父级继承的容器（`.hb-bbs-link__content`、`.link-comment`）在深色里也必须保持透明。
+  给它们补一层 `--hbd-surface` 会在白卡内部切出一道更暗的接缝，整页看起来被切成几块。
+- 浅色下是白卡的容器（`.hb-cpt-page-header`、`.bbs-home__content-list`、`.bbs-home__topic-list-wrapper`、
+  `.hb-cpt__pagination.bbs-home__topic-list`、`.hb-bbs-post`、`.bbs-community-hot-topic`）统一用 `--hbd-raised`。
+- 浅色下本来就带一点灰的容器（`.link-comment__comment-children` 的 `#fafbfc`）交给引擎按角色映射，
+  不要手写，否则深浅两态的"比父级暗一级"会跟不上。
+
+改令牌或例外层之后，在真站复跑接缝检测：
+
+```bash
+node output/quality/live-seams.mjs https://www.xiaoheihe.cn/app/bbs/link/194914463
+```
+
+它同时量浅色与深色两态的父子底色，输出"浅色同色、深色分色"的接缝清单；`total flagged: 0` 才算通过。
+截图与证据落在 `output/quality/live/`。
 
 ### 目录
 
@@ -172,20 +185,20 @@ src/
   copy.ts            复制解锁：选区快照 + 夺焦判别 + copy 事件兜底
   copy.css           复制层：把 html/body 钉回 user-select:text
   reply-btn.ts       评论免打扰：捕获期拦两级评论行点击 + 一级评论行内右下角补纸飞机按钮
-  reply-btn.css      免打扰层：纸飞机按钮的材质与显隐（只碰自己插的节点）
   comment-api-cache.ts 评论接口缓存：钩 XHR/fetch 截获评论树，建 commentid → 头像/回复对象/replyId 查询表
   comment-cards.ts   楼中楼卡片化：就地改造行结构 + 序号徽标 + 纸飞机 + 一级评论上的折叠 + 可点的跨引用 #N
-  comment-cards.css  卡片层：flex 版式、卡片材质、序号 / 纸飞机 / 头像 / 折叠按钮 / 跨引用跳转 / 悬停反馈接管
+  comment-cards.css  卡片层：flex 版式、卡片材质、序号 / 头像 / 折叠按钮 / 跨引用跳转 / 悬停反馈接管
   row-dock.ts        一级评论行尾 dock：两层共用的建/复用/撤除，以及纸飞机路径
-  row-dock.css       行尾 dock 版式：右对齐一行、控件间距（免打扰层与卡片层各注入一份）
+  row-dock.css       行尾 dock 版式：右对齐一行、控件间距
+  shared-ui.ts       共享层注入：令牌、行尾 dock 与图标按钮样式只注入一份
+  controls.css       共享图标按钮：纸飞机 / 回复控件的尺寸、悬浮、按下与焦点态
+  svg.ts             图标构建：统一的 viewBox、aria-hidden 与路径循环
   own-style.ts       共享的样式表注入：等 head 出现再注入带 data-hb-own 的样式，撤除时一并取消待注入
-  tokens.css         两层共用的唯一令牌源：颜色 / 字号 / 圆角 / 尺寸
+  tokens.css         评论层与共享控件的唯一令牌源：颜色 / 字号 / 圆角 / 尺寸 / 动效
   ui.ts / ui.css     右下角控制坞（三个开关，原生 DOM，挂在同一个 Shadow DOM 里；配色与动效令牌在 ui.css 顶部）
   main.ts            入口
-docs/                文档（见 docs/README.md 索引）
-harness/             离线复刻页：把真机评论 DOM 挂成可测页面（生成器与产出说明见 harness/README.md）
-research/            证据与复现：FINDINGS.md 是深色引擎的完整结论，comment-dom.md 是评论区结构文档，
-                     comment-cards-spec.md 是卡片层的规格，comment-ui-reference-notes.md 是参考页对照
+harness/             离线复刻页：把真机评论 DOM 挂成可测页面（生成器与产出数据）
+research/            证据与复现：站点 CSS 快照与一次性探针脚本
 fixtures/            真实页面 DOM 快照（预览壳依赖）
 dist/                构建产物（入库，供 raw 链接安装）
 ```

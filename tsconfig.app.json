@@ -15,7 +15,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-    "types": ["vite/client", "vite-plugin-monkey/client"]
+    "types": ["vite/client", "vite-plugin-monkey/client", "vite-plugin-monkey/style"]
   },
   "include": ["src"]
 }

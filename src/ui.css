@@ -1,27 +1,19 @@
 :host {
   all: initial;
 
-  --hbd-dock-face: rgba(13, 17, 22, 0.78);
-  --hbd-dock-line: rgba(255, 255, 255, 0.08);
-  --hbd-dock-highlight: rgba(255, 255, 255, 0.06);
-  --hbd-ink: #9aa5b3;
-  --hbd-ink-strong: #e6eaf0;
-  --hbd-accent: #a8ccf0;
-  --hbd-accent-wash: rgba(127, 178, 229, 0.12);
-  --hbd-contact: 0 14px 34px rgba(0, 0, 0, 0.42);
   --hbd-size: 36px;
-  --hbd-radius: 9px;
-  --hbd-dock-radius: 14px;
-  --hbd-pad: 5px;
-  --hbd-gap: 2px;
-  --hbd-inset: 18px;
+  --hbd-radius: 8px;
+  --hbd-dock-radius: 16px;
+  --hbd-pad: 4px;
+  --hbd-gap: 4px;
+  --hbd-inset: 16px;
   --hbd-bottom: 20px;
   --hbd-icon-size: 18px;
   --hbd-icon-stroke: 1.7;
-  --hbd-ease: cubic-bezier(0.2, 0, 0, 1);
-  --hbd-t-hover: 150ms;
-  --hbd-t-press: 90ms;
-  --hbd-t-icon: 150ms;
+  --hbd-dock-width: calc(var(--hbd-size) + 2 * var(--hbd-pad));
+  --hbd-dock-open: 104px;
+  --hbd-row-lift: calc(var(--hbd-dock-width) - var(--hbd-dock-open) + 1px);
+  --hbd-label-shift: 4px;
 }
 
 .hbd-dock {
@@ -34,68 +26,152 @@
   display: flex;
   flex-direction: column;
   gap: var(--hbd-gap);
+  width: var(--hbd-dock-width);
   padding: var(--hbd-pad);
+  pointer-events: none;
+}
+
+.hbd-dock::before,
+.hbd-dock::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+
   border: 1px solid var(--hbd-dock-line);
   border-radius: var(--hbd-dock-radius);
+  background-color: var(--hbd-dock-surface);
+  box-shadow:
+    var(--hbd-dock-contact),
+    var(--hbd-dock-edge);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  pointer-events: none;
+}
 
-  background: var(--hbd-dock-face);
-  box-shadow: var(--hbd-contact), inset 0 1px 0 var(--hbd-dock-highlight);
-  backdrop-filter: blur(18px) saturate(135%);
-  -webkit-backdrop-filter: blur(18px) saturate(135%);
-  pointer-events: auto;
+.hbd-dock::before {
+  width: var(--hbd-dock-width);
+}
+
+.hbd-dock::after {
+  width: var(--hbd-dock-open);
+  border-color: var(--hbd-dock-line-active);
+  box-shadow:
+    var(--hbd-dock-contact),
+    var(--hbd-dock-glow),
+    var(--hbd-dock-edge);
+  opacity: 0;
+  transition: opacity var(--hbd-t-open) var(--hbd-ease);
+}
+
+.hbd-dock:hover::after,
+.hbd-dock:focus-within::after {
+  opacity: 1;
 }
 
 .hbd-btn {
+  position: relative;
+  z-index: 1;
+
   box-sizing: border-box;
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: var(--hbd-size);
+  width: 100%;
   height: var(--hbd-size);
-  padding: 0;
+  padding: 0 8px;
   border: 0;
   border-radius: var(--hbd-radius);
 
   background: transparent;
-  color: var(--hbd-ink);
+  color: var(--hbd-dock-ink);
   cursor: pointer;
   pointer-events: auto;
   -webkit-tap-highlight-color: transparent;
 
   transition:
-    background-color var(--hbd-t-hover) var(--hbd-ease),
     color var(--hbd-t-hover) var(--hbd-ease),
     transform var(--hbd-t-press) var(--hbd-ease);
 }
 
+.hbd-btn::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: var(--hbd-row-lift);
+
+  border-radius: var(--hbd-radius);
+  background-color: var(--hbd-dock-hover);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--hbd-t-hover) var(--hbd-ease);
+}
+
 .hbd-btn:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--hbd-ink-strong);
+  color: var(--hbd-dock-ink-strong);
+}
+
+.hbd-btn:hover::before {
+  opacity: 1;
 }
 
 .hbd-btn:active {
   transform: translateY(1px);
-  background: rgba(255, 255, 255, 0.09);
 }
 
 .hbd-btn[aria-pressed='true'] {
-  color: var(--hbd-accent);
+  color: var(--hbd-dock-accent);
 }
 
 .hbd-btn[aria-pressed='true']:hover {
-  background: var(--hbd-accent-wash);
-  color: #cfe4ff;
+  color: var(--hbd-dock-accent-ink);
 }
 
 .hbd-btn:focus-visible {
-  outline: 2px solid var(--hbd-accent);
-  outline-offset: 2px;
+  outline: none;
+}
+
+.hbd-btn:focus-visible::before {
+  opacity: 1;
+  box-shadow:
+    inset 0 0 0 1px var(--hbd-dock-focus-inner),
+    inset 0 0 0 4px var(--hbd-dock-focus-outer);
 }
 
 .hbd-icon {
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+}
+
+.hbd-label {
+  position: absolute;
+  top: 50%;
+  right: 100%;
+
+  font: 500 12px/1 system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  color: inherit;
+  opacity: 0;
+  transform: translate(var(--hbd-label-shift), -50%);
+  pointer-events: none;
+  transition:
+    opacity var(--hbd-t-hover) var(--hbd-ease),
+    transform var(--hbd-t-open) var(--hbd-ease);
+}
+
+.hbd-dock:hover .hbd-label,
+.hbd-dock:focus-within .hbd-label {
+  opacity: 1;
+  transform: translate(0, -50%);
 }
 
 .hbd-btn svg {
@@ -107,7 +183,7 @@
   stroke-width: var(--hbd-icon-stroke);
   stroke-linecap: round;
   stroke-linejoin: round;
-  animation: hbd-icon-in var(--hbd-t-icon) var(--hbd-ease) both;
+  animation: hbd-icon-in var(--hbd-t-hover) var(--hbd-ease) both;
 }
 
 @keyframes hbd-icon-in {
@@ -120,32 +196,47 @@
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  .hbd-dock {
-    background: #0d1117;
+  .hbd-dock::before,
+  .hbd-dock::after {
+    background-color: var(--hbd-dock-surface-solid);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hbd-btn {
+  .hbd-dock::after,
+  .hbd-btn,
+  .hbd-btn::before,
+  .hbd-label {
     transition: none;
+  }
+  .hbd-label {
+    transform: translate(0, -50%);
   }
   .hbd-btn svg {
     animation: none;
   }
+  .hbd-btn:active {
+    transform: none;
+  }
 }
 
 @media (max-width: 640px) {
+  :host {
+    --hbd-size: 44px;
+    --hbd-icon-size: 20px;
+  }
   .hbd-dock {
     right: 12px;
-    bottom: 14px;
+    bottom: 12px;
   }
 }
 
 @media (forced-colors: active) {
-  .hbd-dock {
-    background: ButtonFace;
+  .hbd-dock::before,
+  .hbd-dock::after {
+    background-color: ButtonFace;
     border-color: ButtonText;
     box-shadow: none;
     backdrop-filter: none;
@@ -154,11 +245,20 @@
   .hbd-btn {
     color: ButtonText;
   }
+  .hbd-btn::before {
+    background-color: Highlight;
+  }
+  .hbd-btn:hover {
+    color: HighlightText;
+  }
   .hbd-btn[aria-pressed='true'] {
     color: Highlight;
   }
   .hbd-btn:focus-visible {
     outline: 2px solid Highlight;
-    outline-offset: 2px;
+    outline-offset: -3px;
+  }
+  .hbd-btn:focus-visible::before {
+    box-shadow: none;
   }
 }

@@ -172,16 +172,25 @@ function roleOfVar(name: string): Role | null {
 }
 
 
-type PaletteKey = 'canvas' | 'surface' | 'raised' | 'overlay' | 'ink' | 'inkMuted' | 'inkSoft';
+type PaletteKey =
+  | 'canvas'
+  | 'surface'
+  | 'raised'
+  | 'overlay'
+  | 'border'
+  | 'ink'
+  | 'inkMuted'
+  | 'inkSoft';
 
 const PALETTE_FALLBACK: Record<PaletteKey, RGBA> = {
-  canvas: { r: 11, g: 14, b: 18, a: 1 },
-  surface: { r: 17, g: 21, b: 27, a: 1 },
-  raised: { r: 23, g: 28, b: 36, a: 1 },
-  overlay: { r: 29, g: 36, b: 46, a: 1 },
-  ink: { r: 230, g: 234, b: 240, a: 1 },
-  inkMuted: { r: 164, g: 174, b: 186, a: 1 },
-  inkSoft: { r: 127, g: 139, b: 153, a: 1 },
+  canvas: { r: 7, g: 11, b: 16, a: 1 },
+  surface: { r: 13, g: 19, b: 26, a: 1 },
+  raised: { r: 19, g: 27, b: 36, a: 1 },
+  overlay: { r: 26, g: 36, b: 48, a: 1 },
+  border: { r: 196, g: 218, b: 240, a: 1 },
+  ink: { r: 233, g: 239, b: 247, a: 1 },
+  inkMuted: { r: 168, g: 182, b: 198, a: 1 },
+  inkSoft: { r: 130, g: 146, b: 163, a: 1 },
 };
 
 const palette: Record<PaletteKey, RGBA> = { ...PALETTE_FALLBACK };
@@ -194,6 +203,7 @@ function syncPalette(): void {
   palette.surface = token('--hbd-surface', PALETTE_FALLBACK.surface);
   palette.raised = token('--hbd-raised', PALETTE_FALLBACK.raised);
   palette.overlay = token('--hbd-overlay', PALETTE_FALLBACK.overlay);
+  palette.border = token('--hbd-border', PALETTE_FALLBACK.border);
   palette.ink = token('--hbd-ink', PALETTE_FALLBACK.ink);
   palette.inkMuted = token('--hbd-ink-muted', PALETTE_FALLBACK.inkMuted);
   palette.inkSoft = token('--hbd-ink-soft', PALETTE_FALLBACK.inkSoft);
@@ -294,7 +304,7 @@ function mapBorder(c: RGBA): RGBA | null {
   }
 
   const alpha = clamp(0.05 + ((255 - L) / 255) * 0.13, 0.05, 0.18);
-  return { r: 255, g: 255, b: 255, a: Math.round(alpha * 1000) / 1000 };
+  return { ...palette.border, a: Math.round(alpha * 1000) / 1000 };
 }
 
 function mapColor(role: Role, c: RGBA, selector: string): RGBA | null {
@@ -621,21 +631,127 @@ function restoreInline(): void {
 
 const EXCEPTIONS_CSS = `
 html.${ROOT_CLASS} .nav {
-  --publish-bg: var(--hbd-paper, #e9eef5);
-  --publish-color: var(--hbd-paper-ink, #0b0e12);
-  --publish-shadow: 0 8px 24px rgba(0, 0, 0, 0.42);
-  background-color: rgba(11, 14, 18, 0.84);
-  backdrop-filter: blur(18px) saturate(140%);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
-  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+  --publish-bg: var(--hbd-paper, #b9deff);
+  --publish-color: var(--hbd-paper-ink, #061019);
+  --publish-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  background-color: rgba(7, 11, 16, 0.92);
+  background-image: none;
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  box-shadow:
+    inset 0 -1px 0 rgba(190, 220, 255, 0.08),
+    0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+html.${ROOT_CLASS} .nav .nav-content .nav-links .nav-link.nav-link--active {
+  box-shadow: inset 0 -2px 0 var(--hbd-accent, #72bdff);
 }
 
 @media (prefers-reduced-transparency: reduce) {
   html.${ROOT_CLASS} .nav {
-    background-color: #0b0e12;
+    background-color: #070b10;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }
+}
+
+html.${ROOT_CLASS} .hb-cpt-page-header {
+  background-color: var(--hbd-raised, #131b24);
+  background-image: none;
+  box-shadow: inset 0 -1px 0 rgba(190, 220, 255, 0.08);
+}
+
+html.${ROOT_CLASS} .bbs-community-hot-topic,
+html.${ROOT_CLASS} .hb-cpt__pagination.bbs-home__topic-list,
+html.${ROOT_CLASS} .bbs-home__topic-list-wrapper,
+html.${ROOT_CLASS} .hb-bbs-post {
+  background-color: var(--hbd-raised, #131b24);
+  background-image: none;
+}
+
+html.${ROOT_CLASS} .hb-bbs-link__content,
+html.${ROOT_CLASS} .link-comment {
+  background-color: transparent;
+  background-image: none;
+  box-shadow: none;
+}
+
+html.${ROOT_CLASS} .hb-cpt__bbs-content {
+  background-image: none;
+}
+
+html.${ROOT_CLASS} .hb-bbs-home .bbs-home__content-list,
+html.${ROOT_CLASS} #page-bbs-community .list:before {
+  background-color: var(--hbd-raised, #131b24);
+  box-shadow: none;
+}
+
+html.${ROOT_CLASS} .page-header__container-bg {
+  background-color: transparent;
+}
+
+html.${ROOT_CLASS} .link-section-title .section-title__content::before {
+  content: "";
+  display: block;
+  width: 28px;
+  height: 2px;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  background-color: var(--hbd-accent, #72bdff);
+}
+
+html.${ROOT_CLASS} .hb-cpt__slide-tab .slide-tab-tab__bar,
+html.${ROOT_CLASS} .hb-cpt__slide-tab.block .slide-tab-tab__bar {
+  background-color: var(--hbd-accent, #72bdff);
+  box-shadow: 0 0 14px rgba(114, 189, 255, 0.35);
+}
+
+html.${ROOT_CLASS} .search-input .el-input__wrapper {
+  background-color: #0b121a;
+  background-image: none;
+  box-shadow:
+    inset 0 0 0 1px rgba(190, 220, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition: box-shadow 180ms ease, background-color 180ms ease;
+}
+
+html.${ROOT_CLASS} .search-input .el-input__wrapper.is-focus {
+  box-shadow:
+    inset 0 0 0 1px rgba(114, 189, 255, 0.55),
+    0 0 0 4px rgba(114, 189, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+html.${ROOT_CLASS} .search-input .search-input__action {
+  color: var(--hbd-accent, #72bdff);
+}
+
+html.${ROOT_CLASS} .el-backtop,
+html.${ROOT_CLASS} .scroll-list__button-group .scroll-list__top-btn {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 10px !important;
+  background-color: var(--hbd-raised, #131b24) !important;
+  color: var(--hbd-ink-muted, #a8b6c6) !important;
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 1px rgba(190, 220, 255, 0.1) !important;
+}
+
+html.${ROOT_CLASS} .el-backtop {
+  right: 22px !important;
+  bottom: 160px !important;
+}
+
+html.${ROOT_CLASS} .hb-cpt__scroll-list .scroll-list__button-group {
+  right: 22px !important;
+  bottom: 160px !important;
+}
+
+html.${ROOT_CLASS} .el-backtop:hover,
+html.${ROOT_CLASS} .scroll-list__button-group .scroll-list__top-btn:hover {
+  background-color: var(--hbd-hover, #222f3d) !important;
+  color: var(--hbd-ink, #e9eff7) !important;
 }
 
 html.${ROOT_CLASS} .hb-cpt__topic-entrance .hot-topic__look,
@@ -646,10 +762,9 @@ html.${ROOT_CLASS} .com-game-card .game-info .line-2 .wishlist-box,
 html.${ROOT_CLASS} .com-mod-card .mod-card-download,
 html.${ROOT_CLASS} .website-login .website-login__submit[data-v-7ee09acd],
 html.${ROOT_CLASS} .hb-color__btn--confirm,
-html.${ROOT_CLASS} .hb-cpt__alert-wrapper .hb-cpt__alert .hb-cpt__alert-btn-box .alert-btn-box__btn.confirm,
-html.${ROOT_CLASS} .hb-cpt__slide-tab.block .slide-tab-tab__bar {
+html.${ROOT_CLASS} .hb-cpt__alert-wrapper .hb-cpt__alert .hb-cpt__alert-btn-box .alert-btn-box__btn.confirm {
   background-image: none;
-  background-color: var(--hbd-hover, #232b36);
+  background-color: var(--hbd-raised, #131b24);
 }
 
 html.${ROOT_CLASS} .vjs-track-settings-controls button,
@@ -659,44 +774,40 @@ html.${ROOT_CLASS} .vjs-track-settings-controls button:is(:hover, :focus, :activ
   color: #2b333f;
 }
 
-html.${ROOT_CLASS} .search-input .el-input__wrapper {
-  box-shadow: none;
-}
-
 html.${ROOT_CLASS} .bbs-content__image {
   box-shadow: none;
 }
 
 html.${ROOT_CLASS} .article-vote .vote-wrapper .vote-submit.active p {
   background-image: none;
-  background-color: var(--hbd-accent, #7fb2e5);
-  color: var(--hbd-paper-ink, #0b0e12);
+  background-color: var(--hbd-accent, #72bdff);
+  color: var(--hbd-paper-ink, #061019);
 }
 
 html.${ROOT_CLASS} {
-  --el-color-white: var(--hbd-raised, #171c24);
-  --el-color-black: var(--hbd-ink, #e6eaf0);
-  --el-bg-color: var(--hbd-raised, #171c24);
-  --el-bg-color-page: var(--hbd-canvas, #0b0e12);
-  --el-bg-color-overlay: var(--hbd-overlay, #1d242e);
-  --el-text-color-primary: var(--hbd-ink, #e6eaf0);
-  --el-text-color-regular: #c3cbd6;
-  --el-text-color-secondary: var(--hbd-ink-muted, #a4aeba);
-  --el-text-color-placeholder: var(--hbd-ink-soft, #7f8b99);
-  --el-text-color-disabled: #4a535f;
-  --el-border-color: #2a333f;
-  --el-border-color-light: #252d37;
-  --el-border-color-lighter: #202730;
-  --el-border-color-extra-light: #1b212a;
-  --el-border-color-dark: #364150;
-  --el-fill-color: var(--hbd-overlay, #1d242e);
-  --el-fill-color-light: #191f27;
-  --el-fill-color-lighter: #151a21;
-  --el-fill-color-extra-light: var(--hbd-surface, #11151b);
-  --el-fill-color-blank: var(--hbd-raised, #171c24);
-  --el-mask-color: rgba(11, 14, 18, 0.72);
-  --el-box-shadow: 0 8px 24px rgba(0, 0, 0, 0.48);
-  --el-box-shadow-light: 0 4px 14px rgba(0, 0, 0, 0.38);
+  --el-color-white: var(--hbd-raised, #131b24);
+  --el-color-black: var(--hbd-ink, #e9eff7);
+  --el-bg-color: var(--hbd-raised, #131b24);
+  --el-bg-color-page: var(--hbd-canvas, #070b10);
+  --el-bg-color-overlay: var(--hbd-overlay, #1a2430);
+  --el-text-color-primary: var(--hbd-ink, #e9eff7);
+  --el-text-color-regular: #cbd8e6;
+  --el-text-color-secondary: var(--hbd-ink-muted, #a8b6c6);
+  --el-text-color-placeholder: var(--hbd-ink-soft, #8292a3);
+  --el-text-color-disabled: #536273;
+  --el-border-color: #2b3a4b;
+  --el-border-color-light: #253343;
+  --el-border-color-lighter: #202c3a;
+  --el-border-color-extra-light: #1b2531;
+  --el-border-color-dark: #3a4d62;
+  --el-fill-color: var(--hbd-overlay, #1a2430);
+  --el-fill-color-light: #17212c;
+  --el-fill-color-lighter: #121a23;
+  --el-fill-color-extra-light: var(--hbd-surface, #0d131a);
+  --el-fill-color-blank: var(--hbd-raised, #131b24);
+  --el-mask-color: rgba(7, 11, 16, 0.72);
+  --el-box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  --el-box-shadow-light: 0 6px 18px rgba(0, 0, 0, 0.4);
 }
 `;
 
@@ -916,3 +1027,4 @@ export function getEngineCss(): { bytes: number; sample: string[] } {
     sample: mutations.slice(0, 40),
   };
 }
+

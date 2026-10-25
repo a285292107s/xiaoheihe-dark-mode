@@ -1,5 +1,4 @@
-
-html.hb-reply-btn .hb-reply {
+:is(html.hb-reply-btn .hb-icon-btn, html.hb-comment-cards [data-hb-tc] > .hb-icon-btn) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -16,14 +15,10 @@ html.hb-reply-btn .hb-reply {
   -webkit-user-select: none;
   user-select: none;
   vertical-align: middle;
-  transition:
-    color 120ms ease,
-    border-color 120ms ease,
-    background-color 120ms ease,
-    transform 90ms ease;
+  transition: var(--hb-ui-control-transition);
 }
 
-html.hb-reply-btn .hb-reply svg {
+:is(html.hb-reply-btn .hb-icon-btn, html.hb-comment-cards [data-hb-tc] > .hb-icon-btn) svg {
   display: block;
   width: 16px;
   height: 16px;
@@ -34,42 +29,40 @@ html.hb-reply-btn .hb-reply svg {
   stroke-linejoin: round;
 }
 
-html.hb-reply-btn .hb-reply:hover {
+:is(html.hb-reply-btn .hb-icon-btn, html.hb-comment-cards [data-hb-tc] > .hb-icon-btn):hover {
   color: var(--hb-ui-accent-strong);
   border-color: var(--hb-ui-edge-control-hover);
   background-color: var(--hb-ui-accent-wash);
 }
 
-html.hb-reply-btn .hb-reply:active {
+:is(html.hb-reply-btn .hb-icon-btn, html.hb-comment-cards [data-hb-tc] > .hb-icon-btn):active {
   transform: translateY(1px);
 }
 
-html.hb-reply-btn .hb-reply:focus-visible {
+:is(html.hb-reply-btn .hb-icon-btn, html.hb-comment-cards [data-hb-tc] > .hb-icon-btn):focus-visible {
   outline: none;
-  box-shadow:
-    0 0 0 2px var(--hb-ui-ring-light),
-    0 0 0 3px var(--hb-ui-ring-dark);
+  box-shadow: var(--hb-ui-focus-ring);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html.hb-reply-btn .hb-reply {
+  :is(html.hb-reply-btn .hb-icon-btn, html.hb-comment-cards [data-hb-tc] > .hb-icon-btn) {
     transition: none;
   }
-  html.hb-reply-btn .hb-reply:active {
+  :is(html.hb-reply-btn .hb-icon-btn, html.hb-comment-cards [data-hb-tc] > .hb-icon-btn):active {
     transform: none;
   }
 }
 
 @media (forced-colors: active) {
-  html.hb-reply-btn .hb-reply {
+  :is(html.hb-reply-btn .hb-icon-btn, html.hb-comment-cards [data-hb-tc] > .hb-icon-btn) {
     border-color: ButtonText;
     color: ButtonText;
   }
-  html.hb-reply-btn .hb-reply:hover {
+  :is(html.hb-reply-btn .hb-icon-btn, html.hb-comment-cards [data-hb-tc] > .hb-icon-btn):hover {
     border-color: Highlight;
     color: Highlight;
   }
-  html.hb-reply-btn .hb-reply:focus-visible {
+  :is(html.hb-reply-btn .hb-icon-btn, html.hb-comment-cards [data-hb-tc] > .hb-icon-btn):focus-visible {
     outline: 2px solid Highlight;
     outline-offset: 2px;
     box-shadow: none;

@@ -1,6 +1,7 @@
+import { buildSvg } from './svg';
+
 const DOCK_CLASS = 'hb-row-dock';
 const OWN_ATTR = 'data-hb-own';
-const SVG_NS = 'http://www.w3.org/2000/svg';
 
 const PLANE_PATHS = ['M21.3 3.2 2.9 10.4 12.6 20.4Z', 'M9.1 12.7 21.3 3.2'];
 
@@ -36,14 +37,5 @@ export function pruneEmptyRowDocks(): void {
 }
 
 export function buildPlaneIcon(): SVGSVGElement {
-  const svg = document.createElementNS(SVG_NS, 'svg');
-  svg.setAttribute('viewBox', '0 0 24 24');
-  svg.setAttribute('aria-hidden', 'true');
-  svg.setAttribute('focusable', 'false');
-  for (const d of PLANE_PATHS) {
-    const path = document.createElementNS(SVG_NS, 'path');
-    path.setAttribute('d', d);
-    svg.appendChild(path);
-  }
-  return svg;
+  return buildSvg(PLANE_PATHS);
 }

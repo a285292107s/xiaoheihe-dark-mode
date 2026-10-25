@@ -3,13 +3,13 @@ import { applyDark, isDarkEnabled, onDarkChange } from './dark-mode';
 import { applyDeclutter, isDeclutterEnabled, onDeclutterChange } from './declutter';
 import { applyReplyBtn, isReplyBtnEnabled, onReplyBtnChange } from './reply-btn';
 import { applyCommentCards, isCommentCardsEnabled, onCommentCardsChange } from './comment-cards';
+import { buildSvg } from './svg';
 import uiCss from './ui.css?inline';
 
 const HOST_ID = 'heybox-dark-mode-root';
 const DARK_BUTTON_ID = 'heybox-dark-toggle';
 const DECLUTTER_BUTTON_ID = 'heybox-declutter-toggle';
 const COMMENT_BUTTON_ID = 'heybox-comment-toggle';
-const SVG_NS = 'http://www.w3.org/2000/svg';
 
 const ICON_MOON = ['M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z'];
 const ICON_SUN = [
@@ -33,36 +33,12 @@ const ICON_BUBBLE = [
 ];
 const ICON_BUBBLE_OFF = [...ICON_BUBBLE, 'M3.8 20.2 20.2 3.8'];
 
-function buildIcon(
-  paths: readonly string[],
-  circle?: { cx: number; cy: number; r: number },
-): SVGSVGElement {
-  const svg = document.createElementNS(SVG_NS, 'svg');
-  svg.setAttribute('viewBox', '0 0 24 24');
-  svg.setAttribute('aria-hidden', 'true');
-  svg.setAttribute('focusable', 'false');
-
-  if (circle) {
-    const dot = document.createElementNS(SVG_NS, 'circle');
-    dot.setAttribute('cx', String(circle.cx));
-    dot.setAttribute('cy', String(circle.cy));
-    dot.setAttribute('r', String(circle.r));
-    svg.appendChild(dot);
-  }
-  for (const d of paths) {
-    const path = document.createElementNS(SVG_NS, 'path');
-    path.setAttribute('d', d);
-    svg.appendChild(path);
-  }
-  return svg;
-}
-
 interface Control {
   button: HTMLButtonElement;
   iconSlot: HTMLElement;
 }
 
-function createControl(dock: HTMLElement, id: string): Control {
+function createControl(dock: HTMLElement, id: string, label: string): Control {
   const button = document.createElement('button');
   button.id = id;
   button.className = 'hbd-btn';
@@ -70,8 +46,13 @@ function createControl(dock: HTMLElement, id: string): Control {
 
   const iconSlot = document.createElement('span');
   iconSlot.className = 'hbd-icon';
-  button.appendChild(iconSlot);
 
+  const labelSlot = document.createElement('span');
+  labelSlot.className = 'hbd-label';
+  labelSlot.textContent = label;
+  labelSlot.setAttribute('aria-hidden', 'true');
+
+  button.append(iconSlot, labelSlot);
   dock.appendChild(button);
   return { button, iconSlot };
 }
@@ -86,7 +67,7 @@ function paint(
   control.button.title = label;
   control.button.setAttribute('aria-label', label);
   control.button.setAttribute('aria-pressed', pressed ? 'true' : 'false');
-  control.iconSlot.replaceChildren(buildIcon(paths, circle));
+  control.iconSlot.replaceChildren(buildSvg(paths, circle));
 }
 
 const SUN_CORE = { cx: 12, cy: 12, r: 4 };
@@ -117,7 +98,6 @@ function paintCommentEnhance(control: Control, on: boolean): void {
 
 export function mountControls(): void {
   if (document.getElementById(HOST_ID)) return;
-
   const host = document.createElement('div');
   host.id = HOST_ID;
   host.setAttribute('data-hb-own', '');
@@ -134,9 +114,9 @@ export function mountControls(): void {
   dock.setAttribute('aria-label', '页面显示选项');
   shadow.appendChild(dock);
 
-  const darkControl = createControl(dock, DARK_BUTTON_ID);
-  const declutterControl = createControl(dock, DECLUTTER_BUTTON_ID);
-  const commentControl = createControl(dock, COMMENT_BUTTON_ID);
+  const darkControl = createControl(dock, DARK_BUTTON_ID, '深色模式');
+  const declutterControl = createControl(dock, DECLUTTER_BUTTON_ID, '精简模式');
+  const commentControl = createControl(dock, COMMENT_BUTTON_ID, '评论增强');
 
   const commentEnhanceOn = (): boolean => isReplyBtnEnabled() && isCommentCardsEnabled();
 

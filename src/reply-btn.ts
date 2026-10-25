@@ -1,13 +1,8 @@
 
 import { CARD_ATTR, CARD_REPLY_CLASS } from './comment-cards';
-import { ensureOwnStyle, removeOwnStyle } from './own-style';
 import { appendToRowDock, buildPlaneIcon, dropRowControl, pruneEmptyRowDocks } from './row-dock';
-import replyBtnCss from './reply-btn.css?inline';
-import rowDockCss from './row-dock.css?inline';
-import tokensCss from './tokens.css?inline';
 
 const STORAGE_KEY = 'heybox-reply-btn';
-const STYLE_ID = 'hb-reply-btn';
 const REPLY_CLASS = 'hb-reply-btn';
 
 const MAIN_ROW_SELECTOR = '.link-comment__comment-item';
@@ -89,7 +84,7 @@ function onClickCapture(event: MouseEvent): void {
 function createButton(): HTMLButtonElement {
   const btn = document.createElement('button');
   btn.type = 'button';
-  btn.className = BTN_CLASS;
+  btn.className = `${BTN_CLASS} hb-icon-btn`;
   btn.setAttribute('data-hb-own', '');
   btn.title = '回复这条评论';
   btn.setAttribute('aria-label', '回复这条评论');
@@ -173,12 +168,10 @@ export function applyReplyBtn(enabled: boolean): void {
 
   if (enabled) {
     root.classList.add(REPLY_CLASS);
-    ensureOwnStyle(STYLE_ID, `${tokensCss}\n${rowDockCss}\n${replyBtnCss}`);
     attach();
   } else {
     detach();
     root.classList.remove(REPLY_CLASS);
-    removeOwnStyle(STYLE_ID);
   }
 
   try {
