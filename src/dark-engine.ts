@@ -363,6 +363,44 @@ function transformDeclaration(prop: string, value: string, selector = ''): strin
   return urls.length ? out.replace(MASK_SPAN, (_m, i: string) => urls[+i]) : out;
 }
 
+const BRAND_GRADIENT_FILL = 'var(--hbd-control, #2f3b4a)';
+const BRAND_GRADIENT_SKIP = /level-tag|static-color-hb-lv/;
+const VAR_TOKEN = /var\(\s*(--[\w-]+)\s*(?:,\s*([^()]*(?:\([^()]*\)[^()]*)*))?\)/g;
+
+const gradientVarCache = new Map<string, string>();
+
+function resolveGradientVar(name: string, fallback: string | undefined): string {
+  const cached = gradientVarCache.get(name);
+  if (cached !== undefined) return cached;
+  const resolved = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const value = resolved || (fallback ? resolveGradientVars(fallback.trim()) : '');
+  gradientVarCache.set(name, value);
+  return value;
+}
+
+function resolveGradientVars(value: string): string {
+  return value.replace(VAR_TOKEN, (match, name: string, fallback?: string) => {
+    const resolved = resolveGradientVar(name, fallback);
+    return resolved || match;
+  });
+}
+
+function isBrandGradient(value: string): boolean {
+  if (value.indexOf('gradient') < 0 && value.indexOf('var(') < 0) return false;
+  const resolved = value.indexOf('var(') >= 0 ? resolveGradientVars(value) : value;
+  if (resolved.indexOf('var(') >= 0 || resolved.indexOf('gradient') < 0) return false;
+  const lower = resolved.toLowerCase();
+  if (lower.indexOf('transparent') >= 0 || lower.indexOf('url(') >= 0) return false;
+  const tokens = resolved.match(COLOR_TOKEN);
+  if (!tokens || tokens.length < 2) return false;
+
+  for (const token of tokens) {
+    const stop = parseColor(token);
+    if (!stop || stop.a < 0.99 || !isNeutral(stop) || lum(stop) >= SURFACE_FLOOR) return false;
+  }
+  return true;
+}
+
 
 interface AnyRule {
   selectorText?: string;
@@ -442,12 +480,67 @@ function walk(rules: CSSRuleList): void {
   }
 }
 
+const GRADIENT_BG_PROPS = ['background', 'background-image'];
+
+function flattenGradients(style: CSSStyleDeclaration, selector: string): number {
+  if (selector.indexOf('::') >= 0 || BRAND_GRADIENT_SKIP.test(selector)) return 0;
+
+  const clip = (
+    style.getPropertyValue('background-clip') + style.getPropertyValue('-webkit-background-clip')
+  ).toLowerCase();
+  if (clip.indexOf('text') >= 0) return 0;
+
+  let state = ruleState.get(style);
+  let changed = 0;
+
+  for (const prop of GRADIENT_BG_PROPS) {
+    const current = style.getPropertyValue(prop);
+    if (!current) continue;
+
+    const entry = state?.get(prop);
+    if (entry && current === entry.applied) {
+      changed++;
+      continue;
+    }
+    if (!isBrandGradient(current)) continue;
+
+    if (!state) {
+      state = new Map();
+      ruleState.set(style, state);
+    }
+
+    const priority = style.getPropertyPriority(prop);
+    const next = prop === 'background' ? BRAND_GRADIENT_FILL : 'none';
+    state.set(prop, { orig: current, applied: next, priority });
+    try {
+      style.setProperty(prop, next, priority);
+    } catch {
+      continue;
+    }
+    ruleStyles.add(style);
+    changed++;
+    if (mutations.length < 60) {
+      mutations.push(`${selector} { ${prop}: ${current} -> ${next} }`);
+    }
+
+    if (prop !== 'background-image' || state.has('background-color')) continue;
+    const color = style.getPropertyValue('background-color');
+    const colorPriority = style.getPropertyPriority('background-color');
+    state.set('background-color', { orig: color, applied: BRAND_GRADIENT_FILL, priority: colorPriority });
+    style.setProperty('background-color', BRAND_GRADIENT_FILL, colorPriority);
+    if (mutations.length < 60) {
+      mutations.push(`${selector} { background-color: ${color} -> ${BRAND_GRADIENT_FILL} }`);
+    }
+  }
+  return changed;
+}
+
 function transformStyle(style: CSSStyleDeclaration, selector: string): number {
   const props: string[] = [];
   for (let j = 0; j < style.length; j++) props.push(style[j]);
 
+  let changed = flattenGradients(style, selector);
   let state = ruleState.get(style);
-  let changed = 0;
 
   for (const prop of props) {
     const current = style.getPropertyValue(prop);
@@ -513,6 +606,7 @@ function collect(): void {
   keyframeRules = [];
   pending = [];
   canvasKeys.clear();
+  gradientVarCache.clear();
   mutations.length = 0;
   stats = emptyStats();
 
@@ -754,17 +848,13 @@ html.${ROOT_CLASS} .scroll-list__button-group .scroll-list__top-btn:hover {
   color: var(--hbd-ink, #e9eff7) !important;
 }
 
-html.${ROOT_CLASS} .hb-cpt__topic-entrance .hot-topic__look,
-html.${ROOT_CLASS} .link-section-user .link-user__follow-btn:not(.followed),
-html.${ROOT_CLASS} #page-bbs-link .page-header__user-info .page-header__follow-btn:not(.followed),
-html.${ROOT_CLASS} .image-text__mini-program .mini-program__content .mini-program__btn,
-html.${ROOT_CLASS} .com-game-card .game-info .line-2 .wishlist-box,
-html.${ROOT_CLASS} .com-mod-card .mod-card-download,
-html.${ROOT_CLASS} .website-login .website-login__submit[data-v-7ee09acd],
-html.${ROOT_CLASS} .hb-color__btn--confirm,
-html.${ROOT_CLASS} .hb-cpt__alert-wrapper .hb-cpt__alert .hb-cpt__alert-btn-box .alert-btn-box__btn.confirm {
+html.${ROOT_CLASS} .hb-color__btn--confirm {
   background-image: none;
-  background-color: var(--hbd-raised, #131b24);
+  background-color: var(--hbd-control, #2f3b4a);
+}
+
+html.${ROOT_CLASS} .creator-editor__form-wrapper::before {
+  background-color: transparent;
 }
 
 html.${ROOT_CLASS} .vjs-track-settings-controls button,

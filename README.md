@@ -19,9 +19,9 @@
 应急/调试可用控制台 `__hbSetCopy(false)`。
 
 ```
-产物     89 KB（gzip 23 KB），无运行时依赖
+产物     97 KB（gzip 25 KB），无运行时依赖
 开销     一次遍历 4700~5500 条规则约 20~35ms（实测）；元素级只处理「确实带内联颜色」的那约 20 个元素
-例外     5654 字节（人工审计的例外层，其余全部就地改写站点声明）
+例外     5149 字节（人工审计的例外层，其余全部就地改写站点声明）
 精简     324 字节 CSS + 一个捕获期 click 监听（只接管导航 logo）
 复制     944 字节 CSS + 四个事件监听（无样式重排开销）
 免打扰   2.8 KB 注入 CSS（含共享令牌）+ 一个捕获期 click 监听（只在评论行内生效）
@@ -154,7 +154,8 @@ pnpm run build       # tsc -b && vite build -> dist/xiaoheihe-dark-mode.user.js
 ### 深色表面只有三级
 
 画布 `--hbd-canvas` → 卡片 `--hbd-raised` → 卡片内的悬浮块 `--hbd-overlay`。
-`--hbd-surface` 是页面级表面，**不用来画卡片内部**。
+`--hbd-surface` 是页面级表面，**不用来画卡片内部**。控件（品牌黑按钮压平后的底色）用 `--hbd-control`，
+它比 raised 亮一档，保证按钮落在 raised 工具条或卡片上仍然看得出边界。
 
 例外层（`src/dark-engine.ts` 的 `EXCEPTIONS_CSS`）上不上色，取决于站点在**浅色**下的实际底色：
 
@@ -164,6 +165,16 @@ pnpm run build       # tsc -b && vite build -> dist/xiaoheihe-dark-mode.user.js
   `.hb-cpt__pagination.bbs-home__topic-list`、`.hb-bbs-post`、`.bbs-community-hot-topic`）统一用 `--hbd-raised`。
 - 浅色下本来就带一点灰的容器（`.link-comment__comment-children` 的 `#fafbfc`）交给引擎按角色映射，
   不要手写，否则深浅两态的"比父级暗一级"会跟不上。
+- 浅色下靠底色隐形的装饰性色块直接透明：`.creator-editor__form-wrapper::before` 是 4px、左右各超出父级 16px 的
+  分隔条，浅色下与白底同色看不见，深色里会变成一条横穿卡片边界的长条。
+
+站点的品牌黑按钮共用同一族渐变（`linear-gradient(46deg, #464b50, #14191e)` 等），同一族也有以 `--hb-gradient-6`
+这类自定义属性间接引用的写法；两种都由引擎当作一种材质，就地压成 `background-image: none` 加 `--hbd-control`，
+不再按选择器逐条登记：新增组件沿用同一材质不需要改例外层，站点换构建也不用跟着改哈希。压平的目标色是
+`--hbd-control` 而不是 `--hbd-raised`：发布按钮、查看按钮常常就落在 raised 的工具条或卡片上，压成 raised
+会与父级同色，整块消失。等级徽章（`hb-level-tag` / `static-color-hb-lv-`）、渐变文字（`background-clip: text`）、
+带透明的遮罩与骨架、伪元素造型不参与压平。例外层因此只留特殊设计（纸色 CTA、非中性确认按钮、播放器浅底），
+并且不写带构建哈希的 `[data-v-…]` 选择器。
 
 改令牌或例外层之后，在真站复跑接缝检测：
 

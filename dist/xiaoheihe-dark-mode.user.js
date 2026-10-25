@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         小黑盒深色模式
 // @namespace    xiaoheihe-dark-mode
-// @version      0.8.6
+// @version      0.8.9
 // @author       油猴脚本-小黑盒页面优化
 // @description  为小黑盒网页版（xiaoheihe.cn）提供深色模式、页面精简、复制解锁、一级评论免打扰与楼中楼卡片化：按角色重映射站点 CSS 规则（含伪元素与交互态），可把顶部导航精简为只剩 logo（点 logo 等同点「社区」）并隐藏社区页 / 帖子详情页右侧栏，可在站点回复编辑器夺焦毁掉选区、剪贴板数据被清空时把选中内容救回剪贴板，可把一级评论「回复此楼」的触发从「点整行」收进发言内容右下方一枚纸飞机 —— 点正文只选中、不弹框；楼中楼每条回复则排成卡片（第一行头像/用户名/回复对象/时间，第二行起正文），回复入口是卡片末尾的纸飞机图标，点它即展开站点回复框并引用这一条。深色、精简、评论区增强（免打扰与卡片化一起开关）三项各自记忆偏好、可随时切换；复制解锁常驻开启，没有开关按钮。
 // @license      MIT
@@ -528,6 +528,36 @@
 		if (!changed) return null;
 		return urls.length ? out.replace(MASK_SPAN, (_m, i) => urls[+i]) : out;
 	}
+	var BRAND_GRADIENT_FILL = "var(--hbd-control, #2f3b4a)";
+	var BRAND_GRADIENT_SKIP = /level-tag|static-color-hb-lv/;
+	var VAR_TOKEN = /var\(\s*(--[\w-]+)\s*(?:,\s*([^()]*(?:\([^()]*\)[^()]*)*))?\)/g;
+	var gradientVarCache = new Map();
+	function resolveGradientVar(name, fallback) {
+		const cached = gradientVarCache.get(name);
+		if (cached !== void 0) return cached;
+		const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim() || (fallback ? resolveGradientVars(fallback.trim()) : "");
+		gradientVarCache.set(name, value);
+		return value;
+	}
+	function resolveGradientVars(value) {
+		return value.replace(VAR_TOKEN, (match, name, fallback) => {
+			return resolveGradientVar(name, fallback) || match;
+		});
+	}
+	function isBrandGradient(value) {
+		if (value.indexOf("gradient") < 0 && value.indexOf("var(") < 0) return false;
+		const resolved = value.indexOf("var(") >= 0 ? resolveGradientVars(value) : value;
+		if (resolved.indexOf("var(") >= 0 || resolved.indexOf("gradient") < 0) return false;
+		const lower = resolved.toLowerCase();
+		if (lower.indexOf("transparent") >= 0 || lower.indexOf("url(") >= 0) return false;
+		const tokens = resolved.match(COLOR_TOKEN);
+		if (!tokens || tokens.length < 2) return false;
+		for (const token of tokens) {
+			const stop = parseColor(token);
+			if (!stop || stop.a < .99 || !isNeutral(stop) || lum(stop) >= SURFACE_FLOOR) return false;
+		}
+		return true;
+	}
 	var CANVAS_SELECTOR = /^(?::root|html|body)(\s*,\s*(?::root|html|body))*$/i;
 	var INTERACTIVE_SELECTOR = /:hover|:focus|:active|\.is-active|\.is-open|\.is-selected|\.is-current|(^|[\s.])active([\s.:,]|$)/;
 	function isInteractiveSelector(selector) {
@@ -586,11 +616,58 @@
 			}
 		}
 	}
+	var GRADIENT_BG_PROPS = ["background", "background-image"];
+	function flattenGradients(style, selector) {
+		if (selector.indexOf("::") >= 0 || BRAND_GRADIENT_SKIP.test(selector)) return 0;
+		if ((style.getPropertyValue("background-clip") + style.getPropertyValue("-webkit-background-clip")).toLowerCase().indexOf("text") >= 0) return 0;
+		let state = ruleState.get(style);
+		let changed = 0;
+		for (const prop of GRADIENT_BG_PROPS) {
+			const current = style.getPropertyValue(prop);
+			if (!current) continue;
+			const entry = state?.get(prop);
+			if (entry && current === entry.applied) {
+				changed++;
+				continue;
+			}
+			if (!isBrandGradient(current)) continue;
+			if (!state) {
+				state = new Map();
+				ruleState.set(style, state);
+			}
+			const priority = style.getPropertyPriority(prop);
+			const next = prop === "background" ? BRAND_GRADIENT_FILL : "none";
+			state.set(prop, {
+				orig: current,
+				applied: next,
+				priority
+			});
+			try {
+				style.setProperty(prop, next, priority);
+			} catch {
+				continue;
+			}
+			ruleStyles.add(style);
+			changed++;
+			if (mutations.length < 60) mutations.push(`${selector} { ${prop}: ${current} -> ${next} }`);
+			if (prop !== "background-image" || state.has("background-color")) continue;
+			const color = style.getPropertyValue("background-color");
+			const colorPriority = style.getPropertyPriority("background-color");
+			state.set("background-color", {
+				orig: color,
+				applied: BRAND_GRADIENT_FILL,
+				priority: colorPriority
+			});
+			style.setProperty("background-color", BRAND_GRADIENT_FILL, colorPriority);
+			if (mutations.length < 60) mutations.push(`${selector} { background-color: ${color} -> ${BRAND_GRADIENT_FILL} }`);
+		}
+		return changed;
+	}
 	function transformStyle(style, selector) {
 		const props = [];
 		for (let j = 0; j < style.length; j++) props.push(style[j]);
+		let changed = flattenGradients(style, selector);
 		let state = ruleState.get(style);
-		let changed = 0;
 		for (const prop of props) {
 			const current = style.getPropertyValue(prop);
 			if (!current) continue;
@@ -647,6 +724,7 @@
 		keyframeRules = [];
 		pending = [];
 		canvasKeys.clear();
+		gradientVarCache.clear();
 		mutations.length = 0;
 		stats = emptyStats();
 		const sheets = document.styleSheets;
@@ -872,17 +950,13 @@ html.${ROOT_CLASS$1} .scroll-list__button-group .scroll-list__top-btn:hover {
   color: var(--hbd-ink, #e9eff7) !important;
 }
 
-html.${ROOT_CLASS$1} .hb-cpt__topic-entrance .hot-topic__look,
-html.${ROOT_CLASS$1} .link-section-user .link-user__follow-btn:not(.followed),
-html.${ROOT_CLASS$1} #page-bbs-link .page-header__user-info .page-header__follow-btn:not(.followed),
-html.${ROOT_CLASS$1} .image-text__mini-program .mini-program__content .mini-program__btn,
-html.${ROOT_CLASS$1} .com-game-card .game-info .line-2 .wishlist-box,
-html.${ROOT_CLASS$1} .com-mod-card .mod-card-download,
-html.${ROOT_CLASS$1} .website-login .website-login__submit[data-v-7ee09acd],
-html.${ROOT_CLASS$1} .hb-color__btn--confirm,
-html.${ROOT_CLASS$1} .hb-cpt__alert-wrapper .hb-cpt__alert .hb-cpt__alert-btn-box .alert-btn-box__btn.confirm {
+html.${ROOT_CLASS$1} .hb-color__btn--confirm {
   background-image: none;
-  background-color: var(--hbd-raised, #131b24);
+  background-color: var(--hbd-control, #2f3b4a);
+}
+
+html.${ROOT_CLASS$1} .creator-editor__form-wrapper::before {
+  background-color: transparent;
 }
 
 html.${ROOT_CLASS$1} .vjs-track-settings-controls button,
@@ -1125,7 +1199,7 @@ html.${ROOT_CLASS$1} {
 			sample: mutations.slice(0, 40)
 		};
 	}
-	var dark_base_default = "html.hb-dark{--hbd-canvas:#070b10;--hbd-surface:#0d131a;--hbd-raised:#131b24;--hbd-overlay:#1a2430;--hbd-hover:#222f3d;--hbd-border:#c4daf0;--hbd-ink:#e9eff7;--hbd-ink-muted:#a8b6c6;--hbd-ink-soft:#8292a3;--hbd-accent:#72bdff;--hbd-accent-strong:#a9d6ff;--hbd-accent-wash:#72bdff26;--hbd-paper:#b9deff;--hbd-paper-ink:#061019;--hbd-scroll-thumb:#2a3a4e;--hbd-scroll-thumb-hover:#3b5068;--hbd-selection:#72bdff4d;--lightningcss-light: ;--lightningcss-dark:initial;color-scheme:dark;accent-color:var(--hbd-accent);background-color:var(--hbd-canvas)!important}html.hb-dark body{background-color:var(--hbd-canvas)}html.hb-dark ::-webkit-scrollbar{width:10px;height:10px}html.hb-dark ::-webkit-scrollbar-track{background:0 0}html.hb-dark ::-webkit-scrollbar-corner{background:0 0}html.hb-dark ::-webkit-scrollbar-thumb{background:var(--hbd-scroll-thumb);border:2px solid var(--hbd-canvas);border-radius:999px}html.hb-dark ::-webkit-scrollbar-thumb:hover{background:var(--hbd-scroll-thumb-hover)}html.hb-dark input::placeholder,html.hb-dark textarea::placeholder{color:var(--hbd-ink-soft)}html.hb-dark ::selection{background:var(--hbd-selection)}";
+	var dark_base_default = "html.hb-dark{--hbd-canvas:#070b10;--hbd-surface:#0d131a;--hbd-raised:#131b24;--hbd-overlay:#1a2430;--hbd-hover:#222f3d;--hbd-control:#2f3b4a;--hbd-border:#c4daf0;--hbd-ink:#e9eff7;--hbd-ink-muted:#a8b6c6;--hbd-ink-soft:#8292a3;--hbd-accent:#72bdff;--hbd-accent-strong:#a9d6ff;--hbd-accent-wash:#72bdff26;--hbd-paper:#b9deff;--hbd-paper-ink:#061019;--hbd-scroll-thumb:#2a3a4e;--hbd-scroll-thumb-hover:#3b5068;--hbd-selection:#72bdff4d;--lightningcss-light: ;--lightningcss-dark:initial;color-scheme:dark;accent-color:var(--hbd-accent);background-color:var(--hbd-canvas)!important}html.hb-dark body{background-color:var(--hbd-canvas)}html.hb-dark ::-webkit-scrollbar{width:10px;height:10px}html.hb-dark ::-webkit-scrollbar-track{background:0 0}html.hb-dark ::-webkit-scrollbar-corner{background:0 0}html.hb-dark ::-webkit-scrollbar-thumb{background:var(--hbd-scroll-thumb);border:2px solid var(--hbd-canvas);border-radius:999px}html.hb-dark ::-webkit-scrollbar-thumb:hover{background:var(--hbd-scroll-thumb-hover)}html.hb-dark input::placeholder,html.hb-dark textarea::placeholder{color:var(--hbd-ink-soft)}html.hb-dark ::selection{background:var(--hbd-selection)}";
 	var STORAGE_KEY$4 = "heybox-dark-mode";
 	var BASE_STYLE_ID = "hb-dark-base";
 	var listeners$3 = new Set();
