@@ -1,26 +1,26 @@
-/**
- * 小黑盒深色引擎（原型 / 可移植到 userscript）
- *
- * 设计依据（来自 research/ 的实测结论）：
- *   - 站点两套设计令牌（--hb-* 695 个、--el-*）对渲染几乎完全无效：
- *     注入红色令牌后，页面上 0 个元素变色 → 令牌层不可作为主要手段。
- *   - 真正决定外观的是 CSS 规则里的**字面量颜色**（详情页 546 条规则）。
- *   - 其中 426 条规则作用于伪元素（::before/::after），
- *     「逐元素写内联样式」在物理上无法覆盖 → 必须改写 CSS 规则本身。
- *   - 站点 CSS 跨域可读（CORS），因此可以枚举规则并生成覆盖表。
- *
- * 策略：把站点 CSS 规则读出来，按「角色」把字面量颜色映射为深色等价，
- *      生成一份同选择器、同优先级、同媒体条件、排在最末的覆盖样式表。
- *      浏览器级联自动作用于当前与未来所有 DOM 节点（含伪元素/hover/媒体查询），
- *      零元素级开销。
- */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 (function () {
   'use strict';
 
   var STYLE_ID = 'hb-dark-overrides';
   var ROOT_CLASS = 'hb-dark';
 
-  // ---------------- 颜色工具 ----------------
+  
 
   var NAMED = {
     white: [255, 255, 255, 1], black: [0, 0, 0, 1],
@@ -128,9 +128,9 @@
     return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + Math.round(c.a * 1000) / 1000 + ')';
   }
 
-  // ---------------- 角色判定 ----------------
+  
 
-  // 属性名 -> 颜色角色
+  
   function roleOfProp(prop) {
     var p = prop.toLowerCase();
     if (p.slice(0, 2) === '--') return roleOfVar(p);
@@ -146,26 +146,26 @@
     return null;
   }
 
-  /**
-   * 自定义属性：先看名字，名字无信息时交给明度推断。
-   *
-   * 注意：片段必须整体匹配。早先写成 /color-/ 只能命中 --el-text-color-primary
-   * 这类「color 在中间」的名字，会漏掉 --publish-color 这种「color 在结尾」的，
-   * 于是落到明度推断，把浅色的前景令牌误判成表面色 —— 导航登录按钮的文字
-   * 因此变成与深色渐变底同色。用 (^|-) … ($|-) 修正。
-   */
+  
+
+
+
+
+
+
+
   function roleOfVar(name) {
     if (/shadow/.test(name)) return 'shadow';
     if (/(border|stroke|divider|outline)/.test(name) || /(^|-)line($|-)/.test(name)) return 'border';
     if (/(^|-)(text|color|fg|foreground|ink|label|title|link)($|-)/.test(name)) return 'fg';
     if (/(bg|background|surface|card|panel|fill|plain|white|mask|overlay|paper)/.test(name)) return 'bg';
-    return null; // 交给明度推断
+    return null; 
   }
 
-  // ---------------- 颜色映射 ----------------
+  
 
-  var SURFACE_MIN = 0.058;  // 最深表面（页面底）
-  var SURFACE_MAX = 0.145;  // 最亮表面（浮起卡片）
+  var SURFACE_MIN = 0.058;  
+  var SURFACE_MAX = 0.145;  
 
   function mapSurface(c) {
     var L = lum(c);
@@ -173,22 +173,22 @@
     var h = hsl[0], s = hsl[1];
 
     if (s <= 0.12) {
-      // 中性：保留「越亮越浮起」的层级，压到深色带
-      if (L < 185) return null;                     // 本来就是深色表面 -> 保留
-      var t = (L - 185) / 70;                       // 0..1
+      
+      if (L < 185) return null;                     
+      var t = (L - 185) / 70;                       
       var l = SURFACE_MIN + clamp(t, 0, 1) * (SURFACE_MAX - SURFACE_MIN);
       var rgb = hslToRgb(h, 0, l);
       return { r: rgb[0], g: rgb[1], b: rgb[2], a: c.a };
     }
 
-    // 有彩色
+    
     if (L > 150) {
-      // 明亮色块（淡色标签 / 亮色底）-> 深色同色相底，配浅色文字
-      var nl = 0.15 + (clamp(L, 150, 255) - 150) / 105 * 0.11;  // 0.15..0.26
+      
+      var nl = 0.15 + (clamp(L, 150, 255) - 150) / 105 * 0.11;  
       var rgb2 = hslToRgb(h, Math.min(s, 0.55), nl);
       return { r: rgb2[0], g: rgb2[1], b: rgb2[2], a: c.a };
     }
-    // 品牌主色（饱和且不太亮）与深彩 -> 保留
+    
     return null;
   }
 
@@ -199,16 +199,16 @@
     var h = hsl[0], s = hsl[1], l = hsl[2];
 
     if (s > 0.25) {
-      // 彩色文字：够亮就保留，太暗则提亮以在深底上可读
+      
       if (L > 150) return null;
       var nl = clamp(Math.max(l, 0.62), 0.62, 0.80);
       var rgb = hslToRgb(h, Math.min(s, 0.8), nl);
       return { r: rgb[0], g: rgb[1], b: rgb[2], a: c.a };
     }
 
-    // 中性文字：整体压到浅色带（单调，阈值处连续）
+    
     if (L >= 190) return null;
-    var t = 190 + (190 - L) / 190 * 55;             // L=0 -> 245, L=190 -> 190
+    var t = 190 + (190 - L) / 190 * 55;             
     var v = Math.round(clamp(t, 150, 245));
     return { r: v, g: v, b: Math.round(clamp(v * 1.012, 0, 255)), a: c.a };
   }
@@ -224,25 +224,25 @@
       var rgb = hslToRgb(hsl[0], Math.min(s, 0.5), 0.45);
       return { r: rgb[0], g: rgb[1], b: rgb[2], a: c.a };
     }
-    if (L < 170) return null;                        // 深边框保留
-    // 浅边框 -> 半透明白，亮度越高越弱
+    if (L < 170) return null;                        
+    
     var alpha = clamp(0.06 + (255 - L) / 255 * 0.34, 0.06, 0.30);
     return { r: 255, g: 255, b: 255, a: alpha };
   }
 
   function mapColor(role, c) {
     if (!c) return null;
-    if (role === 'shadow') return null;              // 深色阴影在深底上无害，不处理
+    if (role === 'shadow') return null;              
     if (role === 'bg') return mapSurface(c);
     if (role === 'border') return mapBorder(c);
     return mapText(c);
   }
 
-  // ---------------- 值改写 ----------------
+  
 
   var COLOR_TOKEN = /#[0-9a-fA-F]{3,8}\b|rgba?\([^)]*\)|hsla?\([^)]*\)|\b(?:white|black|whitesmoke|gainsboro|lightgray|lightgrey|silver|darkgray|darkgrey|dimgray|dimgrey|gray|grey|orange|gold|pink|tomato|crimson|seagreen|teal|navy|purple|maroon|olive|lime|aqua|cyan|fuchsia|magenta|red|green|blue|yellow)\b/gi;
 
-  /** 判断一个自定义属性的值是否为「纯颜色」（不是 var()/渐变/triplet） */
+  
   function isPlainColorValue(value) {
     if (value.indexOf('var(') >= 0) return null;
     if (value.indexOf('gradient') >= 0) return null;
@@ -251,21 +251,21 @@
     return c;
   }
 
-  /**
-   * 改写一条声明的值。返回 null 表示无需改写。
-   */
+  
+
+
   function transformDeclaration(prop, value, isCustomProp) {
     var role = roleOfProp(prop);
     if (role === null && !isCustomProp) return null;
     if (role === 'shadow') return null;
 
-    // 自定义属性：值为纯颜色时才处理；角色先看名字，再看明度
+    
     if (isCustomProp) {
       var only = isPlainColorValue(value);
       if (!only) return null;
       var r = role;
       if (!r) {
-        // 明度推断：偏亮 -> 表面，偏暗 -> 文字
+        
         r = lum(only) > 170 ? 'bg' : 'fg';
       }
       if (r === 'shadow') return null;
@@ -274,7 +274,7 @@
       return fmt(mapped0, true);
     }
 
-    // 普通属性：逐 token 改写，保留非颜色部分（url() 等）
+    
     var changed = false;
     var out = String(value).replace(COLOR_TOKEN, function (tok) {
       var c = parseColor(tok);
@@ -287,10 +287,10 @@
     return changed ? out : null;
   }
 
-  // ---------------- 规则遍历 ----------------
+  
 
   var stats = { sheets: 0, scanned: 0, changed: 0, emitted: 0, keyframes: 0, errors: 0 };
-  var out = [];      // 生成的覆盖规则
+  var out = [];      
   var keyframeJobs = [];
 
   function walk(rules, mediaStack) {
@@ -298,7 +298,7 @@
       var rule = rules[i];
       stats.scanned++;
 
-      // 媒体/支持条件：保留条件包裹
+      
       if (rule.cssRules && !rule.selectorText) {
         var cond = null;
         var type = rule.constructor && rule.constructor.name;
@@ -310,7 +310,7 @@
         continue;
       }
 
-      // 关键帧：颜色在 @keyframes 内，无法用覆盖规则命中，需就地改写
+      
       if (rule.keyText && rule.style) { keyframeJobs.push(rule); continue; }
       if (!rule.selectorText || !rule.style) continue;
 
@@ -359,7 +359,7 @@
     }
   }
 
-  // ---------------- 内联样式（JS 写入，CSS 规则无法覆盖）----------------
+  
 
   var INLINE_PROPS = ['color', 'background-color', 'background-image', 'border-color',
     'border-top-color', 'border-right-color', 'border-bottom-color', 'border-left-color'];
@@ -427,7 +427,7 @@
     inlineQueue = new Set();
   }
 
-  // ---------------- 附加：EP 暗色变量 + 基础层 ----------------
+  
 
   var BASE_CSS = [
     'html.' + ROOT_CLASS + ' { color-scheme: dark; }',
@@ -439,7 +439,7 @@
     'html.' + ROOT_CLASS + ' ::-webkit-scrollbar-track { background: #0e1116; }',
     'html.' + ROOT_CLASS + ' ::-webkit-scrollbar-thumb { background: #333b45; border-radius: 4px; }',
     'html.' + ROOT_CLASS + ' ::-webkit-scrollbar-thumb:hover { background: #4a5360; }',
-    // Element Plus 暗色令牌（站点未内置 EP 暗色主题）
+    
     'html.' + ROOT_CLASS + ' {',
     '  --el-color-white: #1b1f24;',
     '  --el-color-black: #e6e8eb;',
@@ -467,18 +467,18 @@
     '}',
   ].join('\n');
 
-  // ---------------- 对外接口 ----------------
+  
 
-  // ---------------- 例外层（人工审计，刻意保持很小）----------------
-  //
-  // 通用引擎处理「表面/文字/边框」的按角色映射，但有一类东西它原理上判不了：
-  // 站点用「深底 + 浅字」表达强调（实心 CTA）。深色主题里强调应当是
-  // 「浅底 + 深字」，可是引擎只看单条声明，无法知道某个深色表面是
-  // 刻意的反转填充，还是压在图片上的角标遮罩（后者不该反转）。
-  //
-  // 实测全站这类失效点只有一个：导航的登录/发布按钮（.nav 变体）。
-  // 站点自己的 .nav--home 变体本来就是「白底深字」，引擎已能正确反转。
-  // 因此这里只补这一处，避免不可预测的全局反转。
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   var EXCEPTIONS_CSS = [
     '/* 导航主 CTA：浅色下为「深底浅字」，深色下反转为「浅底深字」 */',
     'html.' + ROOT_CLASS + ' .nav {',
@@ -505,16 +505,16 @@
       styleEl.id = STYLE_ID;
       styleEl.setAttribute('data-hb-own', '');
     }
-    // 文本没变就不重设，避免无谓的重排
+    
     if (styleEl.textContent !== css) styleEl.textContent = css;
 
-    // 关键：始终排在所有站点样式表之后
+    
     var anchor = document.body || document.documentElement;
     if (styleEl.parentNode !== anchor || anchor.lastElementChild !== styleEl) {
       anchor.appendChild(styleEl);
     }
 
-    // 关键帧就地改写（覆盖表无法命中 @keyframes 内部）
+    
     var kfChanged = 0;
     for (var i = 0; i < keyframeJobs.length; i++) {
       var style = keyframeJobs[i].style;

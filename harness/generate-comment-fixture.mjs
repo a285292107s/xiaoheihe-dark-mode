@@ -364,3 +364,4 @@ console.log(`  评论子树 ${kb(Buffer.byteLength(subtree))}（一级 19 / 楼�
 console.log(`  站点 CSS 子集 ${kb(Buffer.byteLength(css))}`);
 console.log(`  tree payload ${kb(Buffer.byteLength(JSON.stringify(payload)))}（${flat} 条实体，${Object.keys(replyTargets).length} 条有 reply 关系）`);
 console.log(`  出现的 emoji 类：${[...emojiClasses].join(', ') || '（无）'}`);
+
