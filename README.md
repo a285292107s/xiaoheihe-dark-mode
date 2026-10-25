@@ -65,8 +65,9 @@ https://raw.githubusercontent.com/a285292107s/xiaoheihe-dark-mode/main/dist/xiao
 | 倒数第二个（面板） | 精简模式：顶部导航只留 logo（点 logo 进社区）、隐藏社区页 / 帖子详情页右侧栏 | `localStorage` 的 `heybox-declutter`（`'1'` / `'0'`）。**未设置过时默认开启** |
 | 最上面那个（气泡） | 评论区增强：楼中楼卡片化 + 评论免打扰 | `localStorage` 的 `heybox-comment-cards` 与 `heybox-reply-btn`（`'1'` / `'0'`），一次点击两个键一起读写。**未设置过时默认开启** |
 
-三个按钮的图标画的都是**当前**状态（有没有右侧栏 / 气泡有没有被划掉 / 现在是深是浅），
-动作名都在 `title` / `aria-label` 里写全了。
+三个按钮的图标与悬停时浮出的文字画的都是**当前**状态（现在是深是浅 / 右栏藏没藏 / 评论增强开没开，
+依次是「深色模式 / 浅色模式」「隐藏右栏 / 显示右栏」「评论增强 / 默认评论」）；
+动作名写在 `title` 里，`aria-label` 是「当前状态，点击动作」。
 
 **复制解锁不在按钮列里。** 偏好记在 `localStorage` 的 `heybox-copy`（`'1'` / `'0'`），
 应急/调试可用控制台 `__hbSetCopy(false)`（立即生效并记忆）。

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         小黑盒深色模式
 // @namespace    xiaoheihe-dark-mode
-// @version      0.8.5
+// @version      0.8.6
 // @author       油猴脚本-小黑盒页面优化
 // @description  为小黑盒网页版（xiaoheihe.cn）提供深色模式、页面精简、复制解锁、一级评论免打扰与楼中楼卡片化：按角色重映射站点 CSS 规则（含伪元素与交互态），可把顶部导航精简为只剩 logo（点 logo 等同点「社区」）并隐藏社区页 / 帖子详情页右侧栏，可在站点回复编辑器夺焦毁掉选区、剪贴板数据被清空时把选中内容救回剪贴板，可把一级评论「回复此楼」的触发从「点整行」收进发言内容右下方一枚纸飞机 —— 点正文只选中、不弹框；楼中楼每条回复则排成卡片（第一行头像/用户名/回复对象/时间，第二行起正文），回复入口是卡片末尾的纸飞机图标，点它即展开站点回复框并引用这一条。深色、精简、评论区增强（免打扰与卡片化一起开关）三项各自记忆偏好、可随时切换；复制解锁常驻开启，没有开关按钮。
 // @license      MIT
@@ -2425,7 +2425,7 @@ html.${ROOT_CLASS$1} {
 		"M8.5 12h4.5"
 	];
 	var ICON_BUBBLE_OFF = [...ICON_BUBBLE, "M3.8 20.2 20.2 3.8"];
-	function createControl(dock, id, label) {
+	function createControl(dock, id) {
 		const button = document.createElement("button");
 		button.id = id;
 		button.className = "hbd-btn";
@@ -2434,20 +2434,21 @@ html.${ROOT_CLASS$1} {
 		iconSlot.className = "hbd-icon";
 		const labelSlot = document.createElement("span");
 		labelSlot.className = "hbd-label";
-		labelSlot.textContent = label;
 		labelSlot.setAttribute("aria-hidden", "true");
 		button.append(iconSlot, labelSlot);
 		dock.appendChild(button);
 		return {
 			button,
-			iconSlot
+			iconSlot,
+			labelSlot
 		};
 	}
-	function paint(control, paths, circle, label, pressed) {
-		control.button.title = label;
-		control.button.setAttribute("aria-label", label);
+	function paint(control, paths, circle, state, action, pressed) {
+		control.button.title = action;
+		control.button.setAttribute("aria-label", `${state}，点击${action}`);
 		control.button.setAttribute("aria-pressed", pressed ? "true" : "false");
 		control.iconSlot.replaceChildren(buildSvg(paths, circle));
+		control.labelSlot.textContent = state;
 	}
 	var SUN_CORE = {
 		cx: 12,
@@ -2455,13 +2456,13 @@ html.${ROOT_CLASS$1} {
 		r: 4
 	};
 	function paintDark(control, dark) {
-		paint(control, dark ? ICON_MOON : ICON_SUN, dark ? void 0 : SUN_CORE, dark ? "切换到浅色模式" : "切换到深色模式", dark);
+		paint(control, dark ? ICON_MOON : ICON_SUN, dark ? void 0 : SUN_CORE, dark ? "深色模式" : "浅色模式", dark ? "切换到浅色模式" : "切换到深色模式", dark);
 	}
 	function paintDeclutter(control, on) {
-		paint(control, on ? ICON_PANEL_FULL : ICON_PANEL_WITH_RAIL, void 0, on ? "关闭精简模式（恢复首页入口与右侧栏）" : "开启精简模式（隐藏首页入口与右侧栏）", on);
+		paint(control, on ? ICON_PANEL_FULL : ICON_PANEL_WITH_RAIL, void 0, on ? "隐藏右栏" : "显示右栏", on ? "恢复首页入口与右侧栏" : "隐藏首页入口与右侧栏", on);
 	}
 	function paintCommentEnhance(control, on) {
-		paint(control, on ? ICON_BUBBLE : ICON_BUBBLE_OFF, void 0, on ? "关闭评论区增强（恢复一行式楼中楼，点正文重新弹回复框）" : "开启评论区增强（楼中楼卡片化 + 点正文不弹回复框）", on);
+		paint(control, on ? ICON_BUBBLE : ICON_BUBBLE_OFF, void 0, on ? "评论增强" : "默认评论", on ? "恢复默认评论" : "开启评论增强", on);
 	}
 	function mountControls() {
 		if (document.getElementById(HOST_ID)) return;
@@ -2477,9 +2478,9 @@ html.${ROOT_CLASS$1} {
 		dock.setAttribute("role", "group");
 		dock.setAttribute("aria-label", "页面显示选项");
 		shadow.appendChild(dock);
-		const darkControl = createControl(dock, DARK_BUTTON_ID, "深色模式");
-		const declutterControl = createControl(dock, DECLUTTER_BUTTON_ID, "精简模式");
-		const commentControl = createControl(dock, COMMENT_BUTTON_ID, "评论增强");
+		const darkControl = createControl(dock, DARK_BUTTON_ID);
+		const declutterControl = createControl(dock, DECLUTTER_BUTTON_ID);
+		const commentControl = createControl(dock, COMMENT_BUTTON_ID);
 		const commentEnhanceOn = () => isReplyBtnEnabled() && isCommentCardsEnabled();
 		darkControl.button.addEventListener("click", () => applyDark(!isDarkEnabled()));
 		declutterControl.button.addEventListener("click", () => applyDeclutter(!isDeclutterEnabled()));

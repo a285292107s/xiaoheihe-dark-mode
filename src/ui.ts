@@ -36,9 +36,10 @@ const ICON_BUBBLE_OFF = [...ICON_BUBBLE, 'M3.8 20.2 20.2 3.8'];
 interface Control {
   button: HTMLButtonElement;
   iconSlot: HTMLElement;
+  labelSlot: HTMLElement;
 }
 
-function createControl(dock: HTMLElement, id: string, label: string): Control {
+function createControl(dock: HTMLElement, id: string): Control {
   const button = document.createElement('button');
   button.id = id;
   button.className = 'hbd-btn';
@@ -49,31 +50,39 @@ function createControl(dock: HTMLElement, id: string, label: string): Control {
 
   const labelSlot = document.createElement('span');
   labelSlot.className = 'hbd-label';
-  labelSlot.textContent = label;
   labelSlot.setAttribute('aria-hidden', 'true');
 
   button.append(iconSlot, labelSlot);
   dock.appendChild(button);
-  return { button, iconSlot };
+  return { button, iconSlot, labelSlot };
 }
 
 function paint(
   control: Control,
   paths: readonly string[],
   circle: { cx: number; cy: number; r: number } | undefined,
-  label: string,
+  state: string,
+  action: string,
   pressed: boolean,
 ): void {
-  control.button.title = label;
-  control.button.setAttribute('aria-label', label);
+  control.button.title = action;
+  control.button.setAttribute('aria-label', `${state}，点击${action}`);
   control.button.setAttribute('aria-pressed', pressed ? 'true' : 'false');
   control.iconSlot.replaceChildren(buildSvg(paths, circle));
+  control.labelSlot.textContent = state;
 }
 
 const SUN_CORE = { cx: 12, cy: 12, r: 4 };
 
 function paintDark(control: Control, dark: boolean): void {
-  paint(control, dark ? ICON_MOON : ICON_SUN, dark ? undefined : SUN_CORE, dark ? '切换到浅色模式' : '切换到深色模式', dark);
+  paint(
+    control,
+    dark ? ICON_MOON : ICON_SUN,
+    dark ? undefined : SUN_CORE,
+    dark ? '深色模式' : '浅色模式',
+    dark ? '切换到浅色模式' : '切换到深色模式',
+    dark,
+  );
 }
 
 function paintDeclutter(control: Control, on: boolean): void {
@@ -81,7 +90,8 @@ function paintDeclutter(control: Control, on: boolean): void {
     control,
     on ? ICON_PANEL_FULL : ICON_PANEL_WITH_RAIL,
     undefined,
-    on ? '关闭精简模式（恢复首页入口与右侧栏）' : '开启精简模式（隐藏首页入口与右侧栏）',
+    on ? '隐藏右栏' : '显示右栏',
+    on ? '恢复首页入口与右侧栏' : '隐藏首页入口与右侧栏',
     on,
   );
 }
@@ -91,7 +101,8 @@ function paintCommentEnhance(control: Control, on: boolean): void {
     control,
     on ? ICON_BUBBLE : ICON_BUBBLE_OFF,
     undefined,
-    on ? '关闭评论区增强（恢复一行式楼中楼，点正文重新弹回复框）' : '开启评论区增强（楼中楼卡片化 + 点正文不弹回复框）',
+    on ? '评论增强' : '默认评论',
+    on ? '恢复默认评论' : '开启评论增强',
     on,
   );
 }
@@ -114,9 +125,9 @@ export function mountControls(): void {
   dock.setAttribute('aria-label', '页面显示选项');
   shadow.appendChild(dock);
 
-  const darkControl = createControl(dock, DARK_BUTTON_ID, '深色模式');
-  const declutterControl = createControl(dock, DECLUTTER_BUTTON_ID, '精简模式');
-  const commentControl = createControl(dock, COMMENT_BUTTON_ID, '评论增强');
+  const darkControl = createControl(dock, DARK_BUTTON_ID);
+  const declutterControl = createControl(dock, DECLUTTER_BUTTON_ID);
+  const commentControl = createControl(dock, COMMENT_BUTTON_ID);
 
   const commentEnhanceOn = (): boolean => isReplyBtnEnabled() && isCommentCardsEnabled();
 
