@@ -198,7 +198,7 @@ function buildReplyTo(row: HTMLElement): HTMLElement | null {
   } else {
     kind = replyKindOf(row, meta);
     if (kind === 'root') {
-      label = '回复楼主';
+      label = '回复层主';
     } else if (kind === 'other') {
       const name = normalizeText(meta.replyToName);
       if (!name) return null;

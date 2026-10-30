@@ -199,6 +199,7 @@ html.hb-comment-cards [data-hb-tc] > .hb-card-reply {
   position: absolute;
   right: var(--hb-ui-pad-x);
   bottom: var(--hb-ui-gap-block);
+  z-index: 11;
 }
 
 html.hb-comment-cards [data-hb-tc] > .hb-tc__avatar img {

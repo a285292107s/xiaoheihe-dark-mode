@@ -204,6 +204,12 @@ node output/quality/live-seams.mjs https://www.xiaoheihe.cn/app/bbs/link/1949144
 它同时量浅色与深色两态的父子底色，输出"浅色同色、深色分色"的接缝清单；`total flagged: 0` 才算通过。
 截图与证据落在 `output/quality/live/`。
 
+### 楼中楼纸飞机的可点击层级
+
+站点给评论内所有后代 `* { z-index: 10 }`，卡片正文的 flex `order`（9）又排在纸飞机（3）之后，
+同层级下正文会盖住右下角的纸飞机：图标画在那里，点击却落在正文段落上。纸飞机固定用
+`z-index: 11` 压过正文；调回 10 或更低会复发，而且不报错，只是静默点不动。
+
 ### 目录
 
 ```
